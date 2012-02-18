@@ -5,7 +5,7 @@
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  *
- * Version : 1.2.1
+ * Version : 2.0.0
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
@@ -124,7 +124,6 @@
 		var pages = new Array();
 		
 		// Page Functions
-		
 			
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// INITIAL FUNCTIONS
@@ -211,12 +210,12 @@
 			}
 		
 			//save structure elems to vars
-			pN     = target.find('.b-pN');
-			p0     = target.find('.b-p0');
-			p1     = target.find('.b-p1');
-			p2     = target.find('.b-p2');
-			p3     = target.find('.b-p3');
-			p4     = target.find('.b-p4');
+			pN = target.find('.b-pN');
+			p0 = target.find('.b-p0');
+			p1 = target.find('.b-p1');
+			p2 = target.find('.b-p2');
+			p3 = target.find('.b-p3');
+			p4 = target.find('.b-p4');
 			
 			/*if(options.shadows){
 				target.find('.b-shadow-f, .b-shadow-b').remove();		
@@ -226,14 +225,14 @@
 		},
 		resetCSS = function(){
 			
-			$('.b-page').css({'width':options.pWidth, 'height':options.pHeight});
+			$('.b-page').css({'padding':options.pagePadding, 'width':options.pWidth-(2*options.pagePadding), 'height':options.pHeight-(2*options.pagePadding)});
 
-			pN.css({'left':0, '-webkit-transform': 'rotateY(0deg)'});
-			p3.css({'left':0, '-webkit-transform': 'rotateY(180deg)'});
-			p1.css({'left':0, '-webkit-transform': 'rotateY(0deg)'});			
-			p2.css({'left':options.pWidth, '-webkit-transform': 'rotateY(0deg)'});
-			p0.css({'left':options.pWidth, '-webkit-transform': 'rotateY(180deg)'});
-			p4.css({'left':options.pWidth, '-webkit-transform': 'rotateY(0deg)'});
+			pN.css({'left':0, '-webkit-transform': 'rotateY(-1deg)'});
+			p0.css({'left':options.pWidth, '-webkit-transform': 'rotateY(-181deg)'});
+			p1.css({'left':0, '-webkit-transform': 'rotateY(0deg)'});
+			p2.css({'left':options.pWidth, '-webkit-transform': 'rotateY(0deg)'});			
+			p3.css({'left':0, '-webkit-transform': 'rotateY(181deg)'});			
+			p4.css({'left':options.pWidth, '-webkit-transform': 'rotateY(1deg)'});
 						
 			//update css
 			/*target.find('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({'filter':'','zoom':''});
@@ -300,16 +299,10 @@
 				if(num == options.pTotal-2){updateCtrls();}
 				updateHash(options.curr+1, options);
 				initAnim(diff, true, sF);
-				
-				//p2.animate({'-webkit-transform' : "rotateY(0deg)"});
-				//p3.animate({'-webkit-transform' : "rotateY(0deg)"});	
-				var angleFront = 0, angleBack = 181;
-				setInterval(function() {
-				    angleFront--; // degree adjustment each interval
-					angleBack--;
-				    p2.css({'-webkit-transform': "rotateY(" + angleFront + "deg)"});
-				    p3.css({'-webkit-transform': "rotateY(" + angleBack + "deg)"});
-				  },10);
+
+				p2.transition({rotateY: '-181deg'}, options.speed, 'snap');
+				p3.transition({rotateY: '0deg'}, options.speed, 'snap');
+				p4.transition({rotateY: '0deg'}, options.speed, 'snap', function(){updateAfter()});
 					
 			/*
 				//hide p2 as p3 moves across it
@@ -338,6 +331,10 @@
 				if(num == 0){updateCtrls();}
 				updateHash(options.curr+1, options);
 				initAnim(diff, false, sB);
+				
+				pN.transition({rotateY: '0deg'}, options.speed, 'snap');
+				p0.transition({rotateY: '0deg'}, options.speed, 'snap');
+				p1.transition({rotateY: '-181deg'}, options.speed, 'snap', function(){updateAfter()});
 			
 			/*
 				//hide p1 as p0 moves across it
@@ -556,12 +553,13 @@
 				}
 			
 				//save shadow widths for anim
-				if(options.shadows){
+				/*if(options.shadows){
 					options.shadowTopFwdWidth  = '-'+options.shadowTopFwdWidth+'px';
 					options.shadowTopBackWidth = '-'+options.shadowTopBackWidth+'px';
-				}
+				}*/
 			}
 		
+		    /*
 			//setup menu
 			if(options.menu){
 				menu = $(options.menu).addClass('b-menu');
@@ -676,7 +674,8 @@
 					});
 				}
 			}	
-		
+			*/
+			
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// CONTROLS
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -747,6 +746,7 @@
 				}
 			}
 		
+			/*
 			//add corner-peels
 			if(options.peels){
 				peelP = $('<div class="b-peel b-peel-prev" title="Previous Page"><img src="'+options.peelPrevIMG+'" alt="" /></div>').appendTo(ctrls);
@@ -858,7 +858,8 @@
 				});
 			
 			}
-		
+			*/
+			
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 			//save all "b-prev" and "b-next" controls
@@ -1234,7 +1235,7 @@
 		easeIn:             'easeInQuad',                    // easing method for first half of transition
 		easeOut:            'easeOutQuad',                   // easing method for second half of transition
 	
-		closed:             true,                           // start with the book "closed", will add empty pages to beginning and end of book
+		closed:             false,                           // start with the book "closed", will add empty pages to beginning and end of book
 		closedFrontTitle:   null,                            // used with "closed", "menu" and "pageSelector", determines title of blank starting page
 		closedFrontChapter: null,                            // used with "closed", "menu" and "chapterSelector", determines chapter name of blank starting page
 		closedBackTitle:    null,                            // used with "closed", "menu" and "pageSelector", determines chapter name of blank ending page
@@ -1243,10 +1244,10 @@
 		autoCenter:         false,                           // used with "closed", makes book position in center of container when closed
 
 		pagePadding:        10,                              // padding for each page wrapper
-		pageNumbers:        true,                           // display page numbers on each page
+		pageNumbers:        true,                            // display page numbers on each page
 		pageBorder:         1,
 	
-		manual:             true,                            // enables manual page turning, requires jQuery UI to function
+		manual:             false,                           // enables manual page turning, requires jQuery UI to function
 	
 		peels:              false,
 		peelSize:           50,	

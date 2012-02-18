@@ -9,6 +9,17 @@
 	.booklet .b-p2  {}    
 	.booklet .b-p3  {}
 	.booklet .b-p4  {}
+		
+		
+		.booklet {-webkit-perspective: 800; -webkit-perspective-origin: 50% 50%; -webkit-transform-style: preserve-3d; -webkit-transition: -webkit-transform 2s linear;}
+		.booklet .b-page {}
+		.booklet .b-pN  {-webkit-transform-origin: 100% 0;}
+		.booklet .b-p0  {-webkit-transform-origin: 0 0;}
+		.booklet .b-p1  {-webkit-transform-origin: 100% 0;}
+		.booklet .b-p2  {-webkit-transform-origin: 0 0;}    
+		.booklet .b-p3  {-webkit-transform-origin: 100% 0;}
+		.booklet .b-p4  {-webkit-transform-origin: 0 0;}
+	
 	
 	.booklet .b-load  {}
 		
@@ -66,6 +77,7 @@
 	
 /* @z-index fix (needed for older IE browsers)
 ----------------------------------------*/
+
 	body              {z-index:0;}
     .b-menu           {z-index:100;}
     .b-selector       {z-index:100;}
@@ -79,6 +91,7 @@
     .b-prev           {z-index:40;}
     .b-next           {z-index:40;}
     .b-counter        {z-index:40;}
+
 	
 /* @Menu Items
 ----------------------------------------*/
