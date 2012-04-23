@@ -46,7 +46,7 @@
                         num-= 1;
                     }
 
-                    if(obj.options.direction = 'RTL'){
+                    if(obj.options.direction == 'RTL'){
                         num = Math.abs(num - obj.options.pageTotal) - 2;
                     }
 
@@ -162,6 +162,8 @@
 
 				//save original number of pages
                 target.data('total', target.children().length);
+				
+				options.currentIndex = 0;
 
                 initPages();
 				initOptions();
@@ -196,7 +198,6 @@
             // set total page count
             options.pageTotal  = target.children().length;
 
-            options.currentIndex = 0;
             options.startingPageNumber = 0;
 
             if(options.direction == directions.rightToLeft){
@@ -1296,7 +1297,7 @@
                 if(newIndex % 2 != 0) {
                     newIndex-= 1;
                 }
-                if(options.direction = directions.rightToLeft){
+                if(options.direction == directions.rightToLeft){
                     newIndex = Math.abs(newIndex - options.pageTotal) - 2;
                 }
                 goToPage(newIndex)
@@ -1337,10 +1338,10 @@
 		tabs:                 false,                           // adds tabs along the top of the pages
 		tabWidth:             60,                              // set the width of the tabs
 		tabHeight:            20,                              // set the height of the tabs
-        nextControlText:      'Next',
-        previousControlText:  'Previous',
-        nextControlTitle:     'Next Page',
-        previousControlTitle: 'Previous Page',
+        nextControlText:      'Next',                          // inline text for all 'next' controls
+        previousControlText:  'Previous',                      // inline text for all 'previous' controls
+        nextControlTitle:     'Next Page',                     // text for title attributes of all 'next' controls
+        previousControlTitle: 'Previous Page',                 // text for title attributes of all 'previous' controls
         arrows:               false,                           // adds arrow overlays over the book edges
 		arrowsHide:           false,                           // auto hides arrows when controls are not hovered
 		cursor:               'pointer',                       // cursor css setting for side bar areas
