@@ -13,11 +13,11 @@ and the booklet JS and CSS files.
 
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js" type="text/javascript"></script>
-	<script src="/code/booklet/src/jquery.easing.1.3.js" type="text/javascript"></script>
-	<script src="/code/booklet/src/jquery.booklet.1.4.0.js" type="text/javascript"></script>
-	<link href="/code/booklet/src/jquery.booklet.1.4.0.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
+	<script src="booklet/jquery.easing.1.3.js" type="text/javascript"></script>
+	<script src="booklet/jquery.booklet.1.4.0.js" type="text/javascript"></script>
+	<link href="booklet/jquery.booklet.1.4.0.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
 
-The target that will become your booklet should simply be a container, with multiple children. All first level children will become
+The target that will become your booklet should simply be a container with multiple children. All first level children will become
 pages inside of the booklet.
 
 	<div id="mybook">
@@ -80,6 +80,7 @@ Each event returns a data object which contains data related to the event. Commo
 Only available for bookletcreate, bookletstart and bookletchange events:
 
 * data.pages - an array of elements, the two currently visible pages
+
 Only available for bookletadd and bookletremove events:
 
 * data.page - element, the page that was either just added or just removed
@@ -115,7 +116,7 @@ To see all available methods, see the [Documentation](http://www.builtbywill.com
 
 ## Style
 
-Once the booklet is created, the basic generated structure and CSS will appear below. The basic top level classes are bolded.
+Once the booklet is created, the basic generated structure and CSS will appear below.
 
 If more customization is desired, all generated classes are visible in the current jQuery Booklet stylesheet.
 
