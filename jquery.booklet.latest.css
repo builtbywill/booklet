@@ -10,7 +10,7 @@
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
  */
-	.booklet           {width:800px; height:600px; position:relative; /*background:#fff;*/ margin:0 auto 10px;}
+	.booklet          {width:800px; height:600px; position:relative; /*background:#fff;*/ margin:0 auto 10px; overflow:visible !important;}
 	.booklet .b-page  {left:0; top:0; position:absolute; overflow:hidden; padding:0;}
 	
 	.booklet .b-pN  {}
