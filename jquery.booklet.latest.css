@@ -5,12 +5,12 @@
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  *
- * Version : 1.1.1
+ * Version : 1.2.0
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
  */
-	.booklet          {width:800px; height:600px; position:relative; /*background:#fff;*/ margin:0 auto 10px; overflow:visible !important;}
+	.booklet           {width:800px; height:600px; position:relative; /*background:#fff;*/ margin:0 auto 10px; overflow:visible !important;}
 	.booklet .b-page  {left:0; top:0; position:absolute; overflow:hidden; padding:0;}
 	
 	.booklet .b-pN  {}
@@ -20,7 +20,7 @@
 	.booklet .b-p3  {}
 	.booklet .b-p4  {}
 	
-	/*.booklet .b-load  {display:none;}*/
+	.booklet .b-load  {}
    
    	/* Page Wrappers */
 	.booklet .b-wrap       {top:0; position:absolute;}
@@ -50,6 +50,10 @@
 	
 	.booklet .b-p0 {background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:100% 10px;}
 	.booklet .b-p3 {background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:0 10px;}
+	
+   	/* Overlay Controls */
+	.booklet .b-grab     {cursor: url(images/openhand.cur), default;}
+	.booklet .b-grabbing {cursor: url(images/closedhand.cur), default;}
 	
    	/* Overlay Controls */
 	.booklet .b-overlay      {top:0; position:absolute; height:100%; width:50%;}

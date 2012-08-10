@@ -5,7 +5,7 @@
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  *
- * Version : 1.1.1
+ * Version : 1.2.0
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
@@ -80,7 +80,8 @@ function booklet(target, options, id){
 	var self, opts, b, src,
 		hash, i, j, p, diff, busy, init, rhover, lhover, h, a, playing,
 		titles = new Array(), chapters = new Array(),
-		pN, p0, p1, p2, p3, p4, pNwrap, p0wrap, p1wrap, p2wrap, p3wrap, p4wrap, wraps,
+		pN, p0, p1, p2, p3, p4, pNwrap, p0wrap, p1wrap, p2wrap, p3wrap, p4wrap, wraps, sF, sB,
+		p3drag, p0drag, temp, relativeX,
 		overlaysB, overlayN, overlayP, tabs, tabN, tabP, arrows, arrowN, arrowP, next, prev, ctrlsN, ctrlsP,
 		menu, chapter, dd, ddUL, ddH, ddLI, ddA, ddT, ddC, ddCUL, ddCH, ddCLI, ddCA, ddCT,
 		empty = '<div class="b-page-empty" title="" rel=""></div>', blank = '<div class="b-page-blank" title="" rel=""></div>'
@@ -311,7 +312,7 @@ function booklet(target, options, id){
 				updatePager();
 				updateCtrls();
 				updateHash(opts.curr+1, opts);
-				initAnim(diff, true);
+				initAnim(diff, true, sF);
 				
 				//hide p2 as p3 moves across it
 				if(opts.closed && opts.autoCenter && num-diff == 0){
@@ -320,12 +321,21 @@ function booklet(target, options, id){
 				}else{
 					p2.stop().animate({width:0}, opts.speedH, opts.easeIn);
 				}
+				
 				//animate p3 from right to left (left: movement, width: reveal slide, paddingLeft: shadow underneath)
 				//call setuppages at end of animation to reset pages
-				p3.stop().animate({left:opts.pWidthH, width:opts.pWidthH, paddingLeft: opts.shadowBtmWidth}, opts.speedH, opts.easeIn)
-				         .animate({left:0, width:opts.pWidth, paddingLeft:0}, opts.speedH);
+				
+				//animation if dragging forward
+				if(p3drag){
+					p3.stop().animate({left:opts.pWidth/4, width:opts.pWidth*.75, paddingLeft: opts.shadowBtmWidth}, opts.speedH, opts.easeIn)
+					         .animate({left:0, width:opts.pWidth, paddingLeft:0}, opts.speedH);
+				}else{
+					p3.stop().animate({left:opts.pWidthH, width:opts.pWidthH, paddingLeft: opts.shadowBtmWidth}, opts.speedH, opts.easeIn)
+					         .animate({left:0, width:opts.pWidth, paddingLeft:0}, opts.speedH);			
+				}
 				p3wrap.animate({left:opts.shadowBtmWidth}, opts.speedH, opts.easeIn)
-					  .animate({left:0}, opts.speedH, opts.easeOut, function(){updateAfter()});
+					  .animate({left:0}, opts.speedH, opts.easeOut, function(){updateAfter()});				
+			
 			//moving backward (decreasing number)
 			}else if(num < opts.curr && num < opts.pTotal && num >= 0 && !busy){
 				busy = true;
@@ -335,25 +345,44 @@ function booklet(target, options, id){
 				updatePager();
 				updateCtrls();
 				updateHash(opts.curr+1, opts);
-				initAnim(diff, false);
+				initAnim(diff, false, sB);
 				
-				//hide p1 as p0 moves across it
-				p1.animate({left:opts.pWidth, width:0}, opts.speed, opts.easing);
-				p1wrap.animate({left:opts.pWidthN}, opts.speed, opts.easing);
-				
-				//animate p0 from left to right (right: movement, width: reveal slide, paddingLeft: shadow underneath)
-				if(opts.closed && opts.autoCenter && opts.curr == 0){
-					p0.animate({left:opts.pWidthH, width:opts.pWidthH}, opts.speedH, opts.easeIn)
-					  .animate({left:0, width:opts.pWidth}, opts.speedH, opts.easeOut);
-					p2.stop().animate({left:0}, opts.speed, opts.easing);
+				//animation if dragging backwards
+				if(p0drag){
+					//hide p1 as p0 moves across it
+					p1.animate({left:opts.pWidth, width:0}, opts.speed, opts.easing);
+					p1wrap.animate({left:opts.pWidthN}, opts.speed, opts.easing);
+					
+					//animate p0 from left to right (right: movement, width: reveal slide, paddingLeft: shadow underneath)
+					if(opts.closed && opts.autoCenter && opts.curr == 0){
+						p0.animate({left:opts.pWidthH, width:opts.pWidthH}, opts.speedH, opts.easeIn)
+						  .animate({left:0, width:opts.pWidth}, opts.speedH, opts.easeOut);
+						p2.stop().animate({left:0}, opts.speed, opts.easing);
+					}else{
+						p0.animate({left:opts.pWidth, width:opts.pWidth}, opts.speed, opts.easing);
+					}
+					//animate .wrapper content with p0 to keep content right aligned throughout
+					//call setuppages at end of animation to reset pages
+					p0wrap.animate({right:0}, opts.speed, opts.easing, function(){updateAfter()});						
 				}else{
-					p0.animate({left:opts.pWidthH, width:opts.pWidthH}, opts.speedH, opts.easeIn)
-					  .animate({left:opts.pWidth, width:opts.pWidth}, opts.speedH, opts.easeOut);
+					//hide p1 as p0 moves across it
+					p1.animate({left:opts.pWidth, width:0}, opts.speed, opts.easing);
+					p1wrap.animate({left:opts.pWidthN}, opts.speed, opts.easing);
+					
+					//animate p0 from left to right (right: movement, width: reveal slide, paddingLeft: shadow underneath)
+					if(opts.closed && opts.autoCenter && opts.curr == 0){
+						p0.animate({left:opts.pWidthH, width:opts.pWidthH}, opts.speedH, opts.easeIn)
+						  .animate({left:0, width:opts.pWidth}, opts.speedH, opts.easeOut);
+						p2.stop().animate({left:0}, opts.speed, opts.easing);
+					}else{
+						p0.animate({left:opts.pWidthH, width:opts.pWidthH}, opts.speedH, opts.easeIn)
+						  .animate({left:opts.pWidth, width:opts.pWidth}, opts.speedH, opts.easeOut);
+					}
+					//animate .wrapper content with p0 to keep content right aligned throughout
+					//call setuppages at end of animation to reset pages
+					p0wrap.animate({right:opts.shadowBtmWidth}, opts.speedH,opts. easeIn)
+						  .animate({right:0}, opts.speedH, opts.easeOut, function(){updateAfter()});					
 				}
-				//animate .wrapper content with p0 to keep content right aligned throughout
-				//call setuppages at end of animation to reset pages
-				p0wrap.animate({right:opts.shadowBtmWidth}, opts.speedH,opts. easeIn)
-					  .animate({right:0}, opts.speedH, opts.easeOut, function(){updateAfter()});
 			}
 		}
 	});
@@ -361,6 +390,10 @@ function booklet(target, options, id){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 // SETUP CONTROLS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if(opts.manual && $.ui){
+		opts.overlays = false;
+	}
 	
 	//add prev next user defined controls
 	if(opts.next){
@@ -430,57 +463,24 @@ function booklet(target, options, id){
 	ctrlsP.click(function(e){e.preventDefault(); self.prev();});
 	
 	//add page hover animations
-	if(opts.hovers){
-		ctrlsN.hover(
-			function(){
-				if(!busy && opts.curr+2 <= opts.pTotal-2){
-					//animate
-					p2.stop().animate({'width':opts.pWidth-40}, 500, opts.easing);
-					if(opts.closed && opts.autoCenter && opts.curr == 0){
-						p3.stop().animate({'left':opts.pWidth-50, 'width':40}, 500, opts.easing);
-					}else{
-						p3.stop().animate({'left':opts.width-50, 'width':40}, 500, opts.easing);
-					}
-					p3wrap.stop().animate({'left':10}, 500, opts.easing);
-					rhover = true;
-				}
-			},
-			function(){
-				if(!busy && opts.curr+2 <= opts.pTotal-2){
-					p2.stop().animate({'width':opts.pWidth}, 500, opts.easing);
-					if(opts.closed && opts.autoCenter && opts.curr == 0){
-						p3.stop().animate({'left':opts.pWidth, 'width':0}, 500, opts.easing);				
-					}else{
-						p3.stop().animate({'left':opts.width, 'width':0}, 500, opts.easing);	
-					}
-					p3wrap.stop().animate({'left':0}, 500, opts.easing);
-					rhover = false;
-				}
-			}
-		);
-		ctrlsP.hover(
-			function(){
-				if(!busy && opts.curr-2 >= 0){
-					//animate
-					p1.stop().animate({left:10, width:opts.pWidth-10}, 400, opts.easing);
-					p1wrap.stop().animate({left:"-10px"}, 400, opts.easing);
-					p0.stop().animate({left:10, width:40}, 400, opts.easing);
-					p0wrap.stop().animate({right:10}, 400, opts.easing);
-					lhover = true;
-				}
-			},
-			function(){
-				if(!busy && opts.curr-2 >= 0){
-					p1.stop().animate({left:0, width:opts.pWidth}, 400, opts.easing);
-					p1wrap.stop().animate({left:0}, 400, opts.easing);
-					p0.stop().animate({left:0, width:0}, 400, opts.easing);
-					p0wrap.stop().animate({right:0}, 400, opts.easing);
-					lhover = false;
-				}
-			}
-		);
+	if(opts.overlays && opts.hovers){
+		//hovers to start draggable forward
+		ctrlsN.unbind("mouseover mouseout").bind("mouseover",function(){
+			hoverAnimStart(true);
+		})
+		.bind("mouseout",function(){
+			hoverAnimEnd(true);
+		});
+		
+		//hovers to start draggable backwards
+		ctrlsP.unbind("mouseover mouseout").bind("mouseover",function(){
+			hoverAnimStart(false);
+		})
+		.bind("mouseout",function(){
+			hoverAnimEnd(false);
+		});
 	}
-	
+			
 	//arrow animations	
 	if(opts.arrows){
 		if(opts.arrowsHide){
@@ -618,6 +618,8 @@ function booklet(target, options, id){
 			}else if(i % 2 != 0){
 				$(this).wrap('<div class="b-page"><div class="b-wrap b-wrap-right"></div></div>');
 			}else{
+
+
 				$(this).wrap('<div class="b-page"><div class="b-wrap b-wrap-left"></div></div>');
 			}
 			
@@ -632,12 +634,29 @@ function booklet(target, options, id){
 		});
 	}
 
+	function resetSize(){
+		//recalculate size for percentage values
+		if(opts.wPercent){
+			opts.width  = (opts.wOrig.replace('%','')/100) * parseFloat(b.parent().css('width'));
+			b.width(opts.width);
+			opts.pWidth  = opts.width/2;
+			opts.pWidthN = '-'+(opts.pWidth)+'px';
+			opts.pWidthH = opts.pWidth/2;
+		}
+		if(opts.hPercent){
+			opts.height  = (opts.hOrig.replace('%','')/100) * parseFloat(b.parent().css('height'));
+			b.height(opts.height);
+			opts.pHeight = opts.height;
+		}
+		resetCSS();
+	}
+	
 	function resetCSS(){
 		//update css
-		$('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({'filter':'','zoom':''});					
-		//remove old shadows
-		b.find('.b-shadow-b, .b-shadow-f').remove();
-		
+		b.find('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({'filter':'','zoom':''});
+		if(opts.manual && $.ui){
+			b.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');		
+		}
 		wraps.attr('style','');
 		wraps.css({'left':0,'width':opts.pWidth-(opts.pagePadding*2), 'height':opts.pHeight-(opts.pagePadding*2), 'padding': opts.pagePadding});
 		p0wrap.css({'right':0,'left':'auto'});
@@ -664,23 +683,6 @@ function booklet(target, options, id){
 			b.width(opts.width);
 		}
 		
-	}
-
-	function resetSize(){
-		//recalculate size for percentage values
-		if(opts.wPercent){
-			opts.width  = (opts.wOrig.replace('%','')/100) * parseFloat(b.parent().css('width'));
-			b.width(opts.width);
-			opts.pWidth  = opts.width/2;
-			opts.pWidthN = '-'+(opts.pWidth)+'px';
-			opts.pWidthH = opts.pWidth/2;
-		}
-		if(opts.hPercent){
-			opts.height  = (opts.hOrig.replace('%','')/100) * parseFloat(b.parent().css('height'));
-			b.height(opts.height);
-			opts.pHeight = opts.height;
-		}
-		resetCSS();
 	}
 	
 	function resetPages(){	
@@ -745,9 +747,169 @@ function booklet(target, options, id){
 			p0.detach().appendTo(src);
 		}
 		init = true;
+		
+		if(opts.shadows){
+			b.find('.b-shadow-f, .b-shadow-b').remove();		
+			sF = $('<div class="b-shadow-f"></div>').css({'right':0,'width':opts.pWidth, 'height':opts.pHeight}).appendTo(p3);
+			sB = $('<div class="b-shadow-b"></div>').appendTo(p0).css({'left':0,'width':opts.pWidth, 'height':opts.pHeight});		
+		}
+		
+		//reset vars
+		rhover = lhover = p3drag = p0drag = false;
+		
+		//manual page turning, check if jQuery UI is loaded
+		if(opts.manual && $.ui){
+			
+			//implement draggable forward
+			p3.draggable({
+				axis: "x",
+				containment: [p2.offset().left-opts.pWidthH,0,p2.offset().left+opts.pWidth-50,opts.pHeight],
+				drag: function(event, ui) {
+					p3drag = true;
+					temp = ui.originalPosition.left - ui.position.left;
+					p3.removeClass('b-grab').addClass('b-grabbing');
+					p3.width(40+(temp/2));
+					p3wrap.css({'left':10+(temp/8)});
+					p2.width(opts.pWidth-p3.width()+10);
+					if(opts.shadows){
+						sF.css({'right':'-'+(20+temp/4)+'px'});
+						if($.support.opacity){
+							sF.css({'opacity':0.5*(temp/opts.pWidthH)});
+						}else{
+							sF.css({'right':'auto','left':0.1*p3.width()});
+						}
+					}
+				},
+				stop: function(event, ui) {
+					hoverAnimEnd(false);
+					var temp = ui.originalPosition.left - ui.position.left;
+					if(temp>opts.pWidthH/4){
+						if(opts.shadows && !$.support.opacity){
+							sF.css({'left':'auto'});
+						}
+						self.next();
+						p3.removeClass('b-grab b-grabbing');
+					}else{
+						p3drag = false;
+						p3.removeClass('b-grabbing').addClass('b-grab');
+					}
+				}
+			});
+			
+			//implement draggable backwards
+			p0.draggable({
+				axis: "x",
+				containment: [p1.offset().left+10,0,p1.offset().left+opts.pWidth*.75,opts.pHeight],				
+				drag: function(event, ui) {
+					p0drag = true;
+					temp = ui.position.left - ui.originalPosition.left;
+					p0.removeClass('b-grab').addClass('b-grabbing');
+					p0.css({left:40+(temp)/1.5, width:40+(temp)});
+					p0wrap.css({right:10+temp/4});	
+					p1.css({left:ui.position.left+20, width:opts.pWidth-ui.position.left-10});			
+					p1wrap.css({left:-1*(temp+30)});	
+					if(opts.shadows){
+						if($.support.opacity){
+							sB.css({'opacity':0.5*(temp/opts.pWidthH)});
+						}else{
+							sB.css({'left':-0.38*opts.pWidth});
+						}
+					}
+				},
+				stop: function(event, ui) {
+					hoverAnimEnd(true);
+					temp = ui.position.left - ui.originalPosition.left;
+					if(temp>opts.pWidthH/4){
+						self.prev();
+						p0.removeClass('b-grab b-grabbing');
+					}else{
+						p0drag = false;
+						p0.removeClass('b-grabbing').addClass('b-grab');
+					}
+				}
+			});
+			
+			//mousetracking for page movement
+			$(b).unbind('mousemove mouseout').bind('mousemove',function(e){
+				relativeX = e.pageX - b.offset().left;
+				if(relativeX < 50){
+					hoverAnimStart(false);
+				}else if(relativeX > opts.pWidth-50 && opts.curr == 0 && opts.autoCenter && opts.closed){
+					hoverAnimStart(true);
+				}else if(relativeX > 50 && relativeX < opts.width-50){
+					hoverAnimEnd(false);
+					hoverAnimEnd(true);
+				}else if(relativeX > opts.width-50){
+					hoverAnimStart(true);
+				}
+			}).bind('mouseout',function(){
+				hoverAnimEnd(false);
+				hoverAnimEnd(true);
+			});
+			
+		}
+	}
+	
+	function hoverAnimStart(inc){
+		if(inc){
+			if(!busy && !rhover &&!lhover && !p3drag && opts.curr+2 <= opts.pTotal-2){
+				//animate
+				p2.stop().animate({'width':opts.pWidth-40}, 500, opts.easing);
+				p3.addClass('b-grab');
+				if(opts.closed && opts.autoCenter && opts.curr == 0){
+					p3.stop().animate({'left':opts.pWidth-50, 'width':40}, 500, opts.easing);
+				}else{
+					p3.stop().animate({'left':opts.width-50, 'width':40}, 500, opts.easing);
+				}
+				p3wrap.stop().animate({'left':10}, 500, opts.easing);
+				if(opts.shadows && !$.support.opacity){
+					sF.css({'right':'auto','left':'-40%'});
+				}
+				rhover = true;
+			}
+		}else{
+			if(!busy && !lhover && !rhover && !p0drag && opts.curr-2 >= 0){
+				//animate
+				p1.stop().animate({left:10, width:opts.pWidth-10}, 400, opts.easing);
+				p0.addClass('b-grab');
+				p1wrap.stop().animate({left:"-10px"}, 400, opts.easing);
+				p0.stop().animate({left:10, width:40}, 400, opts.easing);
+				p0wrap.stop().animate({right:10}, 400, opts.easing);
+				if(opts.shadows && !$.support.opacity){
+					sB.css({'left':-0.38*opts.pWidth});
+				}
+				lhover = true;
+			}
+		}
 	}
 
-	function initAnim(diff, inc){			
+	function hoverAnimEnd(inc){
+		if(inc){
+			if(!busy && rhover && !p3drag && opts.curr+2 <= opts.pTotal-2){
+				p2.stop().animate({'width':opts.pWidth}, 500, opts.easing);
+				if(opts.closed && opts.autoCenter && opts.curr == 0){
+					p3.stop().animate({'left':opts.pWidth, 'width':0}, 500, opts.easing);				
+				}else{
+					p3.stop().animate({'left':opts.width, 'width':0}, 500, opts.easing);	
+				}
+				p3wrap.stop().animate({'left':0}, 500, opts.easing);
+				if(opts.shadows && !$.support.opacity){
+					sF.css({'left':'auto'});
+				}
+				rhover = false;
+			}
+		}else{
+			if(!busy && lhover && !p0drag && opts.curr-2 >= 0){
+				p1.stop().animate({left:0, width:opts.pWidth}, 400, opts.easing);
+				p1wrap.stop().animate({left:0}, 400, opts.easing);
+				p0.stop().animate({left:0, width:0}, 400, opts.easing);
+				p0wrap.stop().animate({right:0}, 400, opts.easing);
+				lhover = false;
+			}
+		}
+	}
+
+	function initAnim(diff, inc, shadow){			
 		
 		//setup content
 		if(inc && diff > 2){
@@ -772,6 +934,16 @@ function booklet(target, options, id){
 			p1.after(p4.detach());
 			p2.after(p3.detach());
 			
+			if (opts.shadows) {
+				b.find('.b-shadow-f').remove();
+				sF = $('<div class="b-shadow-f"></div>').css({
+					'right': 0,
+					'width': opts.pWidth,
+					'height': opts.pHeight
+				}).appendTo(p3);
+				shadow = sF;
+			}	
+			
 		}else if(!inc && diff > 2){
 			
 			b.find('.b-page-'+(pN.data('page')-1)).after(pN.detach());
@@ -794,6 +966,16 @@ function booklet(target, options, id){
 			}
 			
 			p0.detach().appendTo(src);
+			
+			if (opts.shadows) {
+				b.find('.b-shadow-b, .b-shadow-f').remove();
+				sB = $('<div class="b-shadow-b"></div>').appendTo(p0).css({
+					'left': 0,
+					'width': opts.pWidth,
+					'height': opts.pHeight
+				});
+				shadow = sB;
+			}
 		}
 		
 		//update page visibility
@@ -813,16 +995,6 @@ function booklet(target, options, id){
 		
 		//init shadows
 		if(opts.shadows){
-			//remove old shadows
-			b.find('.b-shadow-b, .b-shadow-f').remove();
-			
-			//add shadows
-			if(inc){
-				shadow = $('<div class="b-shadow-f"></div>').css({'right':0,'width':opts.pWidth, 'height':opts.pHeight}).appendTo(p3);
-			}else if(!inc){
-				shadow = $('<div class="b-shadow-b"></div>').appendTo(p0).css({'left':0,'width':opts.pWidth, 'height':opts.pHeight});
-			}
-			
 			//check for opacity support -> animate shadow overlay on moving slide
 			if($.support.opacity){
 				shadow.animate({opacity:1}, opts.speedH, opts.easeIn)
@@ -864,6 +1036,7 @@ function booklet(target, options, id){
 			if(playing && opts.curr < opts.pTotal-2){
 				clearTimeout(a);
 				a = setTimeout(function(){self.next();},opts.delay);
+				console.log("continue...");
 			}
 			if(opts.curr >= opts.pTotal-2){
 				playing = false;
@@ -1023,6 +1196,8 @@ $.fn.booklet.defaults = {
 
 	pagePadding:        10,                              // padding for each page wrapper
 	pageNumbers:        true,                            // display page numbers on each page
+	
+	manual:             true,                            // enables manual page turning, requires jQuery UI to function
 	
 	hovers:             true,                            // enables preview pageturn hover animation, shows a small preview of previous or next page on hover
 	overlays:           true,                            // enables navigation using a page sized overlay, when enabled links inside the content will not be clickable
