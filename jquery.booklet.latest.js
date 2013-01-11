@@ -120,6 +120,7 @@
             events = {
                 create: 'bookletcreate', // called when booklet has been created
                 start:  'bookletstart',  // called when booklet starts to change pages
+                prechange: 'bookletprechange', // called when booklet has begun changing pages
                 change: 'bookletchange', // called when booklet has finished changing pages
                 add:    'bookletadd',    // called when booklet has added a page
                 remove: 'bookletremove'  // called when booklet has removed a page
@@ -1956,6 +1957,17 @@
                         target.animate({width: options.width}, speed*2, options.easing);
                     }
                 }
+
+                // callback when beginning booklet animation
+                callback = {
+                    options: jQuery.extend({},options),
+                    index: options.currentIndex,
+                    pages: [pages[options.currentIndex].contentNode, pages[options.currentIndex+1].contentNode]
+                };
+                if(options.prechange) {
+                    target.unbind(events.prechange+'.booklet').bind(events.prechange+'.booklet', options.prechange);
+                }
+                target.trigger(events.prechange, callback);
 
             },
             updateAfter = function () {
