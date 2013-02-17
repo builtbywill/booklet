@@ -1,11 +1,11 @@
 /*
  * jQuery Booklet Plugin
- * Copyright (c) 2010 - 2012 W. Grauvogel (http://builtbywill.com/)
+ * Copyright (c) 2010 - 2013 W. Grauvogel (http://builtbywill.com/)
  *
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  *
- * Version : 1.4.0
+ * Version : 1.4.1
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
@@ -298,7 +298,7 @@
 
                     if(!isNaN(options.startingPage) && options.startingPage <= options.pageTotal && options.startingPage > 0) {
                         if((options.startingPage % 2) != 0) {
-                            options.startingPage--
+                            options.startingPage--;
                         }
                         options.currentIndex = options.startingPage;
                     }
@@ -1191,7 +1191,9 @@
                 isHoveringRight = isHoveringLeft = p3drag = p0drag = false;
 
                 // manual page turning, check if jQuery UI is loaded
-                target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
+                if (target.find('.b-page').draggable()) {
+                    target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
+                }
                 if(options.manual && $.ui) {
 
                     // implement draggable forward
@@ -1513,7 +1515,9 @@
             },
             destroyManualControls = function () {
                 // remove old draggables
-                target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
+                if (target.find('.b-page').draggable()) {
+                    target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
+                }
                 // remove mouse tracking for page movement
                 target.unbind('.booklet');
             },
@@ -1993,10 +1997,10 @@
                     if(index == "start") {
                         index = 0;
                     } else if(index == "end") {
-                        index = originalPageTotal - 1;
+                        index = options.pageTotal - 2;
                     }
                 } else if(typeof index === "number") {
-                    if(index < 0 || index >= originalPageTotal) {
+                    if(index < 0 || index >= options.pageTotal) {
                         return;
                     }
                 } else if(typeof index === "undefined") {

@@ -11,8 +11,8 @@ Below is some basic information to get you started.
 To install jQuery Booklet into your webpage, first include jQuery, jQuery UI, jQuery Easing 
 and the booklet JS and CSS files.
 
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js" type="text/javascript"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" type="text/javascript"></script>
 	<script src="booklet/jquery.easing.1.3.js" type="text/javascript"></script>
 	<script src="booklet/jquery.booklet.latest.min.js" type="text/javascript"></script>
 	<link href="booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
