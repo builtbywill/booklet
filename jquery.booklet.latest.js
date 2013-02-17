@@ -622,12 +622,18 @@
                                 }
                                 if(!options.hash) {
                                     chapterListItem.find('a').on('click.booklet', function () {
+                                        var index;
                                         if(options.direction == directions.rightToLeft) {
                                             chapterSelector.find('.b-current').text($(this).find('.b-text').text());
-                                            goToPage(Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2);
+                                            index = Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2;
                                         } else {
-                                            goToPage(parseInt($(this).attr('id').replace('selector-page-', '')));
+                                            index = parseInt($(this).attr('id').replace('selector-page-', ''));
                                         }
+                                        // adjust for odd page
+                                        if (index % 2 != 0) {
+                                            index -= 1;
+                                        }
+                                        goToPage(index);
                                         return false;
                                     });
                                 }
@@ -1464,6 +1470,15 @@
 
                 if(options.menu){
                     $(options.menu).removeClass('b-menu');
+
+                    if(options.pageSelector) {
+                        menu.find('.b-selector-page').remove();
+                        pageSelector = pageSelectorList = listItemNumbers = listItemTitle = pageListItem = pageSelectorHeight = null;
+                    }
+                    if (options.chapterSelector) {
+                        menu.find('.b-selector-chapter').remove();
+                        chapter = chapterSelector = chapterSelectorList = chapterListItem = chapterSelectorHeight = null;
+                    }
                 }
                 menu = null;
 
