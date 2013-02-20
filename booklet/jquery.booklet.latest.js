@@ -1,9 +1,8 @@
 /*
  * jQuery Booklet Plugin
- * Copyright (c) 2010 - 2013 W. Grauvogel (http://builtbywill.com/)
+ * Copyright (c) 2010 - 2013 William Grauvogel (http://builtbywill.com/)
  *
- * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+ * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
  *
  * Version : 1.4.1
  *
