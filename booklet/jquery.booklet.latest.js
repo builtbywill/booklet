@@ -2006,13 +2006,15 @@
             next: next,
             prev: prev,
             gotopage: function (index) {
+                // validate inputs
                 if(typeof index === 'string') {
-                    // validate inputs
                     if(index == "start") {
                         index = 0;
                     } else if(index == "end") {
                         index = options.pageTotal - 2;
-                    }
+                    } else {
+						this.gotopage(parseInt(index));
+					}
                 } else if(typeof index === "number") {
                     if(index < 0 || index >= options.pageTotal) {
                         return;
