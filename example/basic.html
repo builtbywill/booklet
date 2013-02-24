@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Booklet - jQuery Plugin</title>
+
+    <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+    <!-- required files for booklet -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" type="text/javascript"></script>  
+    <script src="../booklet/jquery.easing.1.3.js" type="text/javascript"></script>
+    <script src="../booklet/jquery.booklet.latest.js" type="text/javascript"></script>
+    <link href="../booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
+
+    <style type="text/css">
+        body {background:#ccc; font:normal 12px/1.2 arial, verdana, sans-serif;}
+    </style>
+
+	<script type="text/javascript">
+	    $(function () {		
+	        $("#mybook").booklet();
+	    });
+    </script>
+
+</head>
+<body>
+	<header>
+		<h1>Booklet Example</h1>
+	</header>
+	<section>
+	    <div id="mybook">
+	        <div title="first page">
+	            <h3>Page 1</h3>
+	        </div>
+	        <div title="second page">
+	            <h3>Page 2</h3>
+	        </div>
+	        <div title="third page">
+	            <h3>Page 3</h3>
+	        </div>
+	        <div title="fourth page">
+	            <h3>Page 4</h3>
+	        </div>
+	        <div title="fifth page">
+	            <h3>Page 5</h3>
+	        </div>
+	        <div title="sixth page">
+	            <h3>Page 6</h3>
+	        </div>
+	        <div title="seventh page">
+	            <h3>Page 7</h3>
+	        </div>
+	        <div title="eighth page">
+	            <h3>Page 8</h3>
+	        </div>
+	    </div>
+	</section>
+	<footer></footer>
+</body>
+</html>
