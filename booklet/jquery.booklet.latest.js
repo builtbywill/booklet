@@ -9,40 +9,40 @@
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
  */
-;(function ($) {
+; (function ($) {
 
     $.fn.booklet = function (options, param1, param2) {
 
         var obj, method, params, output, result, config, index;
 
         // option type string - api call
-        if(typeof options === 'string') {
+        if (typeof options === 'string') {
             result = new Array();
-            $(this).each(function(){
+            $(this).each(function () {
                 obj = $(this).data('booklet');
-                if(obj) {
+                if (obj) {
                     method = options;
                     // add optional parameters
                     params = new Array();
-                    if(param1) {
+                    if (param1) {
                         params.push(param1);
                     }
-                    if(param2) {
+                    if (param2) {
                         params.push(param2);
                     }
-                    if(obj[method]) {
+                    if (obj[method]) {
                         output = obj[method].apply(obj, params);
-                        if(typeof output !== 'undefined' || output){
+                        if (typeof output !== 'undefined' || output) {
                             result.push(obj[method].apply(obj, params));
                         }
                     } else {
-                        $.error('Method "' +  method + '" does not exist on jQuery.booklet.');
+                        $.error('Method "' + method + '" does not exist on jQuery.booklet.');
                     }
                 } else {
-                    $.error('jQuery.booklet has not been initialized. Method "'+options+'" cannot be called.');
+                    $.error('jQuery.booklet has not been initialized. Method "' + options + '" cannot be called.');
                 }
             });
-            if(result.length == 1){
+            if (result.length == 1) {
                 return result[0];
             } else if (result.length > 0) {
                 return result;
@@ -50,11 +50,11 @@
                 return $(this);
             }
         }
-        // option type number - api call
-        else if(typeof options === 'number') {
-            return $(this).each(function(){
+            // option type number - api call
+        else if (typeof options === 'number') {
+            return $(this).each(function () {
                 obj = $(this).data('booklet');
-                if(obj) {
+                if (obj) {
                     index = options;
                     obj.gotopage(index);
                 } else {
@@ -62,14 +62,14 @@
                 }
             });
         }
-        // else build new booklet
-        else if (typeof method === 'object' || !method ) {
-            return $(this).each(function(){
+            // else build new booklet
+        else if (typeof method === 'object' || !method) {
+            return $(this).each(function () {
                 config = $.extend({}, $.fn.booklet.defaults, options);
                 obj = $(this).data('booklet');
 
                 // destroy old booklet before creating new one
-                if(obj) {
+                if (obj) {
                     obj.destroy();
                 }
 
@@ -94,8 +94,8 @@
             templates = {
                 empty: '<div class="b-page-empty" title=""></div>', //book page with no content
                 blank: '<div class="b-page-blank" title=""></div>', //transparent item used with closed books
-                sF:    '<div class="b-shadow-f"></div>',
-                sB:    '<div class="b-shadow-b"></div>'
+                sF: '<div class="b-shadow-f"></div>',
+                sB: '<div class="b-shadow-b"></div>'
             },
             directions = {
                 leftToRight: 'LTR',
@@ -135,20 +135,20 @@
                     pageNode;
 
                 // save chapter title
-                if(contentNode.attr('rel')) {
+                if (contentNode.attr('rel')) {
                     chapter = contentNode.attr('rel');
                 }
                 // save page title
-                if(contentNode.attr('title')) {
+                if (contentNode.attr('title')) {
                     title = contentNode.attr('title');
                 }
 
                 //give content the correct wrapper and page wrapper
-                if(contentNode.hasClass('b-page-empty')) {
+                if (contentNode.hasClass('b-page-empty')) {
                     contentNode.wrap('<div class="b-page"><div class="b-wrap"></div></div>');
-                } else if(options.closed && options.covers && (index == 1 || index == options.pageTotal - 2)) {
+                } else if (options.closed && options.covers && (index == 1 || index == options.pageTotal - 2)) {
                     contentNode.wrap('<div class="b-page"><div class="b-wrap b-page-cover"></div></div>');
-                } else if(index % 2 != 0) {
+                } else if (index % 2 != 0) {
                     contentNode.wrap('<div class="b-page"><div class="b-wrap b-wrap-right"></div></div>');
                 } else {
                     contentNode.wrap('<div class="b-page"><div class="b-wrap b-wrap-left"></div></div>');
@@ -157,17 +157,17 @@
                 pageNode = contentNode.parents('.b-page').addClass('b-page-' + index);
 
                 // add page numbers
-                if(
+                if (
                     options.pageNumbers &&
                         !contentNode.hasClass('b-page-empty') &&
-                        //(options.layoutSingle && !contentNode.hasClass('b-page-blank')) &&
+                    //(options.layoutSingle && !contentNode.hasClass('b-page-blank')) &&
                         (!options.closed || (options.closed && !options.covers) || (options.closed && options.covers && index != 1 && index != options.pageTotal - 2))
                     ) {
-                    if(options.direction == directions.leftToRight) {
+                    if (options.direction == directions.leftToRight) {
                         startingPageNumber++;
                     }
                     contentNode.parent().append('<div class="b-counter">' + startingPageNumber + '</div>');
-                    if(options.direction == directions.rightToLeft) {
+                    if (options.direction == directions.rightToLeft) {
                         startingPageNumber--;
                     }
                 }
@@ -213,22 +213,20 @@
                 isDisabled = false;
 
                 callback = {
-                    options: jQuery.extend({},options),
+                    options: jQuery.extend({}, options),
                     index: options.currentIndex,
-                    pages: [pages[options.currentIndex].contentNode, pages[options.currentIndex+1].contentNode]
+                    pages: [pages[options.currentIndex].contentNode, pages[options.currentIndex + 1].contentNode]
                 };
-                if(options.create) {
-                    target.off(events.create+'.booklet').on(events.create+'.booklet', options.create);
+                if (options.create) {
+                    target.off(events.create + '.booklet').on(events.create + '.booklet', options.create);
                 }
                 target.trigger(events.create, callback);
             },
             enable = function () {
                 isDisabled = false;
-                updateOptions();
-                updateManualControls();
             },
             disable = function () {
-                destroyControls();
+                isDisabled = true;
             },
             destroy = function () {
                 // destroy all booklet items
@@ -253,9 +251,9 @@
                 pages = new Array();
 
                 // fix for odd number of pages
-                if((target.children().length % 2) != 0) {
+                if ((target.children().length % 2) != 0) {
                     // if book is closed and using covers, add page before back cover, else after last page
-                    if(options.closed && options.covers) {
+                    if (options.closed && options.covers) {
                         target.children().last().before(templates.blank);
                     } else {
                         target.children().last().after(templates.blank);
@@ -263,9 +261,9 @@
                 }
 
                 // if closed book, add empty pages to start and end
-                if(options.closed) {
-                    $(templates.empty).attr({title: options.closedFrontTitle || '', rel: options.closedFrontChapter || ''}).prependTo(target);
-                    target.children().last().attr({title: options.closedBackTitle || '', rel: options.closedBackChapter || ''});
+                if (options.closed) {
+                    $(templates.empty).attr({ title: options.closedFrontTitle || '', rel: options.closedFrontChapter || '' }).prependTo(target);
+                    target.children().last().attr({ title: options.closedBackTitle || '', rel: options.closedBackChapter || '' });
                     target.append(templates.empty);
                 }
 
@@ -274,12 +272,12 @@
 
                 startingPageNumber = 0;
 
-                if(options.direction == directions.rightToLeft) {
+                if (options.direction == directions.rightToLeft) {
                     startingPageNumber = options.pageTotal;
-                    if(options.closed) {
+                    if (options.closed) {
                         startingPageNumber -= 2;
                     }
-                    if(options.covers) {
+                    if (options.covers) {
                         startingPageNumber -= 2;
                     }
                     $(target.children().get().reverse()).each(function () {
@@ -289,14 +287,14 @@
 
                 if (!isInit) {
                     // set currentIndex
-                    if(options.direction == directions.leftToRight) {
+                    if (options.direction == directions.leftToRight) {
                         options.currentIndex = 0;
-                    } else if(options.direction == directions.rightToLeft) {
+                    } else if (options.direction == directions.rightToLeft) {
                         options.currentIndex = options.pageTotal - 2;
                     }
 
-                    if(!isNaN(options.startingPage) && options.startingPage <= options.pageTotal && options.startingPage > 0) {
-                        if((options.startingPage % 2) != 0) {
+                    if (!isNaN(options.startingPage) && options.startingPage <= options.pageTotal && options.startingPage > 0) {
+                        if ((options.startingPage % 2) != 0) {
                             options.startingPage--;
                         }
                         options.currentIndex = options.startingPage;
@@ -331,13 +329,13 @@
                 target.find('.b-page').removeClass('b-pN b-p0 b-p1 b-p2 b-p3 b-p4').hide();
 
                 // add page classes
-                if(options.currentIndex - 2 >= 0) {
+                if (options.currentIndex - 2 >= 0) {
                     target.find('.b-page-' + (options.currentIndex - 2)).addClass('b-pN').show();
                     target.find('.b-page-' + (options.currentIndex - 1)).addClass('b-p0').show();
                 }
                 target.find('.b-page-' + (options.currentIndex)).addClass('b-p1').show();
                 target.find('.b-page-' + (options.currentIndex + 1)).addClass('b-p2').show();
-                if(options.currentIndex + 3 <= options.pageTotal) {
+                if (options.currentIndex + 3 <= options.pageTotal) {
                     target.find('.b-page-' + (options.currentIndex + 2)).addClass('b-p3').show();
                     target.find('.b-page-' + (options.currentIndex + 3)).addClass('b-p4').show();
                 }
@@ -357,7 +355,7 @@
                 p4wrap = target.find('.b-p4 .b-wrap');
                 wraps = target.find('.b-wrap');
 
-                if(options.shadows) {
+                if (options.shadows) {
                     target.find('.b-shadow-f, .b-shadow-b').remove();
                     sF = $(templates.sF).css(css.sF).appendTo(p3);
                     sB = $(templates.sB).appendTo(p0).css(css.sB);
@@ -365,7 +363,7 @@
             },
             updatePageCSS = function () {
                 // update css
-                target.find('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({'filter': '', 'zoom': ''});
+                target.find('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({ 'filter': '', 'zoom': '' });
 
                 target.find('.b-page').removeAttr('style');
                 wraps.removeAttr('style');
@@ -374,7 +372,7 @@
                 p0wrap.css(css.p0wrap);
                 p1.css(css.p1);
                 p2.css(css.p2);
-                if(options.closed && options.autoCenter && options.currentIndex >= options.pageTotal - 2) {
+                if (options.closed && options.autoCenter && options.currentIndex >= options.pageTotal - 2) {
                     p2.hide();
                 }
                 pN.css(css.pN);
@@ -382,37 +380,37 @@
                 p3.stop().css(css.p3);
                 p4.css(css.p4);
 
-                if(options.closed && options.autoCenter && options.currentIndex == 0) {
-                    pN.css({'left': 0});
-                    p1.css({'left': pWidthN});
-                    p2.css({'left': 0});
-                    p3.css({'left': pWidth});
-                    p4.css({'left': 0});
+                if (options.closed && options.autoCenter && options.currentIndex == 0) {
+                    pN.css({ 'left': 0 });
+                    p1.css({ 'left': pWidthN });
+                    p2.css({ 'left': 0 });
+                    p3.css({ 'left': pWidth });
+                    p4.css({ 'left': 0 });
                 }
 
-                if(options.closed && options.autoCenter && (options.currentIndex == 0 || options.currentIndex >= options.pageTotal - 2)) {
-                    if(options.overlays) {
+                if (options.closed && options.autoCenter && (options.currentIndex == 0 || options.currentIndex >= options.pageTotal - 2)) {
+                    if (options.overlays) {
                         overlaysB.width('100%');
                     }
                     target.width(pWidth);
                 } else {
-                    if(options.overlays) {
+                    if (options.overlays) {
                         overlaysB.width('50%');
                     }
                     target.width(options.width);
                 }
 
                 // ie fix
-                target.find('.b-page').css({'filter': '', 'zoom': ''});
+                target.find('.b-page').css({ 'filter': '', 'zoom': '' });
             },
-            destroyPages = function() {
+            destroyPages = function () {
                 // remove booklet markup
                 target.find(".b-wrap").unwrap();
                 target.find(".b-wrap").children().unwrap();
                 target.find(".b-counter, .b-page-blank, .b-page-empty, .b-shadow-f, .b-shadow-b").remove();
 
                 // revert page order to original
-                if(options.direction == directions.rightToLeft) {
+                if (options.direction == directions.rightToLeft) {
                     $(target.children().get().reverse()).each(function () {
                         $(this).appendTo(target);
                     });
@@ -428,13 +426,11 @@
                 var didUpdate = false;
 
                 // update options if newOptions have been passed in
-                if(newOptions != null && typeof newOptions != "undefined"){
+                if (newOptions != null && typeof newOptions != "undefined") {
 
                     // remove page structure, revert to original order
                     destroyPages();
                     destroyControls();
-
-                    isDisabled = false;
 
                     options = $.extend({}, options, newOptions);
                     didUpdate = true;
@@ -443,20 +439,20 @@
                 }
 
                 // set width + height
-                if(!options.width) {
+                if (!options.width) {
                     options.width = target.width();
-                } else if(typeof options.width == 'string' && options.width.indexOf("px") != -1) {
+                } else if (typeof options.width == 'string' && options.width.indexOf("px") != -1) {
                     options.width = options.width.replace('px', '');
-                } else if(typeof options.width == 'string' && options.width.indexOf("%") != -1) {
+                } else if (typeof options.width == 'string' && options.width.indexOf("%") != -1) {
                     wPercent = true;
                     wOrig = options.width;
                     options.width = (options.width.replace('%', '') / 100) * parseFloat(target.parent().css('width'));
                 }
-                if(!options.height) {
+                if (!options.height) {
                     options.height = target.height();
-                } else if(typeof options.height == 'string' && options.height.indexOf("px") != -1) {
+                } else if (typeof options.height == 'string' && options.height.indexOf("px") != -1) {
                     options.height = options.height.replace('px', '');
-                } else if(typeof options.height == 'string' && options.height.indexOf("%") != -1) {
+                } else if (typeof options.height == 'string' && options.height.indexOf("%") != -1) {
                     hPercent = true;
                     hOrig = options.height;
                     options.height = (options.height.replace('%', '') / 100) * parseFloat(target.parent().css('height'));
@@ -465,23 +461,23 @@
                 target.height(options.height);
 
                 // save page sizes and other vars
-                pWidth  = options.width / 2;
+                pWidth = options.width / 2;
                 pWidthN = '-' + (pWidth) + 'px';
                 pWidthH = pWidth / 2;
                 pHeight = options.height;
-                speedH  = options.speed / 2;
+                speedH = options.speed / 2;
 
                 // set position
-                if(options.closed && options.autoCenter) {
-                    if(options.currentIndex == 0) {
+                if (options.closed && options.autoCenter) {
+                    if (options.currentIndex == 0) {
                         target.width(pWidth);
-                    } else if(options.currentIndex >= options.pageTotal - 2) {
+                    } else if (options.currentIndex >= options.pageTotal - 2) {
                         target.width(pWidth);
                     }
                 }
 
                 // save shadow widths for anim
-                if(options.shadows) {
+                if (options.shadows) {
                     options.shadowTopFwdWidth = '-' + options.shadowTopFwdWidth + 'px';
                     options.shadowTopBackWidth = '-' + options.shadowTopBackWidth + 'px';
                 }
@@ -490,7 +486,7 @@
                 options.pageTotal = target.children('.b-page').length;
 
                 // set booklet opts.name
-                if(options.name) {
+                if (options.name) {
                     document.title = options.name;
                 } else {
                     options.name = document.title;
@@ -505,72 +501,72 @@
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // CONTROLS + MENU
+                // MENU
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // setup menu
-                if(options.menu && $(options.menu).length > 0) {
+                if (options.menu && $(options.menu).length > 0) {
                     menu = $(options.menu);
 
-                    if(!menu.hasClass('b-menu')) {
+                    if (!menu.hasClass('b-menu')) {
                         menu.addClass('b-menu');
                     }
 
                     // setup page selector
-                    if(options.pageSelector && menu.find('.b-selector-page').length == 0) {
+                    if (options.pageSelector && menu.find('.b-selector-page').length == 0) {
                         //add selector
                         pageSelector = $('<div class="b-selector b-selector-page"><span class="b-current">' + (options.currentIndex + 1) + ' - ' + (options.currentIndex + 2) + '</span></div>').appendTo(menu);
                         pageSelectorList = $('<ul></ul>').appendTo(pageSelector).empty().css('height', 'auto');
 
                         // loop through all pages
-                        for(i = 0; i < options.pageTotal; i += 2) {
+                        for (i = 0; i < options.pageTotal; i += 2) {
                             j = i;
                             // numbers for normal view
                             listItemNumbers = (j + 1) + '-' + (j + 2);
-                            if(options.closed) {
+                            if (options.closed) {
                                 // numbers for closed book
                                 j--;
-                                if(i == 0) {
+                                if (i == 0) {
                                     listItemNumbers = '1'
-                                } else if(i == options.pageTotal - 2) {
+                                } else if (i == options.pageTotal - 2) {
                                     listItemNumbers = options.pageTotal - 2
                                 } else {
                                     listItemNumbers = (j + 1) + '-' + (j + 2);
                                 }
                                 // numbers for closed book with covers
-                                if(options.covers) {
+                                if (options.covers) {
                                     j--;
-                                    if(i == 0) {
+                                    if (i == 0) {
                                         listItemNumbers = ''
-                                    } else if(i == options.pageTotal - 2) {
+                                    } else if (i == options.pageTotal - 2) {
                                         listItemNumbers = ''
                                     } else {
                                         listItemNumbers = (j + 1) + '-' + (j + 2);
                                     }
                                 }
                             }
-                            if(i == 0) {
+                            if (i == 0) {
                                 pageSelector.find('.b-current').text(listItemNumbers);
                             }
 
                             // get the title
                             listItemTitle = pages[i].title;
-                            if(listItemTitle == '') {
+                            if (listItemTitle == '') {
                                 listItemTitle = pages[i + 1].title;
                             }
 
                             // get title for reversed direction
-                            if(options.direction == directions.rightToLeft) {
+                            if (options.direction == directions.rightToLeft) {
                                 listItemTitle = pages[Math.abs(i - options.pageTotal) - 1].title;
-                                if(listItemTitle == ''){ listItemTitle = pages[Math.abs(i - options.pageTotal) - 2].title; }
+                                if (listItemTitle == '') { listItemTitle = pages[Math.abs(i - options.pageTotal) - 2].title; }
                             }
 
                             // add the list item
                             pageListItem = $('<li><a href="#' + hashRoot + (i + 1) + '" id="selector-page-' + i + '"><span class="b-text">' + listItemTitle + '</span><span class="b-num">' + listItemNumbers + '</span></a></li>').appendTo(pageSelectorList);
 
-                            if(!options.hash) {
+                            if (!options.hash) {
                                 pageListItem.find('a').on('click.booklet', function () {
-                                    if(options.direction == directions.rightToLeft) {
+                                    if (options.direction == directions.rightToLeft) {
                                         pageSelector.find('.b-current').text($(this).find('.b-num').text());
                                         goToPage(Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2);
                                     } else {
@@ -583,35 +579,35 @@
 
                         // set height
                         pageSelectorHeight = pageSelectorList.height();
-                        pageSelectorList.css({'height': 0, 'padding-bottom': 0});
+                        pageSelectorList.css({ 'height': 0, 'padding-bottom': 0 });
 
                         // add hover effects
                         pageSelector.on('mouseenter.booklet', function () {
-                            pageSelectorList.stop().animate({height: pageSelectorHeight, paddingBottom: 10}, 500);
+                            pageSelectorList.stop().animate({ height: pageSelectorHeight, paddingBottom: 10 }, 500);
                         }).on('mouseleave.booklet', function () {
-                                pageSelectorList.stop().animate({height: 0, paddingBottom: 0}, 500);
-                            });
+                            pageSelectorList.stop().animate({ height: 0, paddingBottom: 0 }, 500);
+                        });
                     } else if (!options.pageSelector) {
                         menu.find('.b-selector-page').remove();
                         pageSelector = pageSelectorList = listItemNumbers = listItemTitle = pageListItem = pageSelectorHeight = null;
                     }
 
                     // setup chapter selector
-                    if(options.chapterSelector && menu.find('.b-selector-chapter').length == 0) {
+                    if (options.chapterSelector && menu.find('.b-selector-chapter').length == 0) {
 
                         chapter = pages[options.currentIndex].chapter;
-                        if(chapter == "") {
+                        if (chapter == "") {
                             chapter = pages[options.currentIndex + 1].chapter;
                         }
 
                         chapterSelector = $('<div class="b-selector b-selector-chapter"><span class="b-current">' + chapter + '</span></div>').appendTo(menu);
                         chapterSelectorList = $('<ul></ul>').appendTo(chapterSelector).empty().css('height', 'auto');
 
-                        for(i = 0; i < options.pageTotal; i += 1) {
-                            if(pages[i].chapter != "" && typeof pages[i].chapter != "undefined") {
-                                if(options.direction == directions.rightToLeft) {
+                        for (i = 0; i < options.pageTotal; i += 1) {
+                            if (pages[i].chapter != "" && typeof pages[i].chapter != "undefined") {
+                                if (options.direction == directions.rightToLeft) {
                                     j = i;
-                                    if(j % 2 != 0) {
+                                    if (j % 2 != 0) {
                                         j--;
                                     }
                                     chapterSelector.find('.b-current').text(pages[i].chapter);
@@ -619,10 +615,10 @@
                                 } else {
                                     chapterListItem = $('<li><a href="#' + hashRoot + (i + 1) + '" id="selector-page-' + i + '"><span class="b-text">' + pages[i].chapter + '</span></a></li>').appendTo(chapterSelectorList);
                                 }
-                                if(!options.hash) {
+                                if (!options.hash) {
                                     chapterListItem.find('a').on('click.booklet', function () {
                                         var index;
-                                        if(options.direction == directions.rightToLeft) {
+                                        if (options.direction == directions.rightToLeft) {
                                             chapterSelector.find('.b-current').text($(this).find('.b-text').text());
                                             index = Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2;
                                         } else {
@@ -640,13 +636,13 @@
                         }
 
                         chapterSelectorHeight = chapterSelectorList.height();
-                        chapterSelectorList.css({'height': 0, 'padding-bottom': 0});
+                        chapterSelectorList.css({ 'height': 0, 'padding-bottom': 0 });
 
                         chapterSelector.on('mouseenter.booklet', function () {
-                            chapterSelectorList.stop().animate({height: chapterSelectorHeight, paddingBottom: 10}, 500);
+                            chapterSelectorList.stop().animate({ height: chapterSelectorHeight, paddingBottom: 10 }, 500);
                         }).on('mouseleave.booklet', function () {
-                                chapterSelectorList.stop().animate({height: 0, paddingBottom: 0}, 500);
-                            });
+                            chapterSelectorList.stop().animate({ height: 0, paddingBottom: 0 }, 500);
+                        });
                     } else if (!options.chapterSelector) {
                         menu.find('.b-selector-chapter').remove();
                         chapter = chapterSelector = chapterSelectorList = chapterListItem = chapterSelectorHeight = null;
@@ -654,59 +650,45 @@
 
                 } else {
                     menu = null;
-                    if(options.menu){
+                    if (options.menu) {
                         $(options.menu).removeClass('b-menu');
                     }
                     target.find('.b-selector').remove();
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // GENERATE CONTROLS
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 ctrls = target.find('.b-controls');
-                if(ctrls.length == 0) {
+                if (ctrls.length == 0) {
                     ctrls = $('<div class="b-controls"></div>').appendTo(target);
                 }
 
                 // force no overlays if using manual controls
-                if(options.manual && $.ui) {
+                if (options.manual && $.ui) {
                     options.overlays = false;
                 }
 
-                // user defined prev next controls
+                // remove old item actions and references
                 if (customN) {
                     customN.off('click.booklet');
-                }
-                if(options.next && $(options.next).length > 0) {
-                    customN = $(options.next);
-                    customN.on('click.booklet', function (e) {
-                        e.preventDefault();
-                        next();
-                    });
-                } else {
                     customN = null;
                 }
                 if (customP) {
                     customP.off('click.booklet');
-                }
-                if(options.prev && $(options.prev).length > 0) {
-                    customP = $(options.prev);
-                    customP.on('click.booklet', function (e) {
-                        e.preventDefault();
-                        prev();
-                    });
-                } else {
                     customP = null;
                 }
 
                 // add overlays
                 overlaysB = target.find('.b-overlay');
-                if(options.overlays && overlaysB.length == 0) {
+                if (options.overlays && overlaysB.length == 0) {
                     overlayP = $('<div class="b-overlay b-overlay-prev b-prev" title="' + options.previousControlTitle + '"></div>').appendTo(ctrls);
                     overlayN = $('<div class="b-overlay b-overlay-next b-next" title="' + options.nextControlTitle + '"></div>').appendTo(ctrls);
                     overlaysB = target.find('.b-overlay');
                     // ie fix
-                    if($.browser.msie) {
-                        overlaysB.css({'background': '#fff', 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=0) !important'});
+                    if ($.browser.msie) {
+                        overlaysB.css({ 'background': '#fff', 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=0) !important' });
                     }
                 } else if (!options.overlays) {
                     overlaysB.remove();
@@ -715,30 +697,30 @@
 
                 // add tabs
                 tabs = target.find('.b-tab');
-                if(options.tabs && tabs.length == 0) {
+                if (options.tabs && tabs.length == 0) {
                     tabP = $('<div class="b-tab b-tab-prev b-prev" title="' + options.previousControlTitle + '">' + options.previousControlText + '</div>').appendTo(ctrls);
                     tabN = $('<div class="b-tab b-tab-next b-next" title="' + options.nextControlTitle + '">' + options.nextControlText + '</div>').appendTo(ctrls);
                     tabs = target.find('.b-tab');
                 } else if (!options.tabs) {
-                    target.css({'marginTop': 0});
+                    target.css({ 'marginTop': 0 });
                     tabs.remove();
                     tabs = null;
                 }
 
                 // update tab css, options might have changed
                 if (options.tabs && tabs.length > 0) {
-                    if(options.tabWidth) {
+                    if (options.tabWidth) {
                         tabs.width(options.tabWidth);
                     }
-                    if(options.tabHeight) {
+                    if (options.tabHeight) {
                         tabs.height(options.tabHeight);
                     }
 
-                    tabs.css({'top': '-' + tabN.outerHeight() + 'px'});
-                    target.css({'marginTop': tabN.outerHeight()});
+                    tabs.css({ 'top': '-' + tabN.outerHeight() + 'px' });
+                    target.css({ 'marginTop': tabN.outerHeight() });
 
-                    // update controls for RTL direction
-                    if(options.direction == directions.rightToLeft) {
+                    // update control titles for RTL direction
+                    if (options.direction == directions.rightToLeft) {
                         tabN.html(options.previousControlText).attr('title', options.previousControlTitle);
                         tabP.html(options.nextControlText).attr('title', options.nextControlTitle);
                     }
@@ -746,13 +728,13 @@
 
                 // add arrows
                 arrows = target.find('.b-arrow');
-                if(options.arrows && arrows.length == 0) {
+                if (options.arrows && arrows.length == 0) {
                     arrowP = $('<div class="b-arrow b-arrow-prev b-prev" title="' + options.previousControlTitle + '"><div>' + options.previousControlText + '</div></div>').appendTo(ctrls);
                     arrowN = $('<div class="b-arrow b-arrow-next b-next" title="' + options.nextControlTitle + '"><div>' + options.nextControlText + '</div></div>').appendTo(ctrls);
                     arrows = target.find('.b-arrow');
 
-                    // update ctrls for RTL direction
-                    if(options.direction == directions.rightToLeft) {
+                    // update control titles for RTL direction
+                    if (options.direction == directions.rightToLeft) {
                         arrowN.html('<div>' + options.previousControlText + '</div>').attr('title', options.previousControlTitle);
                         arrowP.html('<div>' + options.nextControlText + '</div>').attr('title', options.nextControlTitle);
                     }
@@ -761,7 +743,9 @@
                     arrows = null;
                 }
 
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // ADD CONTROL ACTIONS
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // save all "b-prev" and "b-next" controls
                 ctrlsN = ctrls.find('.b-next');
@@ -781,27 +765,43 @@
                     prev();
                 });
 
+                // add click action to custom controls
+                if (options.next && $(options.next).length > 0) {
+                    customN = $(options.next);
+                    customN.on('click.booklet', function (e) {
+                        e.preventDefault();
+                        next();
+                    });
+                }
+                if (options.prev && $(options.prev).length > 0) {
+                    customP = $(options.prev);
+                    customP.on('click.booklet', function (e) {
+                        e.preventDefault();
+                        prev();
+                    });
+                }
+
                 // add page hover animations
-                if(options.overlays && options.hovers) {
+                if (options.overlays && options.hovers) {
                     // hovers to start draggable forward
                     ctrlsN.on("mouseover.booklet", function () {
                         startHoverAnimation(true);
                     }).on("mouseout.booklet", function () {
-                            endHoverAnimation(true);
-                        });
+                        endHoverAnimation(true);
+                    });
 
                     // hovers to start draggable backwards
                     ctrlsP.on("mouseover.booklet", function () {
                         startHoverAnimation(false);
                     }).on("mouseout.booklet", function () {
-                            endHoverAnimation(false);
-                        });
+                        endHoverAnimation(false);
+                    });
                 }
 
                 // add arrow animations
-                if(options.arrows) {
-                    if(options.arrowsHide) {
-                        if($.support.opacity) {
+                if (options.arrows) {
+                    if (options.arrowsHide) {
+                        if ($.support.opacity) {
                             ctrlsN.on('mouseover.booklet', function () {
                                 arrowN.find('div').stop().fadeTo('fast', 1);
                             }).on('mouseout.booklet', function () {
@@ -834,9 +834,9 @@
 
                 // keyboard controls
                 $(document).on('keyup.booklet', function (event) {
-                    if(event.keyCode == 37 && options.keyboard && !isDisabled) {
+                    if (event.keyCode == 37 && options.keyboard) {
                         prev();
-                    } else if(event.keyCode == 39 && options.keyboard && !isDisabled) {
+                    } else if (event.keyCode == 39 && options.keyboard) {
                         next();
                     }
                 });
@@ -844,7 +844,7 @@
                 // hash controls
                 clearInterval(h);
                 h = null;
-                if(options.hash) {
+                if (options.hash) {
                     initHash();
                     clearInterval(h);
                     h = setInterval(function () {
@@ -854,16 +854,16 @@
 
                 // percentage resizing
                 $(window).on('resize.booklet', function () {
-                    if((wPercent || hPercent) && !isDisabled) {
+                    if ((wPercent || hPercent)) {
                         updatePercentageSize();
                     }
                 });
 
                 // auto flip book controls
-                if(options.auto && options.delay) {
+                if (options.auto && options.delay) {
                     clearInterval(a);
                     a = setInterval(function () {
-                        if(options.direction == directions.leftToRight) {
+                        if (options.direction == directions.leftToRight) {
                             next();
                         } else {
                             prev();
@@ -871,27 +871,27 @@
                     }, options.delay);
                     isPlaying = true;
 
-                    if(options.pause && $(options.pause).length > 0) {
+                    if (options.pause && $(options.pause).length > 0) {
                         pause = $(options.pause);
                         pause.off('click.booklet')
                             .on('click.booklet', function (e) {
                                 e.preventDefault();
-                                if(isPlaying) {
+                                if (isPlaying) {
                                     clearInterval(a);
                                     isPlaying = false;
                                 }
                             });
                     }
 
-                    if(options.play && $(options.play).length > 0) {
+                    if (options.play && $(options.play).length > 0) {
                         play = $(options.play);
                         play.off('click.booklet')
                             .on('click.booklet', function (e) {
                                 e.preventDefault();
-                                if(!isPlaying) {
+                                if (!isPlaying) {
                                     clearInterval(a);
                                     a = setInterval(function () {
-                                        if(options.direction == directions.leftToRight) {
+                                        if (options.direction == directions.leftToRight) {
                                             next();
                                         } else {
                                             prev();
@@ -904,18 +904,19 @@
                 } else {
                     clearInterval(a);
                     a = null;
-                    if(options.pause && $(options.pause).length > 0) {
+                    if (options.pause && $(options.pause).length > 0) {
                         $(options.pause).off('click.booklet');
                     }
                     pause = null;
-                    if(options.play && $(options.play).length > 0) {
+                    if (options.play && $(options.play).length > 0) {
                         $(options.play).off('click.booklet');
                     }
                     play = null;
                     isPlaying = false;
                 }
 
-                if(didUpdate){
+                // if options were updated force pages, controls and menu to update
+                if (didUpdate) {
                     updatePages();
                     updateControlVisibility();
                     updateMenu();
@@ -986,29 +987,29 @@
                 anim = {
 
                     hover: {
-                        speed:    options.hoverSpeed,
-                        size:     options.hoverWidth,
+                        speed: options.hoverSpeed,
+                        size: options.hoverWidth,
 
-                        p2:          {width: pWidth - hoverCurlWidth},
-                        p3:          {left: options.width - hoverFullWidth, width: hoverCurlWidth},
-                        p3closed:    {left: pWidth - options.hoverWidth, width: hoverCurlWidth},
-                        p3wrap:      {left: hoverShadowWidth},
+                        p2: { width: pWidth - hoverCurlWidth },
+                        p3: { left: options.width - hoverFullWidth, width: hoverCurlWidth },
+                        p3closed: { left: pWidth - options.hoverWidth, width: hoverCurlWidth },
+                        p3wrap: { left: hoverShadowWidth },
 
-                        p2end:       {width: pWidth},
-                        p2closedEnd: {width: pWidth, left:0},
-                        p3end:       {left: options.width, width: 0},
-                        p3closedEnd: {left: pWidth, width: 0},
-                        p3wrapEnd:   {left: 10},
+                        p2end: { width: pWidth },
+                        p2closedEnd: { width: pWidth, left: 0 },
+                        p3end: { left: options.width, width: 0 },
+                        p3closedEnd: { left: pWidth, width: 0 },
+                        p3wrapEnd: { left: 10 },
 
-                        p1:          {left: hoverCurlWidth, width: pWidth - hoverCurlWidth},
-                        p1wrap:      {left: '-'+hoverCurlWidth+'px'},
-                        p0:          {left: hoverCurlWidth, width: hoverCurlWidth},
-                        p0wrap:      {right: hoverShadowWidth},
+                        p1: { left: hoverCurlWidth, width: pWidth - hoverCurlWidth },
+                        p1wrap: { left: '-' + hoverCurlWidth + 'px' },
+                        p0: { left: hoverCurlWidth, width: hoverCurlWidth },
+                        p0wrap: { right: hoverShadowWidth },
 
-                        p1end:       {left: 0, width: pWidth},
-                        p1wrapEnd:   {left: 0},
-                        p0end:       {left: 0, width: 0},
-                        p0wrapEnd:   {right: 0}
+                        p1end: { left: 0, width: pWidth },
+                        p1wrapEnd: { left: 0 },
+                        p0end: { left: 0, width: 0 },
+                        p0wrapEnd: { right: 0 }
                     },
 
                     // forward
@@ -1037,7 +1038,7 @@
                         width: pWidth,
                         paddingLeft: 0
                     },
-                    p3wrapIn:  {
+                    p3wrapIn: {
                         left: options.shadowBtmWidth
                     },
                     p3wrapOut: {
@@ -1083,43 +1084,45 @@
                 };
             },
             updatePercentageSize = function () {
-                // recalculate size for percentage values, called with window is resized
-                if(wPercent) {
-                    options.width = (wOrig.replace('%', '') / 100) * parseFloat(target.parent().css('width'));
-                    target.width(options.width);
-                    pWidth = options.width / 2;
-                    pWidthN = '-' + (pWidth) + 'px';
-                    pWidthH = pWidth / 2;
+                if (!isDisabled) {
+                    // recalculate size for percentage values, called with window is resized
+                    if (wPercent) {
+                        options.width = (wOrig.replace('%', '') / 100) * parseFloat(target.parent().css('width'));
+                        target.width(options.width);
+                        pWidth = options.width / 2;
+                        pWidthN = '-' + (pWidth) + 'px';
+                        pWidthH = pWidth / 2;
+                    }
+                    if (hPercent) {
+                        options.height = (hOrig.replace('%', '') / 100) * parseFloat(target.parent().css('height'));
+                        target.height(options.height);
+                        pHeight = options.height;
+                    }
+                    updateCSSandAnimations();
+                    updatePageCSS();
                 }
-                if(hPercent) {
-                    options.height = (hOrig.replace('%', '') / 100) * parseFloat(target.parent().css('height'));
-                    target.height(options.height);
-                    pHeight = options.height;
-                }
-                updateCSSandAnimations();
-                updatePageCSS();
             },
             updateControlVisibility = function () {
                 // update controls, cursors and visibility
-                if(options.overlays || options.tabs || options.arrows) {
-                    if($.support.opacity) {
-                        if(options.currentIndex >= 2 && options.currentIndex != 0) {
+                if (options.overlays || options.tabs || options.arrows) {
+                    if ($.support.opacity) {
+                        if (options.currentIndex >= 2 && options.currentIndex != 0) {
                             ctrlsP.fadeIn('fast').css('cursor', options.cursor);
                         } else {
                             ctrlsP.fadeOut('fast').css('cursor', 'default');
                         }
-                        if(options.currentIndex < options.pageTotal - 2) {
+                        if (options.currentIndex < options.pageTotal - 2) {
                             ctrlsN.fadeIn('fast').css('cursor', options.cursor);
                         } else {
                             ctrlsN.fadeOut('fast').css('cursor', 'default');
                         }
                     } else {
-                        if(options.currentIndex >= 2 && options.currentIndex != 0) {
+                        if (options.currentIndex >= 2 && options.currentIndex != 0) {
                             ctrlsP.show().css('cursor', options.cursor);
                         } else {
                             ctrlsP.hide().css('cursor', 'default');
                         }
-                        if(options.currentIndex < options.pageTotal - 2) {
+                        if (options.currentIndex < options.pageTotal - 2) {
                             ctrlsN.show().css('cursor', options.cursor);
                         } else {
                             ctrlsN.hide().css('cursor', 'default');
@@ -1128,23 +1131,23 @@
                 }
             },
             updateMenu = function () {
-                if(options.pageSelector) {
+                if (options.pageSelector) {
                     var currentPageNumbers = '';
-                    if(options.direction == directions.rightToLeft) {
+                    if (options.direction == directions.rightToLeft) {
                         currentPageNumbers = (Math.abs(options.currentIndex - options.pageTotal) - 1) + ' - ' + ((Math.abs(options.currentIndex - options.pageTotal)));
-                        if(options.closed) {
-                            if(options.currentIndex == options.pageTotal - 2) {
+                        if (options.closed) {
+                            if (options.currentIndex == options.pageTotal - 2) {
                                 currentPageNumbers = '1'
-                            } else if(options.currentIndex == 0) {
+                            } else if (options.currentIndex == 0) {
                                 currentPageNumbers = options.pageTotal - 2
                             } else {
                                 currentPageNumbers = (Math.abs(options.currentIndex - options.pageTotal) - 2) + ' - ' + ((Math.abs(options.currentIndex - options.pageTotal) - 1));
                             }
 
-                            if(options.covers) {
-                                if(options.currentIndex == options.pageTotal - 2) {
+                            if (options.covers) {
+                                if (options.currentIndex == options.pageTotal - 2) {
                                     currentPageNumbers = ''
-                                } else if(options.currentIndex == 0) {
+                                } else if (options.currentIndex == 0) {
                                     currentPageNumbers = ''
                                 } else {
                                     currentPageNumbers = (Math.abs(options.currentIndex - options.pageTotal) - 3) + ' - ' + ((Math.abs(options.currentIndex - options.pageTotal) - 2));
@@ -1153,19 +1156,19 @@
                         }
                     } else {
                         currentPageNumbers = (options.currentIndex + 1) + ' - ' + (options.currentIndex + 2);
-                        if(options.closed) {
-                            if(options.currentIndex == 0) {
+                        if (options.closed) {
+                            if (options.currentIndex == 0) {
                                 currentPageNumbers = '1'
-                            } else if(options.currentIndex == options.pageTotal - 2) {
+                            } else if (options.currentIndex == options.pageTotal - 2) {
                                 currentPageNumbers = options.pageTotal - 2
                             } else {
                                 currentPageNumbers = (options.currentIndex) + '-' + (options.currentIndex + 1);
                             }
 
-                            if(options.covers) {
-                                if(options.currentIndex == 0) {
+                            if (options.covers) {
+                                if (options.currentIndex == 0) {
                                     currentPageNumbers = ''
-                                } else if(options.currentIndex == options.pageTotal - 2) {
+                                } else if (options.currentIndex == options.pageTotal - 2) {
                                     currentPageNumbers = ''
                                 } else {
                                     currentPageNumbers = (options.currentIndex - 1) + '-' + (options.currentIndex);
@@ -1175,16 +1178,16 @@
                     }
                     $(options.menu + ' .b-selector-page .b-current').text(currentPageNumbers);
                 }
-                if(options.chapterSelector) {
-                    if(pages[options.currentIndex].chapter != "") {
+                if (options.chapterSelector) {
+                    if (pages[options.currentIndex].chapter != "") {
                         $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex].chapter);
-                    } else if(pages[options.currentIndex + 1].chapter != "") {
+                    } else if (pages[options.currentIndex + 1].chapter != "") {
                         $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex + 1].chapter);
                     }
 
-                    if(options.direction == directions.rightToLeft && pages[options.currentIndex + 1].chapter != "") {
+                    if (options.direction == directions.rightToLeft && pages[options.currentIndex + 1].chapter != "") {
                         $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex + 1].chapter);
-                    } else if(pages[options.currentIndex] != "") {
+                    } else if (pages[options.currentIndex] != "") {
                         $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex].chapter);
                     }
                 }
@@ -1195,11 +1198,12 @@
                 // reset vars
                 isHoveringRight = isHoveringLeft = p3drag = p0drag = false;
 
-                // manual page turning, check if jQuery UI is loaded
+                // remove dragging from old pages
                 if (target.find('.b-page').draggable()) {
                     target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
                 }
-                if(options.manual && $.ui) {
+                // manual page turning, check if jQuery UI is loaded
+                if (options.manual && $.ui) {
 
                     // implement draggable forward
                     p3.draggable({
@@ -1221,15 +1225,15 @@
                             fullPercent = diff / origX;
                             shadowPercent = fullPercent < 0.5 ? fullPercent : (1 - fullPercent);
                             shadowW = (shadowPercent * options.shadowBtmWidth * 2) + hoverShadowWidth;
-                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth :shadowW;
+                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth : shadowW;
 
                             // move shadows
-                            if(options.shadows) {
-                                sF.css({'right': '-' + (options.shadowTopFwdWidth*shadowPercent*2) + 'px'});
-                                if($.support.opacity) {
-                                    sF.css({'opacity': shadowPercent*2});
+                            if (options.shadows) {
+                                sF.css({ 'right': '-' + (options.shadowTopFwdWidth * shadowPercent * 2) + 'px' });
+                                if ($.support.opacity) {
+                                    sF.css({ 'opacity': shadowPercent * 2 });
                                 } else {
-                                    sF.css({'right': 'auto', 'left': 0.1 * p3.width()});
+                                    sF.css({ 'right': 'auto', 'left': 0.1 * p3.width() });
                                 }
                             }
 
@@ -1241,22 +1245,22 @@
                             underW = pWidth - curlW;
 
                             // calculate positions for closed and auto-centered book
-                            if(options.closed && options.autoCenter) {
-                                if(options.currentIndex == 0) {
-                                    targetPercent = 0.5 + 0.5*fullPercent;
+                            if (options.closed && options.autoCenter) {
+                                if (options.currentIndex == 0) {
+                                    targetPercent = 0.5 + 0.5 * fullPercent;
                                     curlW = hoverCurlWidth + (hoverCurlWidth * fullPercent) + diff;
                                     curlW = curlW > pWidth ? pWidth : curlW;
                                     underW = pWidth - curlW;
 
-                                    p2.css({left: pWidth*fullPercent});
-                                    p4.css({left: pWidth*fullPercent});
-                                    target.width(options.width*targetPercent);
-                                } else if(options.currentIndex == options.pageTotal - 4) {
-                                    targetPercent = (1 - fullPercent) + 0.5*fullPercent;
+                                    p2.css({ left: pWidth * fullPercent });
+                                    p4.css({ left: pWidth * fullPercent });
+                                    target.width(options.width * targetPercent);
+                                } else if (options.currentIndex == options.pageTotal - 4) {
+                                    targetPercent = (1 - fullPercent) + 0.5 * fullPercent;
                                     underW = pWidth - curlW;
 
                                     p4.hide();
-                                    target.width(options.width*targetPercent);
+                                    target.width(options.width * targetPercent);
                                 } else {
                                     target.width(options.width);
                                 }
@@ -1264,14 +1268,14 @@
 
                             // set values
                             p3.width(curlW);
-                            p3wrap.css({left: shadowW});
+                            p3wrap.css({ left: shadowW });
                             p2.width(underW);
                         },
                         stop: function (event, ui) {
                             endHoverAnimation(false);
-                            if(fullPercent > options.hoverThreshold) {
-                                if(options.shadows && !$.support.opacity) {
-                                    sF.css({'left': 'auto', opacity: 0});
+                            if (fullPercent > options.hoverThreshold) {
+                                if (options.shadows && !$.support.opacity) {
+                                    sF.css({ 'left': 'auto', opacity: 0 });
                                 }
                                 next();
                                 p3.removeClass('b-grab b-grabbing');
@@ -1279,15 +1283,15 @@
                                 p3drag = false;
                                 p3.removeClass('b-grabbing').addClass('b-grab');
 
-                                sF.animate({left: 'auto', opacity: 0}, anim.hover.speed, options.easing).css(css.sF);
+                                sF.animate({ left: 'auto', opacity: 0 }, anim.hover.speed, options.easing).css(css.sF);
 
-                                if(options.closed && options.autoCenter) {
-                                    if(options.currentIndex == 0) {
-                                        p2.animate({left: 0}, anim.hover.speed, options.easing);
-                                        p4.animate({left: 0}, anim.hover.speed, options.easing);
-                                        target.animate({width: options.width*0.5}, anim.hover.speed, options.easing);
+                                if (options.closed && options.autoCenter) {
+                                    if (options.currentIndex == 0) {
+                                        p2.animate({ left: 0 }, anim.hover.speed, options.easing);
+                                        p4.animate({ left: 0 }, anim.hover.speed, options.easing);
+                                        target.animate({ width: options.width * 0.5 }, anim.hover.speed, options.easing);
                                     } else {
-                                        target.animate({width: options.width}, anim.hover.speed, options.easing);
+                                        target.animate({ width: options.width }, anim.hover.speed, options.easing);
                                     }
                                 }
                             }
@@ -1313,40 +1317,40 @@
                             newX = ui.position.left;
                             diff = newX - origX;
                             fullPercent = diff / (options.width - origX);
-                            if(options.closed && options.autoCenter && options.currentIndex == 2) {
+                            if (options.closed && options.autoCenter && options.currentIndex == 2) {
                                 fullPercent = diff / (pWidth - origX);
                             }
-                            if(fullPercent > 1){fullPercent = 1;}
+                            if (fullPercent > 1) { fullPercent = 1; }
 
                             shadowPercent = fullPercent < 0.5 ? fullPercent : (1 - fullPercent);
                             shadowW = (shadowPercent * options.shadowBtmWidth * 2) + hoverShadowWidth;
-                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth :shadowW;
+                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth : shadowW;
 
-                            if(options.shadows) {
-                                if($.support.opacity) {
-                                    sB.css({'opacity': shadowPercent*2});
+                            if (options.shadows) {
+                                if ($.support.opacity) {
+                                    sB.css({ 'opacity': shadowPercent * 2 });
                                 } else {
-                                    sB.css({'left': options.shadowTopBackWidth*shadowPercent*2});
+                                    sB.css({ 'left': options.shadowTopBackWidth * shadowPercent * 2 });
                                 }
                             }
 
-                            curlW = fullPercent*(pWidth-hoverCurlWidth) + hoverCurlWidth + shadowW;
+                            curlW = fullPercent * (pWidth - hoverCurlWidth) + hoverCurlWidth + shadowW;
                             curlLeft = curlW - shadowW;
                             p1wrapLeft = -curlLeft;
 
                             // calculate positions for closed and auto-centered book
-                            if(options.closed && options.autoCenter) {
-                                if(options.currentIndex == 2) {
-                                    targetPercent = (1-fullPercent) + 0.5*fullPercent;
-                                    curlLeft = (1-fullPercent)*curlLeft;
-                                    p1wrapLeft = -curlLeft - (options.width - (options.width*targetPercent));
+                            if (options.closed && options.autoCenter) {
+                                if (options.currentIndex == 2) {
+                                    targetPercent = (1 - fullPercent) + 0.5 * fullPercent;
+                                    curlLeft = (1 - fullPercent) * curlLeft;
+                                    p1wrapLeft = -curlLeft - (options.width - (options.width * targetPercent));
                                     pN.hide();
-                                    p2.css({left: pWidth*(1-fullPercent)});
-                                    p4.css({left: pWidth*(1-fullPercent)});
-                                    target.width(options.width*targetPercent);
-                                } else if(options.currentIndex == options.pageTotal - 2) {
-                                    targetPercent = 0.5 + 0.5*fullPercent;
-                                    target.width(options.width*targetPercent);
+                                    p2.css({ left: pWidth * (1 - fullPercent) });
+                                    p4.css({ left: pWidth * (1 - fullPercent) });
+                                    target.width(options.width * targetPercent);
+                                } else if (options.currentIndex == options.pageTotal - 2) {
+                                    targetPercent = 0.5 + 0.5 * fullPercent;
+                                    target.width(options.width * targetPercent);
                                 } else {
                                     target.width(options.width);
                                 }
@@ -1354,28 +1358,28 @@
 
                             // set values
                             ui.position.left = curlLeft;
-                            p0.css({width: curlW});
-                            p0wrap.css({right: shadowW});
-                            p1.css({left: curlLeft, width: pWidth - curlLeft});
-                            p1wrap.css({left: p1wrapLeft});
+                            p0.css({ width: curlW });
+                            p0wrap.css({ right: shadowW });
+                            p1.css({ left: curlLeft, width: pWidth - curlLeft });
+                            p1wrap.css({ left: p1wrapLeft });
                         },
                         stop: function (event, ui) {
                             endHoverAnimation(true);
-                            if(fullPercent > options.hoverThreshold) {
+                            if (fullPercent > options.hoverThreshold) {
                                 prev();
                                 p0.removeClass('b-grab b-grabbing');
                             } else {
-                                sB.animate({opacity: 0}, anim.hover.speed, options.easing).css(css.sB);
+                                sB.animate({ opacity: 0 }, anim.hover.speed, options.easing).css(css.sB);
                                 p0drag = false;
                                 p0.removeClass('b-grabbing').addClass('b-grab');
 
-                                if(options.closed && options.autoCenter) {
-                                    if(options.currentIndex == 2) {
-                                        p2.animate({left: pWidth}, anim.hover.speed*2, options.easing);
-                                        p4.animate({left: pWidth}, anim.hover.speed*2, options.easing);
-                                        target.animate({width: options.width}, anim.hover.speed*2, options.easing);
-                                    } else if(options.currentIndex == options.pageTotal - 2) {
-                                        target.animate({width: options.width*0.5}, anim.hover.speed, options.easing);
+                                if (options.closed && options.autoCenter) {
+                                    if (options.currentIndex == 2) {
+                                        p2.animate({ left: pWidth }, anim.hover.speed * 2, options.easing);
+                                        p4.animate({ left: pWidth }, anim.hover.speed * 2, options.easing);
+                                        target.animate({ width: options.width }, anim.hover.speed * 2, options.easing);
+                                    } else if (options.currentIndex == options.pageTotal - 2) {
+                                        target.animate({ width: options.width * 0.5 }, anim.hover.speed, options.easing);
                                     }
                                 }
                             }
@@ -1384,35 +1388,35 @@
 
                     target.find('.b-page').off('click.booklet');
                     if (options.hoverClick) {
-                        target.find('.b-pN, .b-p0').on('click.booklet', prev).css({cursor:'pointer'});
-                        target.find('.b-p3, .b-p4').on('click.booklet', next).css({cursor:'pointer'});
+                        target.find('.b-pN, .b-p0').on('click.booklet', prev).css({ cursor: 'pointer' });
+                        target.find('.b-p3, .b-p4').on('click.booklet', next).css({ cursor: 'pointer' });
                     }
 
                     // mouse tracking for page movement
                     target.off('mousemove.booklet').on('mousemove.booklet', function (e) {
                         diff = e.pageX - target.offset().left;
-                        if(diff < anim.hover.size) {
+                        if (diff < anim.hover.size) {
                             startHoverAnimation(false);
-                        } else if(diff > pWidth - anim.hover.size && options.currentIndex == 0 && options.autoCenter && options.closed) {
+                        } else if (diff > pWidth - anim.hover.size && options.currentIndex == 0 && options.autoCenter && options.closed) {
                             startHoverAnimation(true);
-                        } else if(diff > anim.hover.size && diff <= options.width - anim.hover.size) {
+                        } else if (diff > anim.hover.size && diff <= options.width - anim.hover.size) {
                             endHoverAnimation(false);
                             endHoverAnimation(true);
-                        } else if(diff > options.width - anim.hover.size) {
+                        } else if (diff > options.width - anim.hover.size) {
                             startHoverAnimation(true);
                         }
                     }).off('mouseleave.booklet').on('mouseleave.booklet', function () {
-                            endHoverAnimation(false);
-                            endHoverAnimation(true);
-                        });
+                        endHoverAnimation(false);
+                        endHoverAnimation(true);
+                    });
 
                 }
             },
             initHash = function () {
                 hash = getHashNum();
 
-                if(!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0 && hash != '') {
-                    if((hash % 2) != 0) {
+                if (!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0 && hash != '') {
+                    if ((hash % 2) != 0) {
                         hash--;
                     }
                     options.currentIndex = hash;
@@ -1426,16 +1430,15 @@
                 hash = getHashNum();
 
                 // check page num
-                if(!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0) {
-                    if(hash != options.currentIndex && hash.toString() != currentHash) {
-                        if((hash % 2) != 0) {
-
+                if (!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0) {
+                    if (hash != options.currentIndex && hash.toString() != currentHash) {
+                        if ((hash % 2) != 0) {
                             hash--
                         }
 
                         document.title = options.name + options.hashTitleText + (hash + 1);
 
-                        if(!isBusy) {
+                        if (!isBusy) {
                             goToPage(hash);
                             currentHash = hash;
                         }
@@ -1446,9 +1449,9 @@
                 var hash, hashNum;
                 // get page number from hash tag, last element
                 hash = window.location.hash.split('/');
-                if(hash.length > 1) {
+                if (hash.length > 1) {
                     hashNum = parseInt(hash[2]) - 1;
-                    if(options.direction == directions.rightToLeft) {
+                    if (options.direction == directions.rightToLeft) {
                         hashNum = Math.abs(hashNum + 1 - options.pageTotal);
                     }
                     return hashNum;
@@ -1458,8 +1461,8 @@
             },
             updateHash = function (hash, options) {
                 // set the hash
-                if(options.hash) {
-                    if(options.direction == directions.rightToLeft) {
+                if (options.hash) {
+                    if (options.direction == directions.rightToLeft) {
                         hash = Math.abs(hash - options.pageTotal);
                     }
                     window.location.hash = hashRoot + hash;
@@ -1467,10 +1470,10 @@
             },
             destroyControls = function () {
 
-                if(options.menu){
+                if (options.menu) {
                     $(options.menu).removeClass('b-menu');
 
-                    if(options.pageSelector) {
+                    if (options.pageSelector) {
                         menu.find('.b-selector-page').remove();
                         pageSelector = pageSelectorList = listItemNumbers = listItemTitle = pageListItem = pageSelectorHeight = null;
                     }
@@ -1504,7 +1507,6 @@
 
                 // keyboard
                 //$(document).off('keyup.booklet');
-                isDisabled = true;
 
                 // hash
                 clearInterval(h);
@@ -1516,11 +1518,11 @@
                 // auto play
                 clearInterval(a);
                 a = null;
-                if(options.pause && $(options.pause).length > 0) {
+                if (options.pause && $(options.pause).length > 0) {
                     $(options.pause).off('click.booklet');
                 }
                 pause = null;
-                if(options.play && $(options.play).length > 0) {
+                if (options.play && $(options.play).length > 0) {
                     $(options.play).off('click.booklet');
                 }
                 play = null;
@@ -1542,19 +1544,19 @@
 
             addPage = function (index, html) {
                 // validate inputs
-                if(index == "start") {
+                if (index == "start") {
                     index = 0;
-                } else if(index == "end") {
+                } else if (index == "end") {
                     index = originalPageTotal;
-                } else if(typeof index == "number") {
-                    if(index < 0 || index > originalPageTotal) {
+                } else if (typeof index == "number") {
+                    if (index < 0 || index > originalPageTotal) {
                         return;
                     }
-                } else if(typeof index == "undefined") {
+                } else if (typeof index == "undefined") {
                     return;
                 }
 
-                if(typeof html == "undefined" || html == '') {
+                if (typeof html == "undefined" || html == '') {
                     return;
                 }
 
@@ -1563,13 +1565,13 @@
                 destroyControls();
 
                 // add new page
-                if(options.closed && options.covers && index == originalPageTotal) {
+                if (options.closed && options.covers && index == originalPageTotal) {
                     //end of closed-covers book
                     target.children(':eq(' + (index - 1) + ')').before(html);
-                } else if(options.closed && options.covers && index == 0) {
+                } else if (options.closed && options.covers && index == 0) {
                     //start of closed-covers book
                     target.children(':eq(' + index + ')').after(html);
-                } else if(index == originalPageTotal) {
+                } else if (index == originalPageTotal) {
                     //end of book
                     target.children(':eq(' + (index - 1) + ')').after(html);
                 } else {
@@ -1580,16 +1582,14 @@
 
                 // callback for adding page, returns options, index and the page node
                 callback = {
-                    options: jQuery.extend({},options),
+                    options: jQuery.extend({}, options),
                     index: index,
                     page: target.children(':eq(' + index + ')')[0]
                 };
-                if(options.add) {
-                    target.off(events.add+'.booklet').on(events.add+'.booklet', options.add);
+                if (options.add) {
+                    target.off(events.add + '.booklet').on(events.add + '.booklet', options.add);
                 }
                 target.trigger(events.add, callback);
-
-                isDisabled = false;
 
                 // recall initialize functions
                 initPages();
@@ -1598,22 +1598,22 @@
                 updateControlVisibility();
                 updateMenu();
             },
-            removePage = function(index) {
+            removePage = function (index) {
                 // validate inputs
-                if(index == "start") {
+                if (index == "start") {
                     index = 0;
-                } else if(index == "end") {
+                } else if (index == "end") {
                     index = originalPageTotal;
-                } else if(typeof index == "number") {
-                    if(index < 0 || index > originalPageTotal) {
+                } else if (typeof index == "number") {
+                    if (index < 0 || index > originalPageTotal) {
                         return;
                     }
-                } else if(typeof index == "undefined") {
+                } else if (typeof index == "undefined") {
                     return;
                 }
 
                 // stop if removing last remaining page
-                if(target.children('.b-page').length == 2 && target.find('.b-page-blank').length > 0) {
+                if (target.children('.b-page').length == 2 && target.find('.b-page-blank').length > 0) {
                     return;
                 }
 
@@ -1621,11 +1621,11 @@
                 destroyPages();
                 destroyControls();
 
-                if(index >= options.currentIndex) {
-                    if(index > 0 && (index % 2) != 0) {
-                        options.currentIndex-=2;
+                if (index >= options.currentIndex) {
+                    if (index > 0 && (index % 2) != 0) {
+                        options.currentIndex -= 2;
                     }
-                    if(options.currentIndex < 0){
+                    if (options.currentIndex < 0) {
                         options.currentIndex = 0;
                     }
                 }
@@ -1633,13 +1633,13 @@
                 var removedPage;
 
                 // remove page
-                if(options.closed && options.covers && index == originalPageTotal) {
+                if (options.closed && options.covers && index == originalPageTotal) {
                     // end of closed-covers book
                     removedPage = target.children(':eq(' + (index - 1) + ')').remove();
-                } else if(options.closed && options.covers && index == 0) {
+                } else if (options.closed && options.covers && index == 0) {
                     // start of closed-covers book
                     removedPage = target.children(':eq(' + index + ')').remove();
-                } else if(index == originalPageTotal) {
+                } else if (index == originalPageTotal) {
                     // end of book
                     removedPage = target.children(':eq(' + (index - 1) + ')').remove();
                 } else {
@@ -1650,17 +1650,16 @@
 
                 // callback for adding page, returns options, index and the page node
                 callback = {
-                    options: jQuery.extend({},options),
+                    options: jQuery.extend({}, options),
                     index: index,
                     page: removedPage[0]
                 };
-                if(options.remove) {
-                    target.off(events.remove+'.booklet').on(events.remove+'.booklet', options.remove);
+                if (options.remove) {
+                    target.off(events.remove + '.booklet').on(events.remove + '.booklet', options.remove);
                 }
                 target.trigger(events.remove, callback);
 
                 removedPage = null;
-                isDisabled = false;
 
                 // recall initialize functions
                 initPages();
@@ -1675,8 +1674,8 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             next = function () {
-                if(!isBusy) {
-                    if(isPlaying && options.currentIndex + 2 >= options.pageTotal) {
+                if (!isBusy && !isDisabled) {
+                    if (isPlaying && options.currentIndex + 2 >= options.pageTotal) {
                         goToPage(0);
                     } else {
                         goToPage(options.currentIndex + 2);
@@ -1684,8 +1683,8 @@
                 }
             },
             prev = function () {
-                if(!isBusy) {
-                    if(isPlaying && options.currentIndex - 2 < 0) {
+                if (!isBusy && !isDisabled) {
+                    if (isPlaying && options.currentIndex - 2 < 0) {
                         goToPage(options.pageTotal - 2);
                     } else {
                         goToPage(options.currentIndex - 2);
@@ -1695,143 +1694,145 @@
             goToPage = function (newIndex) {
                 var speed;
 
-                // moving forward (increasing number)
-                if(newIndex > options.currentIndex && newIndex < options.pageTotal && newIndex >= 0 && !isBusy) {
-                    isBusy = true;
-                    diff = newIndex - options.currentIndex;
-                    options.currentIndex = newIndex;
-                    options.movingForward = true;
+                if (newIndex < options.pageTotal && newIndex >= 0 && !isBusy && !isDisabled) {
+                    // moving forward (increasing number)
+                    if (newIndex > options.currentIndex) {
+                        isBusy = true;
+                        diff = newIndex - options.currentIndex;
+                        options.currentIndex = newIndex;
+                        options.movingForward = true;
 
-                    // callback when starting booklet animation
-                    callback = {
-                        options: jQuery.extend({},options),
-                        index: newIndex,
-                        pages: [pages[newIndex].contentNode, pages[newIndex+1].contentNode]
-                    };
-                    if(options.start) {
-                        target.off(events.start+'.booklet').on(events.start+'.booklet', options.start);
-                    }
-                    target.trigger(events.start, callback);
+                        // callback when starting booklet animation
+                        callback = {
+                            options: jQuery.extend({}, options),
+                            index: newIndex,
+                            pages: [pages[newIndex].contentNode, pages[newIndex + 1].contentNode]
+                        };
+                        if (options.start) {
+                            target.off(events.start + '.booklet').on(events.start + '.booklet', options.start);
+                        }
+                        target.trigger(events.start, callback);
 
-                    updateMenu();
-                    if(newIndex == options.pageTotal - 2) updateControlVisibility();
-                    updateHash(options.currentIndex + 1, options);
+                        updateMenu();
+                        if (newIndex == options.pageTotal - 2) updateControlVisibility();
+                        updateHash(options.currentIndex + 1, options);
 
-                    // set animation speed, depending if user dragged any distance or not
-                    speed = p3drag === true ? options.speed * (p3.width() / pWidth) : speedH;
+                        // set animation speed, depending if user dragged any distance or not
+                        speed = p3drag === true ? options.speed * (p3.width() / pWidth) : speedH;
 
-                    startPageAnimation(diff, true, sF, speed);
+                        startPageAnimation(diff, true, sF, speed);
 
-                    // hide p2 as p3 moves across it
-                    if(options.closed && options.autoCenter && newIndex - diff == 0) {
-                        p2.stop().animate(anim.p2closed, p3drag === true ? speed : speed*2, options.easing);
-                        p4.stop().animate(anim.p4closed, p3drag === true ? speed : speed*2, options.easing);
-                    } else {
-                        p2.stop().animate(anim.p2, speed, p3drag === true ? options.easeOut : options.easeIn);
-                    }
-
-                    // if animating after a manual drag, calculate new speed and animate out
-                    if(p3drag) {
-
-                        p3.animate(anim.p3out, speed, options.easeOut);
-                        p3wrap.animate(anim.p3wrapOut, speed, options.easeOut, function () {updateAfter()});
-
-                    } else {
-
-                        p3.stop().animate(anim.p3in, speed, options.easeIn)
-                            .animate(anim.p3out, speed, options.easeOut);
-
-                        p3wrap.animate(anim.p3wrapIn, speed, options.easeIn)
-                            .animate(anim.p3wrapOut, speed, options.easeOut, function () {updateAfter()});
-                    }
-
-                    // moving backward (decreasing number)
-                } else if(newIndex < options.currentIndex && newIndex < options.pageTotal && newIndex >= 0 && !isBusy) {
-                    isBusy = true;
-                    diff = options.currentIndex - newIndex;
-                    options.currentIndex = newIndex;
-                    options.movingForward = false;
-
-                    // callback when starting booklet animation
-                    callback = {
-                        options: jQuery.extend({},options),
-                        index: newIndex,
-                        pages: [pages[newIndex].contentNode, pages[newIndex+1].contentNode]
-                    };
-                    if(options.start) {
-                        target.off(events.start+'.booklet').on(events.start+'.booklet', options.start);
-                    }
-                    target.trigger(events.start, callback);
-
-                    updateMenu();
-                    if(newIndex == 0) updateControlVisibility();
-                    updateHash(options.currentIndex + 1, options);
-
-                    // set animation speed, depending if user dragged any distance or not
-                    speed = p0drag === true ? options.speed * (p0.width() / pWidth) : speedH;
-
-                    startPageAnimation(diff, false, sB, speed);
-
-                    if(p0drag) {
-                        // hide p1 as p0 moves across it
-                        p1.animate(anim.p1, speed, options.easeOut);
-                        p1wrap.animate(anim.p1wrap, speed, options.easeOut);
-
-                        if(options.closed && options.autoCenter && options.currentIndex == 0) {
-                            p0.animate(anim.p0outClosed, speed, options.easeOut);
-                            p2.stop().animate(anim.p2back, speed, options.easeOut);
-                        }else{
-                            p0.animate(anim.p0, speed, options.easeOut);
+                        // hide p2 as p3 moves across it
+                        if (options.closed && options.autoCenter && newIndex - diff == 0) {
+                            p2.stop().animate(anim.p2closed, p3drag === true ? speed : speed * 2, options.easing);
+                            p4.stop().animate(anim.p4closed, p3drag === true ? speed : speed * 2, options.easing);
+                        } else {
+                            p2.stop().animate(anim.p2, speed, p3drag === true ? options.easeOut : options.easeIn);
                         }
 
-                        p0wrap.animate(anim.p0wrapDrag, speed, options.easeOut, function () {updateAfter()});
-                    }else{
-                        // hide p1 as p0 moves across it
-                        p1.animate(anim.p1, speed*2, options.easing);
-                        p1wrap.animate(anim.p1wrap, speed*2, options.easing);
+                        // if animating after a manual drag, calculate new speed and animate out
+                        if (p3drag) {
 
-                        if(options.closed && options.autoCenter && options.currentIndex == 0) {
-                            p0.animate(anim.p0in, speed, options.easeIn)
-                                .animate(anim.p0outClosed, speed, options.easeOut);
-                            p2.stop().animate(anim.p2back, speed*2, options.easing);
-                        }else{
-                            p0.animate(anim.p0in, speed, options.easeIn)
-                                .animate(anim.p0out, speed, options.easeOut);
+                            p3.animate(anim.p3out, speed, options.easeOut);
+                            p3wrap.animate(anim.p3wrapOut, speed, options.easeOut, function () { updateAfter() });
+
+                        } else {
+
+                            p3.stop().animate(anim.p3in, speed, options.easeIn)
+                                .animate(anim.p3out, speed, options.easeOut);
+
+                            p3wrap.animate(anim.p3wrapIn, speed, options.easeIn)
+                                .animate(anim.p3wrapOut, speed, options.easeOut, function () { updateAfter() });
                         }
 
-                        p0wrap.animate(anim.p0wrapIn, speed, options.easeIn)
-                            .animate(anim.p0wrapOut, speed, options.easeOut, function () {updateAfter()});
+                        // moving backward (decreasing number)
+                    } else if (newIndex < options.currentIndex) {
+                        isBusy = true;
+                        diff = options.currentIndex - newIndex;
+                        options.currentIndex = newIndex;
+                        options.movingForward = false;
+
+                        // callback when starting booklet animation
+                        callback = {
+                            options: jQuery.extend({}, options),
+                            index: newIndex,
+                            pages: [pages[newIndex].contentNode, pages[newIndex + 1].contentNode]
+                        };
+                        if (options.start) {
+                            target.off(events.start + '.booklet').on(events.start + '.booklet', options.start);
+                        }
+                        target.trigger(events.start, callback);
+
+                        updateMenu();
+                        if (newIndex == 0) updateControlVisibility();
+                        updateHash(options.currentIndex + 1, options);
+
+                        // set animation speed, depending if user dragged any distance or not
+                        speed = p0drag === true ? options.speed * (p0.width() / pWidth) : speedH;
+
+                        startPageAnimation(diff, false, sB, speed);
+
+                        if (p0drag) {
+                            // hide p1 as p0 moves across it
+                            p1.animate(anim.p1, speed, options.easeOut);
+                            p1wrap.animate(anim.p1wrap, speed, options.easeOut);
+
+                            if (options.closed && options.autoCenter && options.currentIndex == 0) {
+                                p0.animate(anim.p0outClosed, speed, options.easeOut);
+                                p2.stop().animate(anim.p2back, speed, options.easeOut);
+                            } else {
+                                p0.animate(anim.p0, speed, options.easeOut);
+                            }
+
+                            p0wrap.animate(anim.p0wrapDrag, speed, options.easeOut, function () { updateAfter() });
+                        } else {
+                            // hide p1 as p0 moves across it
+                            p1.animate(anim.p1, speed * 2, options.easing);
+                            p1wrap.animate(anim.p1wrap, speed * 2, options.easing);
+
+                            if (options.closed && options.autoCenter && options.currentIndex == 0) {
+                                p0.animate(anim.p0in, speed, options.easeIn)
+                                    .animate(anim.p0outClosed, speed, options.easeOut);
+                                p2.stop().animate(anim.p2back, speed * 2, options.easing);
+                            } else {
+                                p0.animate(anim.p0in, speed, options.easeIn)
+                                    .animate(anim.p0out, speed, options.easeOut);
+                            }
+
+                            p0wrap.animate(anim.p0wrapIn, speed, options.easeIn)
+                                .animate(anim.p0wrapOut, speed, options.easeOut, function () { updateAfter() });
+                        }
                     }
                 }
             },
             startHoverAnimation = function (inc) {
-                if((options.hovers && options.overlays) || options.manual){
-                    if(inc) {
-                        if(!isBusy && !isHoveringRight && !isHoveringLeft && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
+                if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
+                    if (inc) {
+                        if (!isBusy && !isHoveringRight && !isHoveringLeft && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
                             // animate
                             p2.stop().animate(anim.hover.p2, anim.hover.speed, options.easing);
                             p3.addClass('b-grab');
-                            if(options.closed && options.autoCenter && options.currentIndex == 0) {
+                            if (options.closed && options.autoCenter && options.currentIndex == 0) {
                                 p3.stop().animate(anim.hover.p3closed, anim.hover.speed, options.easing);
                             } else {
                                 p3.stop().animate(anim.hover.p3, anim.hover.speed, options.easing);
                             }
                             p3wrap.stop().animate(anim.hover.p3wrap, anim.hover.speed, options.easing);
-                            if(options.shadows && !$.support.opacity) {
-                                sF.css({'right': 'auto', 'left': '-40%'});
+                            if (options.shadows && !$.support.opacity) {
+                                sF.css({ 'right': 'auto', 'left': '-40%' });
                             }
                             isHoveringRight = true;
                         }
                     } else {
-                        if(!isBusy && !isHoveringLeft && !isHoveringRight && !p0drag && options.currentIndex - 2 >= 0) {
+                        if (!isBusy && !isHoveringLeft && !isHoveringRight && !p0drag && options.currentIndex - 2 >= 0) {
                             // animate
                             p1.stop().animate(anim.hover.p1, anim.hover.speed, options.easing);
                             p0.addClass('b-grab');
                             p1wrap.stop().animate(anim.hover.p1wrap, anim.hover.speed, options.easing);
                             p0.stop().animate(anim.hover.p0, anim.hover.speed, options.easing);
                             p0wrap.stop().animate(anim.hover.p0wrap, anim.hover.speed, options.easing);
-                            if(options.shadows && !$.support.opacity) {
-                                sB.css({'left': -0.38 * pWidth});
+                            if (options.shadows && !$.support.opacity) {
+                                sB.css({ 'left': -0.38 * pWidth });
                             }
                             isHoveringLeft = true;
                         }
@@ -1839,10 +1840,10 @@
                 }
             },
             endHoverAnimation = function (inc) {
-                if((options.hovers && options.overlays) || options.manual){
-                    if(inc) {
-                        if(!isBusy && isHoveringRight && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
-                            if(options.closed && options.autoCenter && options.currentIndex == 0) {
+                if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
+                    if (inc) {
+                        if (!isBusy && isHoveringRight && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
+                            if (options.closed && options.autoCenter && options.currentIndex == 0) {
                                 p2.stop().animate(anim.hover.p2closedEnd, anim.hover.speed, options.easing);
                                 p3.stop().animate(anim.hover.p3closedEnd, anim.hover.speed, options.easing);
                             } else {
@@ -1850,13 +1851,13 @@
                                 p3.stop().animate(anim.hover.p3end, anim.hover.speed, options.easing);
                             }
                             p3wrap.stop().animate(anim.hover.p3wrapEnd, anim.hover.speed, options.easing);
-                            if(options.shadows && !$.support.opacity) {
-                                sF.css({'left': 'auto'});
+                            if (options.shadows && !$.support.opacity) {
+                                sF.css({ 'left': 'auto' });
                             }
                             isHoveringRight = false;
                         }
                     } else {
-                        if(!isBusy && isHoveringLeft && !p0drag && options.currentIndex - 2 >= 0) {
+                        if (!isBusy && isHoveringLeft && !p0drag && options.currentIndex - 2 >= 0) {
                             p1.stop().animate(anim.hover.p1end, anim.hover.speed, options.easing);
                             p1wrap.stop().animate(anim.hover.p1wrapEnd, anim.hover.speed, options.easing);
                             p0.stop().animate(anim.hover.p0end, anim.hover.speed, options.easing);
@@ -1868,7 +1869,7 @@
             },
             startPageAnimation = function (diff, inc, shadow, speed) {
                 // setup content
-                if(inc && diff > 2) {
+                if (inc && diff > 2) {
 
                     // initialize next 2 pages, if jumping forward in the book
                     target.find('.b-p3, .b-p4').removeClass('b-p3 b-p4').hide();
@@ -1882,22 +1883,22 @@
                     p3wrap = target.find('.b-p3 .b-wrap');
                     p4wrap = target.find('.b-p4 .b-wrap');
 
-                    if(options.closed && options.autoCenter && options.currentIndex - diff == 0) {
-                        p3.css({'left': pWidth});
-                        p4.css({'left': 0});
+                    if (options.closed && options.autoCenter && options.currentIndex - diff == 0) {
+                        p3.css({ 'left': pWidth });
+                        p4.css({ 'left': 0 });
                     }
 
-                    if(isHoveringRight) {
-                        p3.css({'left': options.width - 40, 'width': 20, 'padding-left': 10});
+                    if (isHoveringRight) {
+                        p3.css({ 'left': options.width - 40, 'width': 20, 'padding-left': 10 });
                     }
 
-                    if(options.shadows) {
+                    if (options.shadows) {
                         target.find('.b-shadow-f').remove();
                         sF = $(templates.sF).css(css.sF).appendTo(p3);
                         shadow = sF;
                     }
 
-                } else if(!inc && diff > 2) {
+                } else if (!inc && diff > 2) {
 
                     // initialize previous 2 pages, if jumping backwards in the book
                     target.find('.b-pN, .b-p0').removeClass('b-pN b-p0').hide();
@@ -1911,17 +1912,17 @@
                     pNwrap = target.find('.b-pN .b-wrap');
                     p0wrap = target.find('.b-p0 .b-wrap');
 
-                    if(options.closed && options.autoCenter) {
-                        pN.css({'left': 0});
+                    if (options.closed && options.autoCenter) {
+                        pN.css({ 'left': 0 });
                     }
                     p0wrap.css(css.p0wrap);
 
-                    if(isHoveringLeft) {
-                        p0.css({left: 10, width: 40});
-                        p0wrap.css({right: 10});
+                    if (isHoveringLeft) {
+                        p0.css({ left: 10, width: 40 });
+                        p0wrap.css({ right: 10 });
                     }
 
-                    if(options.shadows) {
+                    if (options.shadows) {
                         target.find('.b-shadow-b, .b-shadow-f').remove();
                         sB = $(templates.sB).appendTo(p0).css(css.sB);
                         shadow = sB;
@@ -1930,48 +1931,48 @@
 
                 // update page visibility
                 // if moving to start and end of book
-                if(options.closed) {
-                    if(!inc && options.currentIndex == 0) {
+                if (options.closed) {
+                    if (!inc && options.currentIndex == 0) {
                         pN.hide();
-                    } else if(!inc) {
+                    } else if (!inc) {
                         pN.show();
                     }
-                    if(inc && options.currentIndex >= options.pageTotal - 2) {
+                    if (inc && options.currentIndex >= options.pageTotal - 2) {
                         p4.hide();
-                    } else if(inc) {
+                    } else if (inc) {
                         p4.show();
                     }
                 }
 
                 // init shadows
-                if(options.shadows) {
+                if (options.shadows) {
                     // check for opacity support -> animate shadow overlay on moving slide
-                    if($.support.opacity) {
-                        if(!p3drag && !p0drag) {
-                            shadow.animate({opacity: 1}, speed, options.easeIn);
+                    if ($.support.opacity) {
+                        if (!p3drag && !p0drag) {
+                            shadow.animate({ opacity: 1 }, speed, options.easeIn);
                         }
-                        shadow.animate({opacity: 0}, speed, options.easeOut);
+                        shadow.animate({ opacity: 0 }, speed, options.easeOut);
                     } else {
-                        if(inc) {
-                            shadow.animate({right: options.shadowTopFwdWidth}, speed*2, options.easeIn);
+                        if (inc) {
+                            shadow.animate({ right: options.shadowTopFwdWidth }, speed * 2, options.easeIn);
                         } else {
-                            shadow.animate({left: options.shadowTopBackWidth}, speed*2, options.easeIn);
+                            shadow.animate({ left: options.shadowTopBackWidth }, speed * 2, options.easeIn);
                         }
                     }
                 }
 
                 // init position animation
-                if(options.closed && options.autoCenter) {
-                    if(options.currentIndex == 0) {
+                if (options.closed && options.autoCenter) {
+                    if (options.currentIndex == 0) {
                         p3.hide();
                         p4.hide();
-                        target.animate({width: pWidth}, !p3drag && !p0drag ? speed*2 : speed, options.easing);
-                    } else if(options.currentIndex >= options.pageTotal - 2) {
+                        target.animate({ width: pWidth }, !p3drag && !p0drag ? speed * 2 : speed, options.easing);
+                    } else if (options.currentIndex >= options.pageTotal - 2) {
                         p0.hide();
                         pN.hide();
-                        target.animate({width: pWidth}, speed*2, options.easing);
+                        target.animate({ width: pWidth }, speed * 2, options.easing);
                     } else {
-                        target.animate({width: options.width}, speed*2, options.easing);
+                        target.animate({ width: options.width }, speed * 2, options.easing);
                     }
                 }
 
@@ -1984,12 +1985,12 @@
 
                 // callback when ending booklet animation
                 callback = {
-                    options: jQuery.extend({},options),
+                    options: jQuery.extend({}, options),
                     index: options.currentIndex,
-                    pages: [pages[options.currentIndex].contentNode, pages[options.currentIndex+1].contentNode]
+                    pages: [pages[options.currentIndex].contentNode, pages[options.currentIndex + 1].contentNode]
                 };
-                if(options.change) {
-                    target.off(events.change+'.booklet').on(events.change+'.booklet', options.change);
+                if (options.change) {
+                    target.off(events.change + '.booklet').on(events.change + '.booklet', options.change);
                 }
                 target.trigger(events.change, callback);
             };
@@ -2007,38 +2008,38 @@
             prev: prev,
             gotopage: function (index) {
                 // validate inputs
-                if(typeof index === 'string') {
-                    if(index == "start") {
+                if (typeof index === 'string') {
+                    if (index == "start") {
                         index = 0;
-                    } else if(index == "end") {
+                    } else if (index == "end") {
                         index = options.pageTotal - 2;
                     } else {
-						this.gotopage(parseInt(index));
-					}
-                } else if(typeof index === "number") {
-                    if(index < 0 || index >= options.pageTotal) {
+                        this.gotopage(parseInt(index));
+                    }
+                } else if (typeof index === "number") {
+                    if (index < 0 || index >= options.pageTotal) {
                         return;
                     }
-                } else if(typeof index === "undefined") {
+                } else if (typeof index === "undefined") {
                     return;
                 }
                 // adjust for odd page
-                if(index % 2 != 0) {
+                if (index % 2 != 0) {
                     index -= 1;
                 }
                 // adjust for booklet direction
-                if(options.direction == directions.rightToLeft) {
+                if (options.direction == directions.rightToLeft) {
                     index = Math.abs(index - options.pageTotal) - 2;
                 }
                 goToPage(index);
             },
             add: addPage,
             remove: removePage,
-            option: function(name, value) {
-                if(typeof name === 'string') {
+            option: function (name, value) {
+                if (typeof name === 'string') {
                     // if option exists
-                    if(options[name]) {
-                        if(typeof value !== 'undefined'){
+                    if (options[name]) {
+                        if (typeof value !== 'undefined') {
                             // if value is sent in, set the option value and update options
                             options[name] = value;
                             updateOptions();
@@ -2047,14 +2048,14 @@
                             return options[name];
                         }
                     } else {
-                        $.error('Option "' +  name + '" does not exist on jQuery.booklet.');
+                        $.error('Option "' + name + '" does not exist on jQuery.booklet.');
                     }
-                } else if(typeof name === 'object'){
+                } else if (typeof name === 'object') {
                     // if sending in an object, update options
                     updateOptions(name);
-                } else if(typeof name === 'undefined' || !name) {
+                } else if (typeof name === 'undefined' || !name) {
                     // return a copy of the options object, to avoid changes
-                    return jQuery.extend({},options);
+                    return jQuery.extend({}, options);
                 }
             }
         }
