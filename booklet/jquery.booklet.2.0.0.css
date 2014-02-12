@@ -1,25 +1,20 @@
-/*
- * jQuery Booklet Plugin
- * Copyright (c) 2010 - 2013 William Grauvogel (http://builtbywill.com/)
- *
- * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
- *
- * Version : 1.4.2
- *
- * Originally based on the work of:
- *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
- */
+/* @Booklet
+----------------------------------------*/
+	.booklet          {width:800px; height:600px; position:relative; /*background:#fff;*/ margin:0 auto 10px; overflow:visible !important;}
+	.booklet .b-page  {left:0; top:0; position:absolute; overflow:hidden; padding:0; background:#efefef;}
+	
+	.booklet .b-pN  {}
+	.booklet .b-p0  {}
+	.booklet .b-p1  {}
+	.booklet .b-p2  {}    
+	.booklet .b-p3  {}
+	.booklet .b-p4  {}		
+		
 	.booklet {
-		width:800px; height:600px; position:relative; margin:0 auto 10px; overflow:visible !important;
         -webkit-perspective: 800px; -webkit-perspective-origin: 50% 50%; -webkit-transform-style: preserve-3d;
         -moz-perspective: 800px; -moz-perspective-origin: 50% 50%; -moz-transform-style: preserve-3d;
-		box-shadow:0px 5px 20px rgba(0,0,0,0.25);
     }
-
-	.booklet .b-page {
-		left:0; top:0; position:absolute; overflow:hidden; padding:0; background-color:#efefef; outline:1px solid transparent;
-	}
-
+	.booklet .b-page {}
 	.booklet .b-pN  {
         -webkit-transform-origin: 100% 0;
         -moz-transform-origin: 100% 0;
@@ -44,23 +39,10 @@
         -webkit-transform-origin: 0 0;
         -moz-transform-origin: 0 0;
     }
-
-	.booklet .b-page:nth-child(odd)  {}
-	.booklet .b-page:nth-child(even) {}
 	
-	.booklet .b-p4:before {
-	   content: '';
-	   position: absolute;
-	   /* The Shadow */
-	   -webkit-box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-	   -moz-box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-	   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-	   width: 100%;
-	   left: -100%;
-	   height: 92%;
-	   top:  0;
-	}
-	
+	.booklet .b-load  {}
+		
+	.booklet .b-page-empty {background:none;}
 	
    	/* Custom Page Types */
 	.booklet .b-page-blank  {padding:0; width:100%; height:100%;}
@@ -69,17 +51,14 @@
    
    	/* Page Numbers */
 	.booklet .b-counter {bottom:10px; position:absolute; display:block; width:25px; height:20px; background:#ccc; color:#444; text-align:center; font-family:Georgia, "Times New Roman", Times, serif; font-size:10px; padding:5px 0 0;}
-	/*
 	.booklet .b-wrap-left  .b-counter  {left:10px;}
 	.booklet .b-wrap-right .b-counter {right:10px;}
-	*/
-	.booklet .b-page:nth-child(odd)  .b-counter  {left:10px;}
-	.booklet .b-page:nth-child(even) .b-counter {right:10px;}
    
-   	/* Page Shadows 
+   	/* Page Shadows */
 	.booklet .b-shadow-f  {right:0; top:0; position:absolute; opacity:0; background-image:url("images/shadow-top-forward.png"); background-repeat:repeat-y; background-position:100% 0;}
 	.booklet .b-shadow-b  {left:0;  top:0; position:absolute; opacity:0; background-image:url("images/shadow-top-back.png");    background-repeat:repeat-y; background-position:0 0;}
 	
+	/*
 	.booklet .b-p0 {background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:100% 10px;}
 	.booklet .b-p3 {background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:0 10px;}
 	*/
@@ -106,36 +85,47 @@
 	.booklet .b-arrow-prev     {left:-80px;}
 	.booklet .b-arrow-next div {background:url("images/arrow-next.png") no-repeat left top;}
 	.booklet .b-arrow-prev div {background:url("images/arrow-prev.png") no-repeat left top;}
-		
+		   	
+	/* Peel Controls */
+	.booklet .b-peel          {display:block; position:absolute; text-indent:-9999px; bottom:0; height:50px; width:50px; overflow:hidden; z-index:100; cursor:pointer;}
+	.booklet .b-peel img      {text-indent:-9999px; height:100%; width:100%; position:absolute; bottom:0;}
+	.booklet .b-peel-next     {right:0;}
+	.booklet .b-peel-prev     {left:0;}	
+	.booklet .b-peel-next img {right:0;}
+	.booklet .b-peel-prev img {left:0;}	
+	
 /* @z-index fix (needed for older IE browsers)
 ----------------------------------------*/
 
-    body              {z-index:0;}
+	body              {z-index:0;}
     .b-menu           {z-index:100;}
     .b-selector       {z-index:100;}
-    .booklet          {z-index:10;}
+	.booklet          {z-index:10;}
+
     .b-pN             {z-index:10;}
-    .b-p0             {z-index:30;}
-    .b-p1             {z-index:20;}
-    .b-p2             {z-index:20;}
-    .b-p3             {z-index:30;}
+    .b-p0             {z-index:20;}
+    .b-p1             {z-index:30;}
+    .b-p2             {z-index:30;}
+    .b-p3             {z-index:20;}
     .b-p4             {z-index:10;}
+
     .b-prev           {z-index:40;}
     .b-next           {z-index:40;}
     .b-counter        {z-index:40;}
+
 	
 /* @Menu Items
 ----------------------------------------*/
 	.b-menu {height:40px; padding:0 0 10px;}
 	
-	.b-selector             {height:40px; position:relative; float:right; border:none; color:#cecece; cursor:pointer; font:normal 12px "Myriad Pro", Myriad, "DejaVu Sans Condensed","Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;}
+	.b-selector             {height:40px; position:relative; float:right; border:none; color:#cecece; cursor:pointer;}
 	.b-selector .b-current  {padding:8px 15px 12px; line-height:20px; min-width:18px; height:20px; display:block; background:#000; text-align:center;}
 	.b-selector-page        {width:auto; margin-left:15px;}
 	.b-selector-chapter     {width:auto;}
 	
 	.b-selector:hover            {color:#fff; background-position:left 0px;}
 	.b-selector:hover .b-current {background-position:right 0px;}
-	.b-selector ul               {overflow:hidden; margin:0; list-style:none !important; position:absolute; top:40px; right:0; padding:0 0 10px; background:#000; width:240px;}
+	.b-selector ul               {overflow:hidden; margin:0; list-style:none !important; position:absolute; top:40px; right:0; padding:0 0 10px; background:#000; width:240px; font:normal 12px "Myriad Pro", Myriad, "DejaVu Sans Condensed","Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;}
 	.b-selector li               {border:none;}
 	.b-selector a                {color:#cecece; height:14px; text-decoration:none; display:block; padding:5px 10px;}
 	.b-selector a .b-text        {float:left; clear:none;}

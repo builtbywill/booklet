@@ -8,8 +8,8 @@
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
- */
-; (function ($) {
+ */;
+(function ($) {
 
     $.fn.booklet = function (options, param1, param2) {
 
@@ -134,6 +134,7 @@
                     title = '',
                     pageNode;
 
+/*
                 // save chapter title
                 if (contentNode.attr('rel')) {
                     chapter = contentNode.attr('rel');
@@ -153,6 +154,8 @@
                 } else {
                     contentNode.wrap('<div class="b-page"><div class="b-wrap b-wrap-left"></div></div>');
                 }
+*/
+                contentNode.wrap('<div class="b-page"></div>');
 
                 pageNode = contentNode.parents('.b-page').addClass('b-page-' + index);
 
@@ -347,6 +350,7 @@
                 p2 = target.find('.b-p2');
                 p3 = target.find('.b-p3');
                 p4 = target.find('.b-p4');
+/*
                 pNwrap = target.find('.b-pN .b-wrap');
                 p0wrap = target.find('.b-p0 .b-wrap');
                 p1wrap = target.find('.b-p1 .b-wrap');
@@ -360,12 +364,55 @@
                     sF = $(templates.sF).css(css.sF).appendTo(p3);
                     sB = $(templates.sB).appendTo(p0).css(css.sB);
                 }
+*/
             },
             updatePageCSS = function () {
                 // update css
                 target.find('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({ 'filter': '', 'zoom': '' });
 
                 target.find('.b-page').removeAttr('style');
+
+                $('.b-page').css({
+                    padding: options.pagePadding,
+                    width:   pWidth-(2*options.pagePadding),
+                    height:  pHeight-(2*options.pagePadding),
+					visibility: 'hidden'
+                });
+
+                pN.css({
+                    left:0,
+                    '-webkit-transform': 'rotateY(0deg)',
+                    '-moz-transform': 'rotateY(0deg)',
+                });
+                p0.css({
+                    left:pWidth,
+                    '-webkit-transform': 'rotateY(-180deg)',
+                    '-moz-transform': 'rotateY(-180deg)'
+                });
+                p1.css({
+                    left:0,
+                    '-webkit-transform': 'rotateY(0deg)',
+                    '-moz-transform': 'rotateY(0deg)',
+					visibility: 'visible'
+                });
+                p2.css({
+                    left:pWidth,
+                    '-webkit-transform': 'rotateY(0deg)',
+                    '-moz-transform': 'rotateY(0deg)',
+					visibility: 'visible'
+                });
+                p3.css({
+                    left:0,
+                    '-webkit-transform': 'rotateY(180deg)',
+                    '-moz-transform': 'rotateY(180deg)'
+                });
+                p4.css({
+                    left:pWidth,
+                    '-webkit-transform': 'rotateY(0deg)',
+                    '-moz-transform': 'rotateY(0deg)'
+                });
+
+/*
                 wraps.removeAttr('style');
 
                 wraps.css(css.wrap);
@@ -387,7 +434,7 @@
                     p3.css({ 'left': pWidth });
                     p4.css({ 'left': 0 });
                 }
-
+*/
                 if (options.closed && options.autoCenter && (options.currentIndex == 0 || options.currentIndex >= options.pageTotal - 2)) {
                     if (options.overlays) {
                         overlaysB.width('100%');
@@ -1193,6 +1240,7 @@
                 }
             },
             updateManualControls = function () {
+	/*
                 var origX, newX, diff, fullPercent, shadowPercent, shadowW, curlW, underW, targetPercent, curlLeft, p1wrapLeft;
 
                 // reset vars
@@ -1411,6 +1459,7 @@
                     });
 
                 }
+*/
             },
             initHash = function () {
                 hash = getHashNum();
@@ -1722,6 +1771,18 @@
 
                         startPageAnimation(diff, true, sF, speed);
 
+	                   	p4.css({visibility:'visible'});
+						$('.booklet .b-p4:before').animate({boxShadow:'200px 20px 50px #000'});
+	
+	                    p2.transition({rotateY: '-90deg'}, speed/2, 'in')
+						  .transition({visibility:'hidden'}, 0)
+						  .transition({rotateY: '-180deg'}, speed/2, 'out');
+	                   
+
+	                    p3.transition({rotateY: '90deg'}, speed/2, 'in')
+	                      .transition({visibility:'visible'}, 0)
+	                      .transition({rotateY: '0deg'}, speed/2, 'out', function(){updateAfter()});
+/*
                         // hide p2 as p3 moves across it
                         if (options.closed && options.autoCenter && newIndex - diff == 0) {
                             p2.stop().animate(anim.p2closed, p3drag === true ? speed : speed * 2, options.easing);
@@ -1744,7 +1805,7 @@
                             p3wrap.animate(anim.p3wrapIn, speed, options.easeIn)
                                 .animate(anim.p3wrapOut, speed, options.easeOut, function () { updateAfter() });
                         }
-
+*/
                         // moving backward (decreasing number)
                     } else if (newIndex < options.currentIndex) {
                         isBusy = true;
@@ -1772,6 +1833,24 @@
 
                         startPageAnimation(diff, false, sB, speed);
 
+	                   	pN.css({visibility:'visible'});
+	                    p1.transition({rotateY: '90deg'}, speed/2, 'in', function(){
+	                        p1.css({visibility:'hidden'})
+	                          .transition({rotateY: '180deg'}, speed/2, 'out');
+	                    });
+
+	                    p0.transition({rotateY: '-90deg'}, speed/2, 'in', function(){
+	                        p0.css({visibility:'visible'})
+	                          .transition({rotateY: '0deg'}, speed/2, 'out', function(){updateAfter()});
+	                    });
+
+/*
+	                   	pN.transition({rotateY: '0deg'}, speed/2);
+	                    p0.transition({rotateY: '0deg'}, speed, 'in-out');
+	                    p1.transition({rotateY: '180deg'}, speed, 'in-out', function(){updateAfter()});
+*/
+
+/*
                         if (p0drag) {
                             // hide p1 as p0 moves across it
                             p1.animate(anim.p1, speed, options.easeOut);
@@ -1802,10 +1881,12 @@
                             p0wrap.animate(anim.p0wrapIn, speed, options.easeIn)
                                 .animate(anim.p0wrapOut, speed, options.easeOut, function () { updateAfter() });
                         }
+*/
                     }
                 }
             },
             startHoverAnimation = function (inc) {
+	/*
                 if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
                     if (inc) {
                         if (!isBusy && !isHoveringRight && !isHoveringLeft && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
@@ -1838,8 +1919,10 @@
                         }
                     }
                 }
+*/
             },
             endHoverAnimation = function (inc) {
+	/*
                 if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
                     if (inc) {
                         if (!isBusy && isHoveringRight && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
@@ -1866,11 +1949,34 @@
                         }
                     }
                 }
+*/
             },
             startPageAnimation = function (diff, inc, shadow, speed) {
                 // setup content
                 if (inc && diff > 2) {
+	
+					target.find('.b-p3, .b-p4').removeClass('b-p3 b-p4').hide();
+                    target.find('.b-page-' + options.currentIndex).addClass('b-p3').show().stop().css({
+                        'left': pWidth * 2,
+                        'width': 0,
+                        'height': pHeight,
+                        paddingLeft: 0
+                    });
+                    target.find('.b-page-' + (options.currentIndex + 1)).addClass('b-p4').show().css({
+                        'left': pWidth,
+                        'width': pWidth,
+                        'height': pHeight
+                    });
 
+                    p3 = target.find('.b-p3');
+                    p4 = target.find('.b-p4');
+
+                    if(options.closed && options.autoCenter && options.currentIndex - diff == 0) {
+                        p3.css({'left': pWidth});
+                        p4.css({'left': 0});
+                    }
+
+					/*
                     // initialize next 2 pages, if jumping forward in the book
                     target.find('.b-p3, .b-p4').removeClass('b-p3 b-p4').hide();
                     target.find('.b-page-' + options.currentIndex).addClass('b-p3').show().stop().css(css.p3);
@@ -1896,10 +2002,41 @@
                         target.find('.b-shadow-f').remove();
                         sF = $(templates.sF).css(css.sF).appendTo(p3);
                         shadow = sF;
-                    }
+                    }*/
 
                 } else if (!inc && diff > 2) {
+	
+                    target.find('.b-pN, .b-p0').removeClass('b-pN b-p0').hide();
+                    target.find('.b-page-' + options.currentIndex).addClass('b-pN').show().css({
+                        'left': 0,
+                        'width': pWidth,
+                        'height': pHeight
+                    });
+                    target.find('.b-page-' + (options.currentIndex + 1)).addClass('b-p0').show().css({
+                        'left': 0,
+                        'width': 0,
+                        'height': pHeight
+                    });
+                    /*target.find('.b-page-' + options.currentIndex + ' .b-wrap').show().css({
+                     'width': options.pWidth - (options.pagePadding * 2),
+                     'height': options.pHeight - (options.pagePadding * 2),
+                     'padding': options.pagePadding
+                     });
+                     target.find('.b-page-' + (options.currentIndex + 1) + ' .b-wrap').show().css({
+                     'width': options.pWidth - (options.pagePadding * 2),
+                     'height': options.pHeight - (options.pagePadding * 2),
+                     'padding': options.pagePadding
+                     });*/
 
+                    pN = target.find('.b-pN');
+                    p0 = target.find('.b-p0');
+                    //pNwrap = target.find('.b-pN .b-wrap');
+                    //p0wrap = target.find('.b-p0 .b-wrap');
+
+                    if(options.closed && options.autoCenter) {
+                        pN.css({'left': 0});
+                    }
+/*
                     // initialize previous 2 pages, if jumping backwards in the book
                     target.find('.b-pN, .b-p0').removeClass('b-pN b-p0').hide();
                     target.find('.b-page-' + options.currentIndex).addClass('b-pN').show().css(css.pN);
@@ -1927,6 +2064,7 @@
                         sB = $(templates.sB).appendTo(p0).css(css.sB);
                         shadow = sB;
                     }
+*/
                 }
 
                 // update page visibility
@@ -1943,7 +2081,7 @@
                         p4.show();
                     }
                 }
-
+/*
                 // init shadows
                 if (options.shadows) {
                     // check for opacity support -> animate shadow overlay on moving slide
@@ -1960,7 +2098,7 @@
                         }
                     }
                 }
-
+*/
                 // init position animation
                 if (options.closed && options.autoCenter) {
                     if (options.currentIndex == 0) {
@@ -2066,7 +2204,7 @@
         name:                 null,                            // name of the booklet to display in the document title bar
         width:                600,                             // container width
         height:               400,                             // container height
-        speed:                1000,                            // speed of the transition between pages
+        speed:                2000,                            // speed of the transition between pages
         direction:            'LTR',                           // direction of the overall content organization, default LTR, left to right, can be RTL for languages which read right to left
         startingPage:         0,                               // index of the first page to be displayed
         easing:               'easeInOutQuad',                 // easing method for complete transition
