@@ -24,10 +24,10 @@
                     method = options;
                     // add optional parameters
                     params = new Array();
-                    if (param1) {
+                    if (typeof param1 !== 'undefined') {
                         params.push(param1);
                     }
-                    if (param2) {
+                    if (typeof param2 !== 'undefined') {
                         params.push(param2);
                     }
                     if (obj[method]) {
@@ -50,7 +50,7 @@
                 return $(this);
             }
         }
-            // option type number - api call
+        // option type number - api call
         else if (typeof options === 'number') {
             return $(this).each(function () {
                 obj = $(this).data('booklet');
@@ -62,7 +62,7 @@
                 }
             });
         }
-            // else build new booklet
+        // else build new booklet
         else if (typeof method === 'object' || !method) {
             return $(this).each(function () {
                 config = $.extend({}, $.fn.booklet.defaults, options);
@@ -566,6 +566,7 @@
 
                             if (!options.hash) {
                                 pageListItem.find('a').on('click.booklet', function () {
+									if (isBusy || isDisabled) return;
                                     if (options.direction == directions.rightToLeft) {
                                         pageSelector.find('.b-current').text($(this).find('.b-num').text());
                                         goToPage(Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2);
@@ -618,6 +619,7 @@
                                 if (!options.hash) {
                                     chapterListItem.find('a').on('click.booklet', function () {
                                         var index;
+										if (isBusy || isDisabled) return;
                                         if (options.direction == directions.rightToLeft) {
                                             chapterSelector.find('.b-current').text($(this).find('.b-text').text());
                                             index = Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2;
@@ -2040,7 +2042,7 @@
             option: function (name, value) {
                 if (typeof name === 'string') {
                     // if option exists
-                    if (options[name]) {
+                    if (typeof options[name] !== 'undefined') {
                         if (typeof value !== 'undefined') {
                             // if value is sent in, set the option value and update options
                             options[name] = value;
