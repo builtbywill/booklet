@@ -1,10 +1,10 @@
 /*
  * jQuery Booklet Plugin
- * Copyright (c) 2010 - 2013 William Grauvogel (http://builtbywill.com/)
+ * Copyright (c) 2010 - 2014 William Grauvogel (http://builtbywill.com/)
  *
  * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
  *
- * Version : 1.4.2
+ * Version : 1.4.3
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
@@ -787,15 +787,15 @@
                     ctrlsN.on("mouseover.booklet", function () {
                         startHoverAnimation(true);
                     }).on("mouseout.booklet", function () {
-                            endHoverAnimation(true);
-                        });
+                        endHoverAnimation(true);
+                    });
 
                     // hovers to start draggable backwards
                     ctrlsP.on("mouseover.booklet", function () {
                         startHoverAnimation(false);
                     }).on("mouseout.booklet", function () {
-                            endHoverAnimation(false);
-                        });
+                        endHoverAnimation(false);
+                    });
                 }
 
                 // add arrow animations
@@ -1195,218 +1195,219 @@
                 // reset vars
                 isHoveringRight = isHoveringLeft = p3drag = p0drag = false;
 
-                // manual page turning, check if jQuery UI is loaded
-                if (target.find('.b-page').draggable()) {
-                    target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
-                }
-                if(options.manual && $.ui) {
+				if($.ui) {
+	                // manual page turning, check if jQuery UI is loaded
+	                if(target.find('.b-page').draggable()) {
+	                    target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
+	                }
+	                if(options.manual) {
+	                    // implement draggable forward
+	                    p3.draggable({
+	                        axis: "x",
+	                        containment: [
+	                            target.offset().left,
+	                            0,
+	                            p2.offset().left + pWidth - hoverFullWidth,
+	                            pHeight
+	                        ],
+	                        drag: function (event, ui) {
+	                            p3drag = true;
+	                            p3.removeClass('b-grab').addClass('b-grabbing');
 
-                    // implement draggable forward
-                    p3.draggable({
-                        axis: "x",
-                        containment: [
-                            target.offset().left,
-                            0,
-                            p2.offset().left + pWidth - hoverFullWidth,
-                            pHeight
-                        ],
-                        drag: function (event, ui) {
-                            p3drag = true;
-                            p3.removeClass('b-grab').addClass('b-grabbing');
+	                            // calculate positions
+	                            origX = ui.originalPosition.left;
+	                            newX = ui.position.left;
+	                            diff = origX - newX;
+	                            fullPercent = diff / origX;
+	                            shadowPercent = fullPercent < 0.5 ? fullPercent : (1 - fullPercent);
+	                            shadowW = (shadowPercent * options.shadowBtmWidth * 2) + hoverShadowWidth;
+	                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth :shadowW;
 
-                            // calculate positions
-                            origX = ui.originalPosition.left;
-                            newX = ui.position.left;
-                            diff = origX - newX;
-                            fullPercent = diff / origX;
-                            shadowPercent = fullPercent < 0.5 ? fullPercent : (1 - fullPercent);
-                            shadowW = (shadowPercent * options.shadowBtmWidth * 2) + hoverShadowWidth;
-                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth :shadowW;
+	                            // move shadows
+	                            if(options.shadows) {
+	                                sF.css({'right': '-' + (options.shadowTopFwdWidth*shadowPercent*2) + 'px'});
+	                                if($.support.opacity) {
+	                                    sF.css({'opacity': shadowPercent*2});
+	                                } else {
+	                                    sF.css({'right': 'auto', 'left': 0.1 * p3.width()});
+	                                }
+	                            }
 
-                            // move shadows
-                            if(options.shadows) {
-                                sF.css({'right': '-' + (options.shadowTopFwdWidth*shadowPercent*2) + 'px'});
-                                if($.support.opacity) {
-                                    sF.css({'opacity': shadowPercent*2});
-                                } else {
-                                    sF.css({'right': 'auto', 'left': 0.1 * p3.width()});
-                                }
-                            }
+	                            // set top page curl width
+	                            curlW = hoverCurlWidth + diff / 2;
+	                            curlW = curlW > pWidth ? pWidth : curlW; // constrain max width
 
-                            // set top page curl width
-                            curlW = hoverCurlWidth + diff / 2;
-                            curlW = curlW > pWidth ? pWidth : curlW; // constrain max width
+	                            // set bottom page width, hide
+	                            underW = pWidth - curlW;
 
-                            // set bottom page width, hide
-                            underW = pWidth - curlW;
+	                            // calculate positions for closed and auto-centered book
+	                            if(options.closed && options.autoCenter) {
+	                                if(options.currentIndex == 0) {
+	                                    targetPercent = 0.5 + 0.5*fullPercent;
+	                                    curlW = hoverCurlWidth + (hoverCurlWidth * fullPercent) + diff;
+	                                    curlW = curlW > pWidth ? pWidth : curlW;
+	                                    underW = pWidth - curlW;
 
-                            // calculate positions for closed and auto-centered book
-                            if(options.closed && options.autoCenter) {
-                                if(options.currentIndex == 0) {
-                                    targetPercent = 0.5 + 0.5*fullPercent;
-                                    curlW = hoverCurlWidth + (hoverCurlWidth * fullPercent) + diff;
-                                    curlW = curlW > pWidth ? pWidth : curlW;
-                                    underW = pWidth - curlW;
+	                                    p2.css({left: pWidth*fullPercent});
+	                                    p4.css({left: pWidth*fullPercent});
+	                                    target.width(options.width*targetPercent);
+	                                } else if(options.currentIndex == options.pageTotal - 4) {
+	                                    targetPercent = (1 - fullPercent) + 0.5*fullPercent;
+	                                    underW = pWidth - curlW;
 
-                                    p2.css({left: pWidth*fullPercent});
-                                    p4.css({left: pWidth*fullPercent});
-                                    target.width(options.width*targetPercent);
-                                } else if(options.currentIndex == options.pageTotal - 4) {
-                                    targetPercent = (1 - fullPercent) + 0.5*fullPercent;
-                                    underW = pWidth - curlW;
+	                                    p4.hide();
+	                                    target.width(options.width*targetPercent);
+	                                } else {
+	                                    target.width(options.width);
+	                                }
+	                            }
 
-                                    p4.hide();
-                                    target.width(options.width*targetPercent);
-                                } else {
-                                    target.width(options.width);
-                                }
-                            }
+	                            // set values
+	                            p3.width(curlW);
+	                            p3wrap.css({left: shadowW});
+	                            p2.width(underW);
+	                        },
+	                        stop: function (event, ui) {
+	                            endHoverAnimation(false);
+	                            if(fullPercent > options.hoverThreshold) {
+	                                if(options.shadows && !$.support.opacity) {
+	                                    sF.css({'left': 'auto', opacity: 0});
+	                                }
+	                                next();
+	                                p3.removeClass('b-grab b-grabbing');
+	                            } else {
+	                                p3drag = false;
+	                                p3.removeClass('b-grabbing').addClass('b-grab');
 
-                            // set values
-                            p3.width(curlW);
-                            p3wrap.css({left: shadowW});
-                            p2.width(underW);
-                        },
-                        stop: function (event, ui) {
-                            endHoverAnimation(false);
-                            if(fullPercent > options.hoverThreshold) {
-                                if(options.shadows && !$.support.opacity) {
-                                    sF.css({'left': 'auto', opacity: 0});
-                                }
-                                next();
-                                p3.removeClass('b-grab b-grabbing');
-                            } else {
-                                p3drag = false;
-                                p3.removeClass('b-grabbing').addClass('b-grab');
+	                                sF.animate({left: 'auto', opacity: 0}, anim.hover.speed, options.easing).css(css.sF);
 
-                                sF.animate({left: 'auto', opacity: 0}, anim.hover.speed, options.easing).css(css.sF);
+	                                if(options.closed && options.autoCenter) {
+	                                    if(options.currentIndex == 0) {
+	                                        p2.animate({left: 0}, anim.hover.speed, options.easing);
+	                                        p4.animate({left: 0}, anim.hover.speed, options.easing);
+	                                        target.animate({width: options.width*0.5}, anim.hover.speed, options.easing);
+	                                    } else {
+	                                        target.animate({width: options.width}, anim.hover.speed, options.easing);
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    });
 
-                                if(options.closed && options.autoCenter) {
-                                    if(options.currentIndex == 0) {
-                                        p2.animate({left: 0}, anim.hover.speed, options.easing);
-                                        p4.animate({left: 0}, anim.hover.speed, options.easing);
-                                        target.animate({width: options.width*0.5}, anim.hover.speed, options.easing);
-                                    } else {
-                                        target.animate({width: options.width}, anim.hover.speed, options.easing);
-                                    }
-                                }
-                            }
-                        }
-                    });
+	                    // implement draggable backwards
+	                    p0.draggable({
+	                        axis: "x",
+	                        //containment: 'parent',
+	                        containment: [
+	                            target.offset().left + hoverCurlWidth,
+	                            0,
+	                            target.offset().left + options.width,
+	                            pHeight
+	                        ],
+	                        drag: function (event, ui) {
+	                            p0drag = true;
+	                            p0.removeClass('b-grab').addClass('b-grabbing');
 
-                    // implement draggable backwards
-                    p0.draggable({
-                        axis: "x",
-                        //containment: 'parent',
-                        containment: [
-                            target.offset().left + hoverCurlWidth,
-                            0,
-                            target.offset().left + options.width,
-                            pHeight
-                        ],
-                        drag: function (event, ui) {
-                            p0drag = true;
-                            p0.removeClass('b-grab').addClass('b-grabbing');
+	                            // calculate positions
+	                            origX = ui.originalPosition.left;
+	                            newX = ui.position.left;
+	                            diff = newX - origX;
+	                            fullPercent = diff / (options.width - origX);
+	                            if(options.closed && options.autoCenter && options.currentIndex == 2) {
+	                                fullPercent = diff / (pWidth - origX);
+	                            }
+	                            if(fullPercent > 1){fullPercent = 1;}
 
-                            // calculate positions
-                            origX = ui.originalPosition.left;
-                            newX = ui.position.left;
-                            diff = newX - origX;
-                            fullPercent = diff / (options.width - origX);
-                            if(options.closed && options.autoCenter && options.currentIndex == 2) {
-                                fullPercent = diff / (pWidth - origX);
-                            }
-                            if(fullPercent > 1){fullPercent = 1;}
+	                            shadowPercent = fullPercent < 0.5 ? fullPercent : (1 - fullPercent);
+	                            shadowW = (shadowPercent * options.shadowBtmWidth * 2) + hoverShadowWidth;
+	                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth :shadowW;
 
-                            shadowPercent = fullPercent < 0.5 ? fullPercent : (1 - fullPercent);
-                            shadowW = (shadowPercent * options.shadowBtmWidth * 2) + hoverShadowWidth;
-                            shadowW = diff / origX >= 0.5 ? shadowW -= hoverShadowWidth :shadowW;
+	                            if(options.shadows) {
+	                                if($.support.opacity) {
+	                                    sB.css({'opacity': shadowPercent*2});
+	                                } else {
+	                                    sB.css({'left': options.shadowTopBackWidth*shadowPercent*2});
+	                                }
+	                            }
 
-                            if(options.shadows) {
-                                if($.support.opacity) {
-                                    sB.css({'opacity': shadowPercent*2});
-                                } else {
-                                    sB.css({'left': options.shadowTopBackWidth*shadowPercent*2});
-                                }
-                            }
+	                            curlW = fullPercent*(pWidth-hoverCurlWidth) + hoverCurlWidth + shadowW;
+	                            curlLeft = curlW - shadowW;
+	                            p1wrapLeft = -curlLeft;
 
-                            curlW = fullPercent*(pWidth-hoverCurlWidth) + hoverCurlWidth + shadowW;
-                            curlLeft = curlW - shadowW;
-                            p1wrapLeft = -curlLeft;
+	                            // calculate positions for closed and auto-centered book
+	                            if(options.closed && options.autoCenter) {
+	                                if(options.currentIndex == 2) {
+	                                    targetPercent = (1-fullPercent) + 0.5*fullPercent;
+	                                    curlLeft = (1-fullPercent)*curlLeft;
+	                                    p1wrapLeft = -curlLeft - (options.width - (options.width*targetPercent));
+	                                    pN.hide();
+	                                    p2.css({left: pWidth*(1-fullPercent)});
+	                                    p4.css({left: pWidth*(1-fullPercent)});
+	                                    target.width(options.width*targetPercent);
+	                                } else if(options.currentIndex == options.pageTotal - 2) {
+	                                    targetPercent = 0.5 + 0.5*fullPercent;
+	                                    target.width(options.width*targetPercent);
+	                                } else {
+	                                    target.width(options.width);
+	                                }
+	                            }
 
-                            // calculate positions for closed and auto-centered book
-                            if(options.closed && options.autoCenter) {
-                                if(options.currentIndex == 2) {
-                                    targetPercent = (1-fullPercent) + 0.5*fullPercent;
-                                    curlLeft = (1-fullPercent)*curlLeft;
-                                    p1wrapLeft = -curlLeft - (options.width - (options.width*targetPercent));
-                                    pN.hide();
-                                    p2.css({left: pWidth*(1-fullPercent)});
-                                    p4.css({left: pWidth*(1-fullPercent)});
-                                    target.width(options.width*targetPercent);
-                                } else if(options.currentIndex == options.pageTotal - 2) {
-                                    targetPercent = 0.5 + 0.5*fullPercent;
-                                    target.width(options.width*targetPercent);
-                                } else {
-                                    target.width(options.width);
-                                }
-                            }
+	                            // set values
+	                            ui.position.left = curlLeft;
+	                            p0.css({width: curlW});
+	                            p0wrap.css({right: shadowW});
+	                            p1.css({left: curlLeft, width: pWidth - curlLeft});
+	                            p1wrap.css({left: p1wrapLeft});
+	                        },
+	                        stop: function (event, ui) {
+	                            endHoverAnimation(true);
+	                            if(fullPercent > options.hoverThreshold) {
+	                                prev();
+	                                p0.removeClass('b-grab b-grabbing');
+	                            } else {
+	                                sB.animate({opacity: 0}, anim.hover.speed, options.easing).css(css.sB);
+	                                p0drag = false;
+	                                p0.removeClass('b-grabbing').addClass('b-grab');
 
-                            // set values
-                            ui.position.left = curlLeft;
-                            p0.css({width: curlW});
-                            p0wrap.css({right: shadowW});
-                            p1.css({left: curlLeft, width: pWidth - curlLeft});
-                            p1wrap.css({left: p1wrapLeft});
-                        },
-                        stop: function (event, ui) {
-                            endHoverAnimation(true);
-                            if(fullPercent > options.hoverThreshold) {
-                                prev();
-                                p0.removeClass('b-grab b-grabbing');
-                            } else {
-                                sB.animate({opacity: 0}, anim.hover.speed, options.easing).css(css.sB);
-                                p0drag = false;
-                                p0.removeClass('b-grabbing').addClass('b-grab');
+	                                if(options.closed && options.autoCenter) {
+	                                    if(options.currentIndex == 2) {
+	                                        p2.animate({left: pWidth}, anim.hover.speed*2, options.easing);
+	                                        p4.animate({left: pWidth}, anim.hover.speed*2, options.easing);
+	                                        target.animate({width: options.width}, anim.hover.speed*2, options.easing);
+	                                    } else if(options.currentIndex == options.pageTotal - 2) {
+	                                        target.animate({width: options.width*0.5}, anim.hover.speed, options.easing);
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    });
 
-                                if(options.closed && options.autoCenter) {
-                                    if(options.currentIndex == 2) {
-                                        p2.animate({left: pWidth}, anim.hover.speed*2, options.easing);
-                                        p4.animate({left: pWidth}, anim.hover.speed*2, options.easing);
-                                        target.animate({width: options.width}, anim.hover.speed*2, options.easing);
-                                    } else if(options.currentIndex == options.pageTotal - 2) {
-                                        target.animate({width: options.width*0.5}, anim.hover.speed, options.easing);
-                                    }
-                                }
-                            }
-                        }
-                    });
+	                    target.find('.b-page').off('click.booklet');
+	                    if (options.hoverClick) {
+	                        target.find('.b-pN, .b-p0').on('click.booklet', prev).css({cursor:'pointer'});
+	                        target.find('.b-p3, .b-p4').on('click.booklet', next).css({cursor:'pointer'});
+	                    }
 
-                    target.find('.b-page').off('click.booklet');
-                    if (options.hoverClick) {
-                        target.find('.b-pN, .b-p0').on('click.booklet', prev).css({cursor:'pointer'});
-                        target.find('.b-p3, .b-p4').on('click.booklet', next).css({cursor:'pointer'});
-                    }
+	                    // mouse tracking for page movement
+	                    target.off('mousemove.booklet').on('mousemove.booklet', function (e) {
+	                        diff = e.pageX - target.offset().left;
+	                        if(diff < anim.hover.size) {
+	                            startHoverAnimation(false);
+	                        } else if(diff > pWidth - anim.hover.size && options.currentIndex == 0 && options.autoCenter && options.closed) {
+	                            startHoverAnimation(true);
+	                        } else if(diff > anim.hover.size && diff <= options.width - anim.hover.size) {
+	                            endHoverAnimation(false);
+	                            endHoverAnimation(true);
+	                        } else if(diff > options.width - anim.hover.size) {
+	                            startHoverAnimation(true);
+	                        }
+	                    }).off('mouseleave.booklet').on('mouseleave.booklet', function () {
+	                            endHoverAnimation(false);
+	                            endHoverAnimation(true);
+	                        });
 
-                    // mouse tracking for page movement
-                    target.off('mousemove.booklet').on('mousemove.booklet', function (e) {
-                        diff = e.pageX - target.offset().left;
-                        if(diff < anim.hover.size) {
-                            startHoverAnimation(false);
-                        } else if(diff > pWidth - anim.hover.size && options.currentIndex == 0 && options.autoCenter && options.closed) {
-                            startHoverAnimation(true);
-                        } else if(diff > anim.hover.size && diff <= options.width - anim.hover.size) {
-                            endHoverAnimation(false);
-                            endHoverAnimation(true);
-                        } else if(diff > options.width - anim.hover.size) {
-                            startHoverAnimation(true);
-                        }
-                    }).off('mouseleave.booklet').on('mouseleave.booklet', function () {
-                            endHoverAnimation(false);
-                            endHoverAnimation(true);
-                        });
-
-                }
+	                }
+				}
             },
             initHash = function () {
                 hash = getHashNum();
@@ -1528,10 +1529,12 @@
                 destroyManualControls();
             },
             destroyManualControls = function () {
-                // remove old draggables
-                if (target.find('.b-page').draggable()) {
-                    target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
-                }
+				if($.ui){
+	                // remove old draggables
+	                if (target.find('.b-page').draggable()) {
+	                    target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
+	                }
+				}
                 // remove mouse tracking for page movement
                 target.off('.booklet');
             },
