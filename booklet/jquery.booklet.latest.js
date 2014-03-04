@@ -160,10 +160,9 @@
                 pageNode = contentNode.parents('.b-page').addClass('b-page-' + index);
 
                 // add page numbers
-                if (
-                    options.pageNumbers && !contentNode.hasClass('b-page-empty') &&
-                        //(options.layoutSingle && !contentNode.hasClass('b-page-blank')) &&
-                        (!options.closed || (options.closed && !options.covers) || (options.closed && options.covers && index != 1 && index != options.pageTotal - 2))
+                if (options.pageNumbers && !contentNode.hasClass('b-page-empty') &&
+                    //(options.layoutSingle && !contentNode.hasClass('b-page-blank')) &&
+                    (!options.closed || (options.closed && !options.covers) || (options.closed && options.covers && index != 1 && index != options.pageTotal - 2))
                     ) {
                     if (options.direction == directions.leftToRight) {
                         startingPageNumber++;
@@ -304,15 +303,15 @@
                 }
 
                 /*
-                 if(options.layoutSingle) {
-                 target.children().each(function () {
-                 if(options.direction == directions.leftToRight){
-                 $(this).before(templates.blank);
-                 }else{
-                 $(this).after(templates.blank);
-                 }
-                 });
-                 }
+                if(options.layoutSingle) {
+	                 target.children().each(function () {
+		                 if(options.direction == directions.leftToRight){
+			                 $(this).before(templates.blank);
+		                 }else{
+			                 $(this).after(templates.blank);
+		                 }
+	                 });
+	             }
                  */
 
                 // load pages
@@ -357,13 +356,12 @@
                 p3wrap = target.find('.b-p3 .b-wrap');
                 p4wrap = target.find('.b-p4 .b-wrap');
                 wraps = target.find('.b-wrap');
-
+*/
                 if (options.shadows) {
                     target.find('.b-shadow-f, .b-shadow-b').remove();
                     sF = $(templates.sF).css(css.sF).appendTo(p3);
                     sB = $(templates.sB).appendTo(p0).css(css.sB);
                 }
-*/
             },
             updatePageCSS = function () {
                 // update css
@@ -382,33 +380,39 @@
                     left:0,
                     '-webkit-transform': 'rotateY(0deg)',
                     '-moz-transform': 'rotateY(0deg)',
+                    'transform': 'rotateY(0deg)'
                 });
                 p0.css({
                     left:pWidth,
                     '-webkit-transform': 'rotateY(-180deg)',
-                    '-moz-transform': 'rotateY(-180deg)'
+                    '-moz-transform': 'rotateY(-180deg)',
+                    'transform': 'rotateY(-180deg)'
                 });
                 p1.css({
                     left:0,
                     '-webkit-transform': 'rotateY(0deg)',
                     '-moz-transform': 'rotateY(0deg)',
+                    'transform': 'rotateY(0deg)',
 					visibility: 'visible'
                 });
                 p2.css({
                     left:pWidth,
                     '-webkit-transform': 'rotateY(0deg)',
                     '-moz-transform': 'rotateY(0deg)',
+                    'transform': 'rotateY(0deg)',
 					visibility: 'visible'
                 });
                 p3.css({
                     left:0,
                     '-webkit-transform': 'rotateY(180deg)',
-                    '-moz-transform': 'rotateY(180deg)'
+                    '-moz-transform': 'rotateY(180deg)',
+                    'transform': 'rotateY(180deg)'
                 });
                 p4.css({
                     left:pWidth,
                     '-webkit-transform': 'rotateY(0deg)',
-                    '-moz-transform': 'rotateY(0deg)'
+                    '-moz-transform': 'rotateY(0deg)',
+                    'transform': 'rotateY(0deg)'
                 });
 
 /*
@@ -1779,16 +1783,14 @@
                         startPageAnimation(diff, true, sF, speed);
 
 	                   	p4.css({visibility:'visible'});
-						$('.booklet .b-p4:before').animate({boxShadow:'200px 20px 50px #000'});
-	
-	                    p2.transition({rotateY: '-90deg'}, speed/2, 'in')
+
+	                    p2.transition({rotateY:'-90deg'}, speed/2, 'in')
 						  .transition({visibility:'hidden'}, 0)
 						  .transition({rotateY: '-180deg'}, speed/2, 'out');
-	                   
 
-	                    p3.transition({rotateY: '90deg'}, speed/2, 'in')
+	                    p3.transition({rotateY:'90deg'}, speed/2, 'in')
 	                      .transition({visibility:'visible'}, 0)
-	                      .transition({rotateY: '0deg'}, speed/2, 'out', function(){updateAfter()});
+	                      .transition({rotateY:'0deg'}, speed/2, 'out', function(){updateAfter()});
 /*
                         // hide p2 as p3 moves across it
                         if (options.closed && options.autoCenter && newIndex - diff == 0) {
@@ -1845,14 +1847,14 @@
                         startPageAnimation(diff, false, sB, speed);
 
 	                   	pN.css({visibility:'visible'});
-	                    p1.transition({rotateY: '90deg'}, speed/2, 'in', function(){
+	                    p1.transition({rotateY:'90deg'}, speed/2, 'in', function(){
 	                        p1.css({visibility:'hidden'})
-	                          .transition({rotateY: '180deg'}, speed/2, 'out');
+	                          .transition({rotateY:'180deg'}, speed/2, 'out');
 	                    });
 
-	                    p0.transition({rotateY: '-90deg'}, speed/2, 'in', function(){
+	                    p0.transition({rotateY:'-90deg'}, speed/2, 'in', function(){
 	                        p0.css({visibility:'visible'})
-	                          .transition({rotateY: '0deg'}, speed/2, 'out', function(){updateAfter()});
+	                          .transition({rotateY:'0deg'}, speed/2, 'out', function(){updateAfter()});
 	                    });
 
 /*
@@ -2013,11 +2015,13 @@
                         p3.css({ 'left': options.width - 40, 'width': 20, 'padding-left': 10 });
                     }
 
+                   */
+					
                     if (options.shadows) {
                         target.find('.b-shadow-f').remove();
                         sF = $(templates.sF).css(css.sF).appendTo(p3);
                         shadow = sF;
-                    }*/
+                    }
 
                 } else if (!inc && diff > 2) {
 	
@@ -2074,12 +2078,12 @@
                         p0wrap.css({ right: 10 });
                     }
 
+*/
                     if (options.shadows) {
                         target.find('.b-shadow-b, .b-shadow-f').remove();
                         sB = $(templates.sB).appendTo(p0).css(css.sB);
                         shadow = sB;
                     }
-*/
                 }
 
                 // update page visibility
@@ -2096,9 +2100,15 @@
                         p4.show();
                     }
                 }
-/*
+
                 // init shadows
                 if (options.shadows) {
+                    if (!p3drag && !p0drag) {
+                        shadow.animate({ opacity: 1 }, speed, options.easeIn);
+                    }
+                    shadow.animate({ opacity: 0 }, speed, options.easeOut);
+					
+					/*
                     // check for opacity support -> animate shadow overlay on moving slide
                     if ($.support.opacity) {
                         if (!p3drag && !p0drag) {
@@ -2111,9 +2121,9 @@
                         } else {
                             shadow.animate({ left: options.shadowTopBackWidth }, speed * 2, options.easeIn);
                         }
-                    }
+                    }*/
                 }
-*/
+
                 // init position animation
                 if (options.closed && options.autoCenter) {
                     if (options.currentIndex == 0) {
