@@ -141,6 +141,7 @@
 	<script> window.jQuery || document.write('<script src="../booklet/jquery-2.1.0.min.js"><\/script>') </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 	<script> window.jQuery.ui || document.write('<script src="../booklet/jquery-ui-1.10.4.min.js"><\/script>') </script>
+    <script src="../booklet/jquery.transit.min.js"></script>
     <script src="../booklet/jquery.easing.1.3.js"></script>
     <script src="../booklet/jquery.booklet.latest.js"></script>
 	<script type="text/javascript">
@@ -164,7 +165,9 @@
 			    chapterSelector: true,
 			    arrows: true,
 			    tabs: true,
-                arrowsHide:true
+                arrowsHide:true,
+                overlays:true,
+                manual:false
 			});
 			var updateOptions = function () {
 				$('#options-list').children().remove();

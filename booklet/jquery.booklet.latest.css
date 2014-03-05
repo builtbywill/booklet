@@ -18,7 +18,7 @@
     }
 
 	.booklet .b-page {
-		left:0; top:0; position:absolute; overflow:hidden; padding:0; background-color:#efefef; outline:1px solid transparent;
+		left:0; top:0; position:absolute; overflow:hidden; padding:0; outline:1px solid transparent;
 	}
 
 	.booklet .b-pN  {
@@ -52,8 +52,8 @@
         transform-origin:0 0;
     }
 
-	.booklet .b-page:nth-child(odd)  {}
-	.booklet .b-page:nth-child(even) {}
+	.booklet .b-page:nth-child(odd)  {background: -webkit-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));}
+	.booklet .b-page:nth-child(even) {background: -webkit-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));}
 	
 	.booklet .b-pN:before,
 	.booklet .b-p0:before,
@@ -76,8 +76,9 @@
 	}
 	
    	/* Custom Page Types */
-	.booklet .b-page-blank  {padding:0; width:100%; height:100%;}
-	.booklet .b-page-cover  {padding:0; width:100%; height:100%; background:#925C0E;}
+    .booklet .b-page-empty  {background-color:transparent;}
+	.booklet .b-page-blank  {}
+	.booklet .b-page-cover  {background:#925C0E;}
 	.booklet .b-page-cover h3  {color:#fff; text-shadow:0 1px 3px #222;}
    
    	/* Page Numbers */
@@ -90,12 +91,9 @@
 	.booklet .b-page:nth-child(even) .b-counter {right:10px;}
    
    	/* Page Shadows */
-	.booklet .b-shadow-f  {right:0; top:0; position:absolute; opacity:0; width:100%; height:100%; background: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.5));  /*background-image:url("images/shadow-top-forward.png"); background-repeat:repeat-y; background-position:100% 0;*/}
-	.booklet .b-shadow-b  {left:0;  top:0; position:absolute; opacity:0; width:100%; height:100%; background: -webkit-linear-gradient(left, rgba(0,0,0,0.5), rgba(0,0,0,0));  /*background-image:url("images/shadow-top-back.png");    background-repeat:repeat-y; background-position:0 0;*/}
-	
-	.booklet .b-p0 {/*background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:100% 10px;*/}
-	.booklet .b-p3 {/*background-image:url("images/shadow.png"); background-repeat:repeat-y; background-position:0 10px;*/}
-	
+	.booklet .b-shadow-f  {left:0; top:0; position:absolute; opacity:0; width:100%; height:100%; background: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.25));}
+	.booklet .b-shadow-b  {left:0;  top:0; position:absolute; opacity:0; width:100%; height:100%; background: -webkit-linear-gradient(left, rgba(0,0,0,0.25), rgba(0,0,0,0));}
+
    	/* Overlay Controls */
 	.booklet .b-grab     {cursor: url("images/openhand.cur"), default;}
 	.booklet .b-grabbing {cursor: url("images/closedhand.cur"), default;}
@@ -125,6 +123,7 @@
     body              {z-index:0;}
     .b-menu           {z-index:100;}
     .b-selector       {z-index:100;}
+    .b-overlay        {z-index:100;}
     .booklet          {z-index:10;}
     .b-pN             {z-index:10;}
     .b-p0             {z-index:30;}
