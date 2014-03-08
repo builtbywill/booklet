@@ -92,10 +92,10 @@
             isHoveringLeft = false,
             isDisabled = false,
             templates = {
-                empty: '<div class="b-page-empty" title=""></div>', //book page with no content
-                blank: '<div class="b-page-blank" title=""></div>', //transparent item used with closed books
-                sF: '<div class="b-shadow-f"></div>',
-                sB: '<div class="b-shadow-b"></div>'
+                empty: '<div class="b-page-empty"></div>', // book page with no content
+                blank: '<div class="b-page-blank"></div>', // transparent item used with closed books
+                shadowLeft: '<div class="b-shadow-left"></div>',    // shadow for left handed pages
+                shadowRight: '<div class="b-shadow-right"></div>'   // shadow for right handed pages
             },
             directions = {
                 leftToRight: 'LTR',
@@ -106,14 +106,13 @@
 
             currentHash = '', hashRoot = '/page/', hash, i, j, h, a, diff,
             originalPageTotal, startingPageNumber,
-        //page content vars
-            pN, p0, p1, p2, p3, p4, sF, sB,
-        //control vars
-            p3drag, p0drag, ctrls, overlaysB, overlayN, overlayP, tabs, tabN, tabP, arrows, arrowN, arrowP, customN, customP, ctrlsN, ctrlsP, menu, pause, play,
-            pageSelector, pageSelectorList, listItemNumbers, listItemTitle, pageListItem, pageSelectorHeight,
-            chapter, chapterSelector, chapterSelectorList, chapterListItem, chapterSelectorHeight,
+        // page content vars
+            pN, p0, p1, p2, p3, p4,
+        // control vars
+            p3drag, p0drag, ctrls, overlaysB, overlayN, overlayP, tabs, tabN, tabP, arrows, arrowN, arrowP, customN, customP, ctrlsN, ctrlsP, pause, play,
             wPercent, wOrig, hPercent, hOrig,
             pWidth, pWidthN, pWidthH, pHeight, speedH,
+            shadowLeft1, shadowRight1, shadowLeft2, shadowRight2,
 
             events = {
                 create: 'bookletcreate', // called when booklet has been created
@@ -129,19 +128,8 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             Page = function (contentNode, index, options) {
-                var chapter = '',
-                    title = '',
-                    pageNode;
-/*
-                // save chapter title
-                if (contentNode.attr('rel')) {
-                    chapter = contentNode.attr('rel');
-                }
-                // save page title
-                if (contentNode.attr('title')) {
-                    title = contentNode.attr('title');
-                }
- */
+                var pageNode;
+
                 //give content the correct wrapper and page wrapper
                 if (contentNode.hasClass('b-page-empty')) {
                     contentNode.wrap('<div class="b-page b-page-empty"></div></div>');
@@ -170,9 +158,7 @@
                 return {
                     index: index,
                     contentNode: contentNode[0],
-                    pageNode: pageNode[0],
-                    chapter: chapter,
-                    title: title
+                    pageNode: pageNode[0]
                 }
             },
 
@@ -181,8 +167,6 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             init = function () {
-                // remove load wrapper for compatibility with version 1.2.0
-                target.find('.b-load').children().unwrap();
 
                 // setup target DOM object
                 target.addClass('booklet');
@@ -202,7 +186,6 @@
                 updatePages();
 
                 updateControlVisibility();
-                updateMenu();
 
                 isInit = true;
                 isDisabled = false;
@@ -242,7 +225,6 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             initPages = function () {
-
                 pages = [];
 
                 // fix for odd number of pages
@@ -322,6 +304,7 @@
             updatePageStructure = function () {
                 // reset all content
                 target.find('.b-page').removeClass('b-pN b-p0 b-p1 b-p2 b-p3 b-p4').hide();
+                target.find('.b-shadow-left, .b-shadow-right').remove();
 
                 // add page classes
                 if (options.currentIndex - 2 >= 0) {
@@ -335,7 +318,7 @@
                     target.find('.b-page-' + (options.currentIndex + 3)).addClass('b-p4').show();
                 }
 
-                // save structure elems to vars
+                // save structure to vars
                 pN = target.find('.b-pN');
                 p0 = target.find('.b-p0');
                 p1 = target.find('.b-p1');
@@ -345,7 +328,7 @@
             },
             updatePageCSS = function () {
                 // update css
-                target.find('.b-shadow-f, .b-shadow-b, .b-p0, .b-p3').css({ 'filter': '', 'zoom': '' });
+                target.find('.b-p0, .b-p3').css({ 'filter': '', 'zoom': '' });
                 target.find('.b-page').removeAttr('style').css(css.bPage);
                 p1.css(css.p1);
                 p2.css(css.p2);
@@ -364,14 +347,8 @@
                 }
 
                 if (options.closed && options.autoCenter && (options.currentIndex == 0 || options.currentIndex >= options.pageTotal - 2)) {
-                    if (options.overlays) {
-                        overlaysB.width('100%');
-                    }
                     target.width(pWidth);
                 } else {
-                    if (options.overlays) {
-                        overlaysB.width('50%');
-                    }
                     target.width(options.width);
                 }
 
@@ -380,9 +357,8 @@
             },
             destroyPages = function () {
                 // remove booklet markup
-                target.find(".b-wrap").unwrap();
-                target.find(".b-wrap").children().unwrap();
-                target.find(".b-counter, .b-page-blank, .b-page-empty, .b-shadow-f, .b-shadow-b").remove();
+                target.find(".b-page").children().unwrap();
+                target.find(".b-counter, .b-page-blank, .b-page-empty, .b-shadow-left, .b-shadow-right").remove();
 
                 // revert page order to original
                 if (options.direction == directions.rightToLeft) {
@@ -393,7 +369,7 @@
             },
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // OPTION / CONTROL FUNCTIONS
+        // OPTIONS + CONTROLS
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             updateOptions = function (newOptions) {
@@ -402,17 +378,47 @@
 
                 // update options if newOptions have been passed in
                 if (newOptions != null && typeof newOptions != "undefined") {
-
                     // remove page structure, revert to original order
                     destroyPages();
-                    destroyControls();
-
                     options = $.extend({}, options, newOptions);
                     didUpdate = true;
-
                     initPages();
                 }
 
+                updateSizes();
+                // update all CSS, as sizes may have changed
+                updateCSSandAnimations();
+
+                // set total page count
+                options.pageTotal = target.children('.b-page').length;
+
+                // set booklet opts.name
+                if (options.name) {
+                    document.title = options.name;
+                } else {
+                    options.name = document.title;
+                }
+
+                // update pages after first init
+                if (isInit) {
+                    updatePages();
+                }
+
+                destroyControls();
+                createControls();
+                addCustomControlActions();
+                addKeyboardControlAction();
+                addHashControlAction();
+                addResizeControlAction();
+                addAutoPlayControlAction();
+
+                // if options were updated force pages and controls to update
+                if (didUpdate) {
+                    updatePages();
+                    updateControlVisibility();
+                }
+            },
+            updateSizes = function () {
                 // set width + height
                 if (!options.width) {
                     options.width = target.width();
@@ -442,7 +448,7 @@
                 pHeight = options.height;
                 speedH = options.speed / 2;
 
-                // set position
+                // set width for closed + autoCenter
                 if (options.closed && options.autoCenter) {
                     if (options.currentIndex == 0) {
                         target.width(pWidth);
@@ -450,224 +456,87 @@
                         target.width(pWidth);
                     }
                 }
-
-                // set total page count
-                options.pageTotal = target.children('.b-page').length;
-
-                // set booklet opts.name
-                if (options.name) {
-                    document.title = options.name;
-                } else {
-                    options.name = document.title;
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                // update all CSS, as sizes may have changed
-                updateCSSandAnimations();
-                if (isInit) {
-                    updatePages();
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // MENU
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                // setup menu
-                if (options.menu && $(options.menu).length > 0) {
-                    menu = $(options.menu);
-
-                    if (!menu.hasClass('b-menu')) {
-                        menu.addClass('b-menu');
+            },
+            updateCSSandAnimations = function () {
+                // init base css
+                css = {
+                    bPage: {
+                        padding: options.pagePadding,
+                        width: pWidth-(2*options.pagePadding),
+                        height:  pHeight-(2*options.pagePadding),
+                        visibility: 'hidden'
+                    },
+                    pN: {
+                        left:0,
+                        '-webkit-transform': 'rotateY(0deg)',
+                        '-moz-transform': 'rotateY(0deg)',
+                        'transform': 'rotateY(0deg)'
+                    },
+                    p0: {
+                        left:pWidth,
+                        '-webkit-transform': 'rotateY(-180deg)',
+                        '-moz-transform': 'rotateY(-180deg)',
+                        'transform': 'rotateY(-180deg)'
+                    },
+                    p1: {
+                        left: 0,
+                        '-webkit-transform': 'rotateY(0deg)',
+                        '-moz-transform': 'rotateY(0deg)',
+                        'transform': 'rotateY(0deg)',
+                        visibility: 'visible'
+                    },
+                    p2: {
+                        left: pWidth,
+                        '-webkit-transform': 'rotateY(0deg)',
+                        '-moz-transform': 'rotateY(0deg)',
+                        'transform': 'rotateY(0deg)',
+                        visibility: 'visible'
+                    },
+                    p3: {
+                        left:0,
+                        '-webkit-transform': 'rotateY(180deg)',
+                        '-moz-transform': 'rotateY(180deg)',
+                        'transform': 'rotateY(180deg)'
+                    },
+                    p4: {
+                        left:pWidth,
+                        '-webkit-transform': 'rotateY(0deg)',
+                        '-moz-transform': 'rotateY(0deg)',
+                        'transform': 'rotateY(0deg)'
+                    },
+                    shadow: {
+                        width: pWidth,
+                        height: pHeight
                     }
+                };
 
-                    // setup page selector
-                    if (options.pageSelector && menu.find('.b-selector-page').length == 0) {
-                        //add selector
-                        pageSelector = $('<div class="b-selector b-selector-page"><span class="b-current">' + (options.currentIndex + 1) + ' - ' + (options.currentIndex + 2) + '</span></div>').appendTo(menu);
-                        pageSelectorList = $('<ul></ul>').appendTo(pageSelector).empty().css('height', 'auto');
-
-                        // loop through all pages
-                        for (i = 0; i < options.pageTotal; i += 2) {
-                            j = i;
-                            // numbers for normal view
-                            listItemNumbers = (j + 1) + '-' + (j + 2);
-                            if (options.closed) {
-                                // numbers for closed book
-                                j--;
-                                if (i == 0) {
-                                    listItemNumbers = '1'
-                                } else if (i == options.pageTotal - 2) {
-                                    listItemNumbers = options.pageTotal - 2
-                                } else {
-                                    listItemNumbers = (j + 1) + '-' + (j + 2);
-                                }
-                                // numbers for closed book with covers
-                                if (options.covers) {
-                                    j--;
-                                    if (i == 0) {
-                                        listItemNumbers = ''
-                                    } else if (i == options.pageTotal - 2) {
-                                        listItemNumbers = ''
-                                    } else {
-                                        listItemNumbers = (j + 1) + '-' + (j + 2);
-                                    }
-                                }
-                            }
-                            if (i == 0) {
-                                pageSelector.find('.b-current').text(listItemNumbers);
-                            }
-
-                            // get the title
-                            listItemTitle = pages[i].title;
-                            if (listItemTitle == '') {
-                                listItemTitle = pages[i + 1].title;
-                            }
-
-                            // get title for reversed direction
-                            if (options.direction == directions.rightToLeft) {
-                                listItemTitle = pages[Math.abs(i - options.pageTotal) - 1].title;
-                                if (listItemTitle == '') {
-                                    listItemTitle = pages[Math.abs(i - options.pageTotal) - 2].title;
-                                }
-                            }
-
-                            // add the list item
-                            pageListItem = $('<li><a href="#' + hashRoot + (i + 1) + '" id="selector-page-' + i + '"><span class="b-text">' + listItemTitle + '</span><span class="b-num">' + listItemNumbers + '</span></a></li>').appendTo(pageSelectorList);
-
-                            if (!options.hash) {
-                                pageListItem.find('a').on('click.booklet', function (e) {
-                                    e.preventDefault();
-                                    if (isBusy || isDisabled) return;
-                                    if (options.direction == directions.rightToLeft) {
-                                        pageSelector.find('.b-current').text($(this).find('.b-num').text());
-                                        goToPage(Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2);
-                                    } else {
-                                        goToPage(parseInt($(this).attr('id').replace('selector-page-', '')));
-                                    }
-                                });
-                            }
-                        }
-
-                        // set height
-                        pageSelectorHeight = pageSelectorList.height();
-                        pageSelectorList.css({ 'height': 0, 'padding-bottom': 0 });
-
-                        // add hover effects
-                        pageSelector.on('mouseenter.booklet',function () {
-                            pageSelectorList.stop().animate({ height: pageSelectorHeight, paddingBottom: 10 }, 500);
-                        }).on('mouseleave.booklet', function () {
-                                pageSelectorList.stop().animate({ height: 0, paddingBottom: 0 }, 500);
-                            });
-                    } else if (!options.pageSelector) {
-                        menu.find('.b-selector-page').remove();
-                        pageSelector = pageSelectorList = listItemNumbers = listItemTitle = pageListItem = pageSelectorHeight = null;
+                // init animation params
+                anim = {
+                    hover: {
+                        speed: options.hoverSpeed,
+                        size: options.hoverWidth
                     }
+                };
+            },
 
-                    // setup chapter selector
-                    if (options.chapterSelector && menu.find('.b-selector-chapter').length == 0) {
-
-                        chapter = pages[options.currentIndex].chapter;
-                        if (chapter == "") {
-                            chapter = pages[options.currentIndex + 1].chapter;
-                        }
-
-                        chapterSelector = $('<div class="b-selector b-selector-chapter"><span class="b-current">' + chapter + '</span></div>').appendTo(menu);
-                        chapterSelectorList = $('<ul></ul>').appendTo(chapterSelector).empty().css('height', 'auto');
-
-                        for (i = 0; i < options.pageTotal; i += 1) {
-                            if (pages[i].chapter != "" && typeof pages[i].chapter != "undefined") {
-                                if (options.direction == directions.rightToLeft) {
-                                    j = i;
-                                    if (j % 2 != 0) {
-                                        j--;
-                                    }
-                                    chapterSelector.find('.b-current').text(pages[i].chapter);
-                                    chapterListItem = $('<li><a href="#' + hashRoot + (j + 1) + '" id="selector-page-' + (j) + '"><span class="b-text">' + pages[i].chapter + '</span></a></li>').prependTo(chapterSelectorList);
-                                } else {
-                                    chapterListItem = $('<li><a href="#' + hashRoot + (i + 1) + '" id="selector-page-' + i + '"><span class="b-text">' + pages[i].chapter + '</span></a></li>').appendTo(chapterSelectorList);
-                                }
-                                if (!options.hash) {
-                                    chapterListItem.find('a').on('click.booklet', function (e) {
-                                        e.preventDefault();
-                                        var index;
-                                        if (isBusy || isDisabled) return;
-                                        if (options.direction == directions.rightToLeft) {
-                                            chapterSelector.find('.b-current').text($(this).find('.b-text').text());
-                                            index = Math.abs(parseInt($(this).attr('id').replace('selector-page-', '')) - options.pageTotal) - 2;
-                                        } else {
-                                            index = parseInt($(this).attr('id').replace('selector-page-', ''));
-                                        }
-                                        // adjust for odd page
-                                        if (index % 2 != 0) {
-                                            index -= 1;
-                                        }
-                                        goToPage(index);
-                                    });
-                                }
-                            }
-                        }
-
-                        chapterSelectorHeight = chapterSelectorList.height();
-                        chapterSelectorList.css({ 'height': 0, 'padding-bottom': 0 });
-
-                        chapterSelector.on('mouseenter.booklet',function () {
-                            chapterSelectorList.stop().animate({ height: chapterSelectorHeight, paddingBottom: 10 }, 500);
-                        }).on('mouseleave.booklet', function () {
-                                chapterSelectorList.stop().animate({ height: 0, paddingBottom: 0 }, 500);
-                            });
-                    } else if (!options.chapterSelector) {
-                        menu.find('.b-selector-chapter').remove();
-                        chapter = chapterSelector = chapterSelectorList = chapterListItem = chapterSelectorHeight = null;
-                    }
-
-                } else {
-                    menu = null;
-                    if (options.menu) {
-                        $(options.menu).removeClass('b-menu');
-                    }
-                    target.find('.b-selector').remove();
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // GENERATE CONTROLS
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+            createControls = function () {
+                // add controls container
                 ctrls = target.find('.b-controls');
                 if (ctrls.length == 0) {
                     ctrls = $('<div class="b-controls"></div>').appendTo(target);
                 }
 
-                // force no overlays if using manual controls
-                if (options.manual && $.ui) {
-                    options.overlays = false;
-                }
+                // create controls
+                createTabControls();
+                createArrowControls();
 
-                // remove old item actions and references
-                if (customN) {
-                    customN.off('click.booklet');
-                    customN = null;
-                }
-                if (customP) {
-                    customP.off('click.booklet');
-                    customP = null;
-                }
+                // save all controls
+                ctrlsN = ctrls.find('.b-next');
+                ctrlsP = ctrls.find('.b-prev');
 
-                // add overlays
-                overlaysB = target.find('.b-overlay');
-                if (options.overlays && overlaysB.length == 0) {
-                    overlayP = $('<div class="b-overlay b-overlay-prev b-prev" title="' + options.previousControlTitle + '"></div>').appendTo(ctrls);
-                    overlayN = $('<div class="b-overlay b-overlay-next b-next" title="' + options.nextControlTitle + '"></div>').appendTo(ctrls);
-                    overlaysB = target.find('.b-overlay');
-                    // ie fix
-                    //if ($.browser.msie) {
-                    //    overlaysB.css({ 'background': '#fff', 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=0) !important' });
-                    //}
-                } else if (!options.overlays) {
-                    overlaysB.remove();
-                    overlaysB = null;
-                }
-
+                addControlActions();
+            },
+            createTabControls = function () {
                 // add tabs
                 tabs = target.find('.b-tab');
                 if (options.tabs && tabs.length == 0) {
@@ -698,7 +567,8 @@
                         tabP.html(options.nextControlText).attr('title', options.nextControlTitle);
                     }
                 }
-
+            },
+            createArrowControls = function () {
                 // add arrows
                 arrows = target.find('.b-arrow');
                 if (options.arrows && arrows.length == 0) {
@@ -715,18 +585,9 @@
                     arrows.remove();
                     arrows = null;
                 }
+            },
 
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // ADD CONTROL ACTIONS
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                // save all "b-prev" and "b-next" controls
-                ctrlsN = ctrls.find('.b-next');
-                ctrlsP = ctrls.find('.b-prev');
-
-                // reset all bound events
-                ctrlsN.off(".booklet");
-                ctrlsP.off(".booklet");
+            addControlActions = function () {
 
                 // add click actions
                 ctrlsN.on('click.booklet', function (e) {
@@ -738,6 +599,77 @@
                     prev();
                 });
 
+                // add page hover animations
+                if (options.hovers) {
+                    // mouse tracking for page movement
+                    target.on('mousemove.booklet',function (e) {
+                        diff = e.pageX - target.offset().left;
+                        if (options.overlays) {
+                            if (diff < pWidth && options.currentIndex != 0) {
+                                if (isHoveringRight) endHoverAnimation(true);
+                                startHoverAnimation(false);
+                            } else if (diff > pWidth && options.currentIndex + 2 < options.pageTotal) {
+                                if (isHoveringLeft) endHoverAnimation(false);
+                                startHoverAnimation(true);
+                            } else {
+                                endHoverAnimation(false);
+                                endHoverAnimation(true);
+                            }
+                        } else {
+                            if (diff < anim.hover.size) {
+                                startHoverAnimation(false);
+                            } else if (diff > pWidth - anim.hover.size && options.currentIndex == 0 && options.autoCenter && options.closed) {
+                                startHoverAnimation(true);
+                            } else if (diff > anim.hover.size && diff <= options.width - anim.hover.size) {
+                                endHoverAnimation(false);
+                                endHoverAnimation(true);
+                            } else if (diff > options.width - anim.hover.size) {
+                                startHoverAnimation(true);
+                            }
+                        }
+                    }).on('mouseleave.booklet', function () {
+                        endHoverAnimation(false);
+                        endHoverAnimation(true);
+                    });
+                }
+
+                // add overlay or hover click action
+                if (options.overlays || options.hovers) {
+                    // mouse tracking for page movement
+                    target.on('click.booklet',function (e) {
+                        diff = e.pageX - target.offset().left;
+                        if (diff < pWidth && options.currentIndex != 0) {
+                            if (options.overlays)
+                                e.preventDefault();
+                            prev();
+                        } else if (diff > pWidth && options.currentIndex + 2 < options.pageTotal) {
+                            if (options.overlays)
+                                e.preventDefault();
+                            next();
+                        }
+                    });
+                }
+
+                // add arrow animations
+                if(options.arrows) {
+                    if(options.arrowsHide) {
+                        ctrlsN.on('mouseover.booklet', function () {
+                            arrowN.find('div').stop().fadeTo('fast', 1);
+                        }).on('mouseout.booklet', function () {
+                                arrowN.find('div').stop().fadeTo('fast', 0);
+                            });
+                        ctrlsP.on('mouseover.booklet', function () {
+                            arrowP.find('div').stop().fadeTo('fast', 1);
+                        }).on('mouseout.booklet', function () {
+                                arrowP.find('div').stop().fadeTo('fast', 0);
+                            });
+                    } else {
+                        arrowN.find('div').show();
+                        arrowP.find('div').show();
+                    }
+                }
+            },
+            addCustomControlActions = function () {
                 // add click action to custom controls
                 if (options.next && $(options.next).length > 0) {
                     customN = $(options.next);
@@ -753,58 +685,8 @@
                         prev();
                     });
                 }
-
-                // add page hover animations
-                if (options.overlays && options.hovers) {
-                    // hovers to start draggable forward
-                    ctrlsN.on("mouseover.booklet",function () {
-                        startHoverAnimation(true);
-                    }).on("mouseout.booklet", function () {
-                            endHoverAnimation(true);
-                        });
-
-                    // hovers to start draggable backwards
-                    ctrlsP.on("mouseover.booklet",function () {
-                        startHoverAnimation(false);
-                    }).on("mouseout.booklet", function () {
-                            endHoverAnimation(false);
-                        });
-                }
-
-                // add arrow animations
-                if (options.arrows) {
-                    if (options.arrowsHide) {
-                        if ($.support.opacity) {
-                            ctrlsN.on('mouseover.booklet',function () {
-                                arrowN.find('div').stop().fadeTo('fast', 1);
-                            }).on('mouseout.booklet', function () {
-                                    arrowN.find('div').stop().fadeTo('fast', 0);
-                                });
-                            ctrlsP.on('mouseover.booklet',function () {
-                                arrowP.find('div').stop().fadeTo('fast', 1);
-                            }).on('mouseout.booklet', function () {
-                                    arrowP.find('div').stop().fadeTo('fast', 0);
-                                });
-                        } else {
-                            ctrlsN.on('mouseover.booklet',function () {
-                                arrowN.find('div').show();
-                            }).on('mouseout.booklet', function () {
-                                    arrowN.find('div').hide();
-                                });
-                            ctrlsP.on('mouseover.booklet',function () {
-                                arrowP.find('div').show();
-                            }).on('mouseout.booklet', function () {
-                                    arrowP.find('div').hide();
-                                });
-                        }
-                    } else {
-                        arrowN.find('div').show();
-                        arrowP.find('div').show();
-                    }
-                }
-
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+            },
+            addKeyboardControlAction = function () {
                 // keyboard controls
                 $(document).on('keyup.booklet', function (event) {
                     if (event.keyCode == 37 && options.keyboard) {
@@ -813,7 +695,9 @@
                         next();
                     }
                 });
+            },
 
+            addHashControlAction = function () {
                 // hash controls
                 clearInterval(h);
                 h = null;
@@ -824,7 +708,65 @@
                         pollHash()
                     }, 250);
                 }
+            },
+            initHash = function () {
+                hash = getHashNum();
 
+                if (!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0 && hash != '') {
+                    if ((hash % 2) != 0) {
+                        hash--;
+                    }
+                    options.currentIndex = hash;
+                } else {
+                    updateHash(options.currentIndex + 1, options);
+                }
+
+                currentHash = hash;
+            },
+            pollHash = function () {
+                hash = getHashNum();
+
+                // check page num
+                if (!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0) {
+                    if (hash != options.currentIndex && hash.toString() != currentHash) {
+                        if ((hash % 2) != 0) {
+                            hash--
+                        }
+
+                        document.title = options.name + options.hashTitleText + (hash + 1);
+
+                        if (!isBusy) {
+                            goToPage(hash);
+                            currentHash = hash;
+                        }
+                    }
+                }
+            },
+            getHashNum = function () {
+                var hash, hashNum;
+                // get page number from hash tag, last element
+                hash = window.location.hash.split('/');
+                if (hash.length > 1) {
+                    hashNum = parseInt(hash[2]) - 1;
+                    if (options.direction == directions.rightToLeft) {
+                        hashNum = Math.abs(hashNum + 1 - options.pageTotal);
+                    }
+                    return hashNum;
+                } else {
+                    return '';
+                }
+            },
+            updateHash = function (hash, options) {
+                // set the hash
+                if (options.hash) {
+                    if (options.direction == directions.rightToLeft) {
+                        hash = Math.abs(hash - options.pageTotal);
+                    }
+                    window.location.hash = hashRoot + hash;
+                }
+            },
+
+            addResizeControlAction = function () {
                 // percentage resizing
                 $(window).on('resize.booklet', function () {
                     if ((wPercent || hPercent)) {
@@ -832,6 +774,8 @@
                     }
                 });
 
+            },
+            addAutoPlayControlAction = function () {
                 // auto flip book controls
                 if (options.auto && options.delay) {
                     clearInterval(a);
@@ -887,132 +831,59 @@
                     play = null;
                     isPlaying = false;
                 }
+            },
 
-                // if options were updated force pages, controls and menu to update
-                if (didUpdate) {
-                    updatePages();
-                    updateControlVisibility();
-                    updateMenu();
+            destroyControls = function () {
+
+                if (customN) {
+                    customN.off('click.booklet');
+                    customN = null;
                 }
+
+                if (customP) {
+                    customP.off('click.booklet');
+                    customP = null;
+                }
+
+                if (ctrlsN) {
+                    ctrlsN.off(".booklet");
+                    ctrlsN = null;
+                }
+                if (ctrlsP) {
+                    ctrlsP.off(".booklet");
+                    ctrlsP = null;
+                }
+
+                target.find('.b-controls').remove();
+
+                // keyboard
+                $(document).off('keyup.booklet');
+
+                // hash
+                clearInterval(h);
+                h = null;
+
+                // window resize
+                $(window).off('resize.booklet');
+
+                // auto play
+                clearInterval(a);
+                a = null;
+                if (options.pause && $(options.pause).length > 0) {
+                    $(options.pause).off('click.booklet');
+                }
+                pause = null;
+                if (options.play && $(options.play).length > 0) {
+                    $(options.play).off('click.booklet');
+                }
+                play = null;
+
+                // remove mouse tracking for page movement
+                target.off('.booklet');
+
+                destroyManualControls();
             },
-            updateCSSandAnimations = function () {
-                // init base css
-                css = {
-                    bPage: {
-                        padding: options.pagePadding,
-                        width: pWidth-(2*options.pagePadding),
-                        height:  pHeight-(2*options.pagePadding),
-                        visibility: 'hidden'
-                    },
-                    pN: {
-                        left:0,
-                        '-webkit-transform': 'rotateY(0deg)',
-                        '-moz-transform': 'rotateY(0deg)',
-                        'transform': 'rotateY(0deg)'
-                    },
-                    p0: {
-                        left:pWidth,
-                        '-webkit-transform': 'rotateY(-180deg)',
-                        '-moz-transform': 'rotateY(-180deg)',
-                        'transform': 'rotateY(-180deg)'
-                    },
-                    p1: {
-                        left: 0,
-                        '-webkit-transform': 'rotateY(0deg)',
-                        '-moz-transform': 'rotateY(0deg)',
-                        'transform': 'rotateY(0deg)',
-                        visibility: 'visible'
-                    },
-                    p2: {
-                        left: pWidth,
-                        '-webkit-transform': 'rotateY(0deg)',
-                        '-moz-transform': 'rotateY(0deg)',
-                        'transform': 'rotateY(0deg)',
-                        visibility: 'visible'
-                    },
-                    p3: {
-                        left:0,
-                        '-webkit-transform': 'rotateY(180deg)',
-                        '-moz-transform': 'rotateY(180deg)',
-                        'transform': 'rotateY(180deg)'
-                    },
-                    p4: {
-                        left:pWidth,
-                        '-webkit-transform': 'rotateY(0deg)',
-                        '-moz-transform': 'rotateY(0deg)',
-                        'transform': 'rotateY(0deg)'
-                    },
-                    sF: {
-                        width: pWidth,
-                        height: pHeight
-                    },
-                    sB: {
-                        width: pWidth,
-                        height: pHeight
-                    }
-                };
 
-                // init animation params
-                anim = {
-
-                    hover: {
-                        speed: options.hoverSpeed,
-                        size: options.hoverWidth
-                    },
-
-                    // forward
-                    p2: {
-                        width: 0
-                    },
-                    p2closed: {
-                        width: 0,
-                        left: pWidth
-                    },
-                    p4closed: {
-                        left: pWidth
-                    },
-                    p3in: {
-                        left: pWidthH,
-                        width: pWidthH
-                        //paddingLeft: options.shadowBtmWidth
-                    },
-                    p3inDrag: {
-                        left: pWidth / 4,
-                        width: pWidth * .75
-                        //paddingLeft: options.shadowBtmWidth
-                    },
-                    p3out: {
-                        left: 0,
-                        width: pWidth,
-                        paddingLeft: 0
-                    },
-
-                    // backwards
-                    p1: {
-                        left: pWidth,
-                        width: 0
-                    },
-                    p0: {
-                        left: pWidth,
-                        width: pWidth
-                    },
-                    p0in: {
-                        left: pWidthH,
-                        width: pWidthH
-                    },
-                    p0out: {
-                        left: pWidth,
-                        width: pWidth
-                    },
-                    p0outClosed: {
-                        left: 0,
-                        width: pWidth
-                    },
-                    p2back: {
-                        left: 0
-                    }
-                };
-            },
             updatePercentageSize = function () {
                 if (!isDisabled) {
                     // recalculate size for percentage values, called with window is resized
@@ -1035,93 +906,19 @@
             updateControlVisibility = function () {
                 // update controls, cursors and visibility
                 if (options.overlays || options.tabs || options.arrows) {
-                    if ($.support.opacity) {
-                        if (options.currentIndex >= 2 && options.currentIndex != 0) {
-                            ctrlsP.fadeIn('fast').css('cursor', options.cursor);
-                        } else {
-                            ctrlsP.fadeOut('fast').css('cursor', 'default');
-                        }
-                        if (options.currentIndex < options.pageTotal - 2) {
-                            ctrlsN.fadeIn('fast').css('cursor', options.cursor);
-                        } else {
-                            ctrlsN.fadeOut('fast').css('cursor', 'default');
-                        }
+                    if (options.currentIndex >= 2 && options.currentIndex != 0) {
+                        ctrlsP.fadeIn('fast').css('cursor', options.cursor);
                     } else {
-                        if (options.currentIndex >= 2 && options.currentIndex != 0) {
-                            ctrlsP.show().css('cursor', options.cursor);
-                        } else {
-                            ctrlsP.hide().css('cursor', 'default');
-                        }
-                        if (options.currentIndex < options.pageTotal - 2) {
-                            ctrlsN.show().css('cursor', options.cursor);
-                        } else {
-                            ctrlsN.hide().css('cursor', 'default');
-                        }
+                        ctrlsP.fadeOut('fast').css('cursor', 'default');
+                    }
+                    if (options.currentIndex < options.pageTotal - 2) {
+                        ctrlsN.fadeIn('fast').css('cursor', options.cursor);
+                    } else {
+                        ctrlsN.fadeOut('fast').css('cursor', 'default');
                     }
                 }
             },
-            updateMenu = function () {
-                if (options.pageSelector) {
-                    var currentPageNumbers = '';
-                    if (options.direction == directions.rightToLeft) {
-                        currentPageNumbers = (Math.abs(options.currentIndex - options.pageTotal) - 1) + ' - ' + ((Math.abs(options.currentIndex - options.pageTotal)));
-                        if (options.closed) {
-                            if (options.currentIndex == options.pageTotal - 2) {
-                                currentPageNumbers = '1'
-                            } else if (options.currentIndex == 0) {
-                                currentPageNumbers = options.pageTotal - 2
-                            } else {
-                                currentPageNumbers = (Math.abs(options.currentIndex - options.pageTotal) - 2) + ' - ' + ((Math.abs(options.currentIndex - options.pageTotal) - 1));
-                            }
 
-                            if (options.covers) {
-                                if (options.currentIndex == options.pageTotal - 2) {
-                                    currentPageNumbers = ''
-                                } else if (options.currentIndex == 0) {
-                                    currentPageNumbers = ''
-                                } else {
-                                    currentPageNumbers = (Math.abs(options.currentIndex - options.pageTotal) - 3) + ' - ' + ((Math.abs(options.currentIndex - options.pageTotal) - 2));
-                                }
-                            }
-                        }
-                    } else {
-                        currentPageNumbers = (options.currentIndex + 1) + ' - ' + (options.currentIndex + 2);
-                        if (options.closed) {
-                            if (options.currentIndex == 0) {
-                                currentPageNumbers = '1'
-                            } else if (options.currentIndex == options.pageTotal - 2) {
-                                currentPageNumbers = options.pageTotal - 2
-                            } else {
-                                currentPageNumbers = (options.currentIndex) + '-' + (options.currentIndex + 1);
-                            }
-
-                            if (options.covers) {
-                                if (options.currentIndex == 0) {
-                                    currentPageNumbers = ''
-                                } else if (options.currentIndex == options.pageTotal - 2) {
-                                    currentPageNumbers = ''
-                                } else {
-                                    currentPageNumbers = (options.currentIndex - 1) + '-' + (options.currentIndex);
-                                }
-                            }
-                        }
-                    }
-                    $(options.menu + ' .b-selector-page .b-current').text(currentPageNumbers);
-                }
-                if (options.chapterSelector) {
-                    if (pages[options.currentIndex].chapter != "") {
-                        $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex].chapter);
-                    } else if (pages[options.currentIndex + 1].chapter != "") {
-                        $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex + 1].chapter);
-                    }
-
-                    if (options.direction == directions.rightToLeft && pages[options.currentIndex + 1].chapter != "") {
-                        $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex + 1].chapter);
-                    } else if (pages[options.currentIndex] != "") {
-                        $(options.menu + ' .b-selector-chapter .b-current').text(pages[options.currentIndex].chapter);
-                    }
-                }
-            },
             updateManualControls = function () {
 	/*
                 var origX, newX, diff, fullPercent, shadowPercent, shadowW, curlW, underW, targetPercent, curlLeft, p1wrapLeft;
@@ -1332,6 +1129,7 @@
                             } else if (diff > pWidth - anim.hover.size && options.currentIndex == 0 && options.autoCenter && options.closed) {
                                 startHoverAnimation(true);
                             } else if (diff > anim.hover.size && diff <= options.width - anim.hover.size) {
+
                                 endHoverAnimation(false);
                                 endHoverAnimation(true);
                             } else if (diff > options.width - anim.hover.size) {
@@ -1346,123 +1144,6 @@
                 }
 */
             },
-            initHash = function () {
-                hash = getHashNum();
-
-                if (!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0 && hash != '') {
-                    if ((hash % 2) != 0) {
-                        hash--;
-                    }
-                    options.currentIndex = hash;
-                } else {
-                    updateHash(options.currentIndex + 1, options);
-                }
-
-                currentHash = hash;
-            },
-            pollHash = function () {
-                hash = getHashNum();
-
-                // check page num
-                if (!isNaN(hash) && hash <= options.pageTotal - 1 && hash >= 0) {
-                    if (hash != options.currentIndex && hash.toString() != currentHash) {
-                        if ((hash % 2) != 0) {
-                            hash--
-                        }
-
-                        document.title = options.name + options.hashTitleText + (hash + 1);
-
-                        if (!isBusy) {
-                            goToPage(hash);
-                            currentHash = hash;
-                        }
-                    }
-                }
-            },
-            getHashNum = function () {
-                var hash, hashNum;
-                // get page number from hash tag, last element
-                hash = window.location.hash.split('/');
-                if (hash.length > 1) {
-                    hashNum = parseInt(hash[2]) - 1;
-                    if (options.direction == directions.rightToLeft) {
-                        hashNum = Math.abs(hashNum + 1 - options.pageTotal);
-                    }
-                    return hashNum;
-                } else {
-                    return '';
-                }
-            },
-            updateHash = function (hash, options) {
-                // set the hash
-                if (options.hash) {
-                    if (options.direction == directions.rightToLeft) {
-                        hash = Math.abs(hash - options.pageTotal);
-                    }
-                    window.location.hash = hashRoot + hash;
-                }
-            },
-            destroyControls = function () {
-
-                if (options.menu) {
-                    $(options.menu).removeClass('b-menu');
-
-                    if (options.pageSelector) {
-                        menu.find('.b-selector-page').remove();
-                        pageSelector = pageSelectorList = listItemNumbers = listItemTitle = pageListItem = pageSelectorHeight = null;
-                    }
-                    if (options.chapterSelector) {
-                        menu.find('.b-selector-chapter').remove();
-                        chapter = chapterSelector = chapterSelectorList = chapterListItem = chapterSelectorHeight = null;
-                    }
-                }
-                menu = null;
-
-                if (customN) {
-                    customN.off('click.booklet');
-                    customN = null;
-                }
-
-                if (customP) {
-                    customP.off('click.booklet');
-                    customP = null;
-                }
-
-                if (ctrlsN) {
-                    ctrlsN.off(".booklet");
-                    ctrlsN = null;
-                }
-                if (ctrlsP) {
-                    ctrlsP.off(".booklet");
-                    ctrlsP = null;
-                }
-
-                target.find('.b-selector, .b-controls').remove();
-
-                // keyboard
-                //$(document).off('keyup.booklet');
-
-                // hash
-                clearInterval(h);
-                h = null;
-
-                // window resize
-                //$(window).off('resize.booklet');
-
-                // auto play
-                clearInterval(a);
-                a = null;
-                if (options.pause && $(options.pause).length > 0) {
-                    $(options.pause).off('click.booklet');
-                }
-                pause = null;
-                if (options.play && $(options.play).length > 0) {
-                    $(options.play).off('click.booklet');
-                }
-                play = null;
-
-                destroyManualControls();
-            },
             destroyManualControls = function () {
                 if ($.ui) {
                     // remove old draggables
@@ -1470,8 +1151,6 @@
                         target.find('.b-page').draggable('destroy').removeClass('b-grab b-grabbing');
                     }
                 }
-                // remove mouse tracking for page movement
-                target.off('.booklet');
             },
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1532,7 +1211,6 @@
                 updateOptions();
                 updatePages();
                 updateControlVisibility();
-                updateMenu();
             },
             removePage = function (index) {
                 // validate inputs
@@ -1602,7 +1280,6 @@
                 updatePages();
                 updateOptions();
                 updateControlVisibility();
-                updateMenu();
             },
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1657,7 +1334,6 @@
                     }
                     target.trigger(events.start, callback);
 
-                    updateMenu();
                     updateHash(options.currentIndex + 1, options);
                     if (newIndex == options.pageTotal - 2 || newIndex == 0) {
                         updateControlVisibility();
@@ -1671,10 +1347,12 @@
                     if (inc && !isBusy && !isHoveringRight && !isHoveringLeft && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
                         p4.css({visibility:'visible'});
                         p2.stop().transition({rotateY:'-10deg'}, anim.hover.speed, options.easing);
+                        animateShadows(inc, anim.hover.speed, 0.10);
                         isHoveringRight = true;
                     } else if (!isBusy && !isHoveringLeft && !isHoveringRight && !p0drag && options.currentIndex - 2 >= 0) {
                         pN.css({visibility:'visible'});
                         p1.stop().transition({rotateY:'10deg'}, anim.hover.speed, options.easing);
+                        animateShadows(inc, anim.hover.speed, 0.10);
                         isHoveringLeft = true;
                     }
                 }
@@ -1687,12 +1365,14 @@
                         if (!isBusy && isHoveringRight && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
                             p4.css({visibility:'hidden'});
                             p2.stop().transition({rotateY:'0deg'}, anim.hover.speed, options.easing);
+                            animateShadows(inc, anim.hover.speed, 0);
                             isHoveringRight = false;
                         }
                     } else {
                         if (!isBusy && isHoveringLeft && !p0drag && options.currentIndex - 2 >= 0) {
                             pN.css({visibility:'hidden'});
                             p1.stop().transition({rotateY:'0deg'}, anim.hover.speed, options.easing);
+                            animateShadows(inc, anim.hover.speed, 0);
                             isHoveringLeft = false;
                         }
                     }
@@ -1733,34 +1413,8 @@
                       .transition({visibility:'visible'}, 0)
                       .transition({rotateY:'0deg', left: opening ? 0 : p3.css('left')}, speed/2, options.easeOut, function(){updateAfter()});
 
-                    /*
-                     // hide p2 as p3 moves across it
-                     if (options.closed && options.autoCenter && newIndex - diff == 0) {
-                     p2.stop().animate(anim.p2closed, p3drag === true ? speed : speed * 2, options.easing);
-                     p4.stop().animate(anim.p4closed, p3drag === true ? speed : speed * 2, options.easing);
-                     } else {
-                     p2.stop().animate(anim.p2, speed, p3drag === true ? options.easeOut : options.easeIn);
-                     }
+                    //todo: handle manual drag
 
-                     // if animating after a manual drag, calculate new speed and animate out
-                     if (p3drag) {
-
-                     p3.animate(anim.p3out, speed, options.easeOut);
-                     p3wrap.animate(anim.p3wrapOut, speed, options.easeOut, function () {
-                     updateAfter()
-                     });
-
-                     } else {
-
-                     p3.stop().animate(anim.p3in, speed, options.easeIn)
-                     .animate(anim.p3out, speed, options.easeOut);
-
-                     p3wrap.animate(anim.p3wrapIn, speed, options.easeIn)
-                     .animate(anim.p3wrapOut, speed, options.easeOut, function () {
-                     updateAfter()
-                     });
-                     }
-                     */
                 } else {
 
                     pN.css({visibility:'visible'});
@@ -1777,69 +1431,44 @@
                       .transition({visibility:'visible'}, 0)
                       .transition({rotateY:'0deg', left: closing ? 0 : p0.css('left')}, speed/2, options.easeOut, function(){updateAfter()});
 
-                    /*
-                     if (p0drag) {
-                     // hide p1 as p0 moves across it
-                     p1.animate(anim.p1, speed, options.easeOut);
-                     p1wrap.animate(anim.p1wrap, speed, options.easeOut);
-
-                     if (options.closed && options.autoCenter && options.currentIndex == 0) {
-                     p0.animate(anim.p0outClosed, speed, options.easeOut);
-                     p2.stop().animate(anim.p2back, speed, options.easeOut);
-                     } else {
-                     p0.animate(anim.p0, speed, options.easeOut);
-                     }
-
-                     p0wrap.animate(anim.p0wrapDrag, speed, options.easeOut, function () {
-                     updateAfter()
-                     });
-                     } else {
-                     // hide p1 as p0 moves across it
-                     p1.animate(anim.p1, speed * 2, options.easing);
-                     p1wrap.animate(anim.p1wrap, speed * 2, options.easing);
-
-                     if (options.closed && options.autoCenter && options.currentIndex == 0) {
-                     p0.animate(anim.p0in, speed, options.easeIn)
-                     .animate(anim.p0outClosed, speed, options.easeOut);
-                     p2.stop().animate(anim.p2back, speed * 2, options.easing);
-                     } else {
-                     p0.animate(anim.p0in, speed, options.easeIn)
-                     .animate(anim.p0out, speed, options.easeOut);
-                     }
-
-                     p0wrap.animate(anim.p0wrapIn, speed, options.easeIn)
-                     .animate(anim.p0wrapOut, speed, options.easeOut, function () {
-                     updateAfter()
-                     });
-                     }
-                     */
+                    //todo: handle manual drag
                 }
 
-                // init shadows
+                animateShadows(inc, speed, 1);
+            },
+            addShadows = function (inc) {
+                if ((inc && p3.find('.b-shadow-left').length == 0) || (!inc && p1.find('.b-shadow-left').length == 0)) {
+                    shadowLeft1 = $(templates.shadowLeft).appendTo(inc ? p3 : p1).css(css.shadow);
+                }
+                if ((inc && p2.find('.b-shadow-right').length == 0) || (!inc && p0.find('.b-shadow-right').length == 0)) {
+                    shadowRight1 = $(templates.shadowRight).appendTo(inc ? p2: p0).css(css.shadow);
+                }
+                if ((inc && p1.find('.b-shadow-left').length == 0) || (!inc && pN.find('.b-shadow-left').length == 0)) {
+                    shadowLeft2 = $(templates.shadowLeft).appendTo(inc ? p1 : pN).css(css.shadow);
+                }
+                if ((inc && p4.find('.b-shadow-right').length == 0) || (!inc && p2.find('.b-shadow-right').length == 0)) {
+                    shadowRight2 = $(templates.shadowRight).appendTo(inc ? p4: p2).css(css.shadow);
+                }
+            },
+            animateShadows = function (inc, speed, percentage) {
                 if (options.shadows) {
-                    target.find('.b-shadow-f, .b-shadow-b').remove();
-                    var shadowLeft1 = $(templates.sF).appendTo(inc ? p3 : p1).css(css.sF);
-                    var shadowRight1 = $(templates.sB).appendTo(inc ? p2: p0).css(css.sB);
-
-                    var shadowLeft2 = $(templates.sF).appendTo(inc ? p1 : pN).css(css.sF);
-                    var shadowRight2 = $(templates.sB).appendTo(inc ? p4: p2).css(css.sB);
-
+                    addShadows(inc);
                     if (inc) {
-                        shadowLeft1.css({ opacity: 1 });
-                        shadowRight2.css({ opacity: 1 });
+                        shadowLeft1.css({ opacity: percentage });
+                        shadowRight2.css({ opacity: percentage });
                         shadowRight2.animate({ opacity: 0 }, speed, options.easing);
-                        shadowRight1.animate({ opacity: 1 }, speed/2, options.easeIn, function(){
+                        shadowRight1.animate({ opacity: percentage }, speed/2, options.easeIn, function(){
                             shadowLeft1.animate({ opacity: 0 }, speed/2, options.easeOut);
                         });
-                        shadowLeft2.animate({ opacity: 1 }, speed, options.easing);
+                        shadowLeft2.animate({ opacity: percentage }, speed, options.easing);
                     } else {
-                        shadowRight1.css({ opacity: 1 });
-                        shadowLeft2.css({ opacity: 1 });
+                        shadowRight1.css({ opacity: percentage });
+                        shadowLeft2.css({ opacity: percentage });
                         shadowLeft2.animate({ opacity: 0 }, speed, options.easeIn);
-                        shadowLeft1.animate({ opacity: 1 }, speed/2, options.easeIn, function(){
+                        shadowLeft1.animate({ opacity: percentage }, speed/2, options.easeIn, function(){
                             shadowRight1.animate({ opacity: 0 }, speed/2, options.easeOut);
                         });
-                        shadowRight2.animate({ opacity: 1 }, speed, options.easing);
+                        shadowRight2.animate({ opacity: percentage }, speed, options.easing);
                     }
                 }
             },
@@ -1853,15 +1482,8 @@
                     p3 = target.find('.b-p3');
                     p4 = target.find('.b-p4');
 
-					/*
-					if (options.closed && options.autoCenter && options.currentIndex - diff == 0) {
-                     p3.css({'left': pWidthN});
-                     p4.css({'left': 0});
-                     }
-                    if (isHoveringRight) {
-                        p3.css({ 'left': options.width - 40, 'width': 20, 'padding-left': 10 });
-                    }
-                   */
+					// todo: handle hovering
+
                 } else if (!inc && diff > 2) {
                     // initialize previous 2 pages, if jumping backwards in the book
                     target.find('.b-pN, .b-p0').removeClass('b-pN b-p0').hide();
@@ -1870,36 +1492,11 @@
                     pN = target.find('.b-pN');
                     p0 = target.find('.b-p0');
 
-                    /*
-                    if (options.closed && options.autoCenter) {
-                     pN.css({'left': pWidthN});
-                     }
-                    if (isHoveringLeft) {
-                        p0.css({ left: 10, width: 40 });
-                        p0wrap.css({ right: 10 });
-                    }
-                    */
+                    // todo: handle hovering
                 }
-
-                // update page visibility
-                // if moving to start and end of book
-                /*
-                if (options.closed) {
-                    if (!inc && options.currentIndex == 0) {
-                        pN.hide();
-                    } else if (!inc) {
-                        pN.show();
-                    }
-                    if (inc && options.currentIndex >= options.pageTotal - 2) {
-                        p4.hide();
-                    } else if (inc) {
-                        p4.show();
-                    }
-                }*/
             },
             updateAfter = function () {
                 updatePages();
-                updateMenu();
                 updateControlVisibility();
                 isBusy = false;
 
@@ -1994,10 +1591,6 @@
         easeOut:              'easeOutQuad',                   // easing method for second half of transition
 
         closed:               false,                           // start with the book "closed", will add empty pages to beginning and end of book
-        closedFrontTitle:     'Beginning',                     // used with "closed", "menu" and "pageSelector", determines title of blank starting page
-        closedFrontChapter:   'Beginning of Book',             // used with "closed", "menu" and "chapterSelector", determines chapter name of blank starting page
-        closedBackTitle:      'End',                           // used with "closed", "menu" and "pageSelector", determines chapter name of blank ending page
-        closedBackChapter:    'End of Book',                   // used with "closed", "menu" and "chapterSelector", determines chapter name of blank ending page
         covers:               false,                           // used with "closed", makes first and last pages into covers, without page numbers (if enabled)
         autoCenter:           false,                           // used with "closed", makes book position in center of container when closed
 
@@ -2010,7 +1603,7 @@
         hoverWidth:           50,                              // default width for page-turn hover preview
         hoverSpeed:           500,                             // default speed for page-turn hover preview
         hoverThreshold:       0.25,                            // default percentage used for manual page dragging, sets the percentage amount a drag must be before moving next or prev
-        hoverClick:           true,                            // enables hovered arreas to be clicked when using manual page turning
+        hoverClick:           true,                            // enables hovered areas to be clicked when using manual page turning
         overlays:             false,                           // enables navigation using a page sized overlay, when enabled links inside the content will not be clickable
         tabs:                 false,                           // adds tabs along the top of the pages
         tabWidth:             60,                              // set the width of the tabs
@@ -2032,10 +1625,6 @@
         delay:                5000,                            // amount of time between automatic page flipping
         pause:                null,                            // selector for element to use as click trigger for pausing auto page flipping
         play:                 null,                            // selector for element to use as click trigger for restarting auto page flipping
-
-        menu:                 null,                            // selector for element to use as the menu area, required for 'pageSelector'
-        pageSelector:         false,                           // enables navigation with a drop-down menu of pages, requires 'menu'
-        chapterSelector:      false,                           // enables navigation with a drop-down menu of chapters, determined by the "rel" attribute, requires 'menu'
 
         shadows:              true,                            // display shadows on page animations
 
