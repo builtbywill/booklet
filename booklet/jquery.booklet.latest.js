@@ -879,7 +879,9 @@
                 play = null;
 
                 // remove mouse tracking for page movement
-                target.off('.booklet');
+                target.off('click.booklet');
+                target.off('mousemove.booklet');
+                target.off('mouseleave.booklet');
 
                 destroyManualControls();
             },
@@ -1356,8 +1358,6 @@
                         isHoveringLeft = true;
                     }
                 }
-
-                //todo: add shadows
             },
             endHoverAnimation = function (inc) {
                 if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
@@ -1377,8 +1377,6 @@
                         }
                     }
                 }
-
-                //todo: add shadows
             },
             animatePages = function(diff, inc, speed) {
 
@@ -1424,9 +1422,11 @@
                         pN.transition({left:pWidthN}, speed, options.easing);
                         p2.transition({left:0}, speed, options.easing);
                     }
+
                     p1.transition({rotateY:'90deg', left: closing ? -(pWidthH) : p1.css('left')}, speed/2, options.easeIn)
                       .transition({visibility:'hidden'}, 0)
                       .transition({rotateY:'180deg', left: closing ? 0 : p1.css('left')}, speed/2, options.easeOut);
+
                     p0.transition({rotateY:'-90deg', left: closing ? pWidthH : p0.css('left')}, speed/2, options.easeIn)
                       .transition({visibility:'visible'}, 0)
                       .transition({rotateY:'0deg', left: closing ? 0 : p0.css('left')}, speed/2, options.easeOut, function(){updateAfter()});
