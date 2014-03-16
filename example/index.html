@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Booklet - jQuery Plugin</title>
+    <!--[if lt IE 9]><script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <link href="../booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
+    <style type="text/css">
+		body {background:#ccc; font:normal 12px/1.2 arial, verdana, sans-serif;}
+        input, textarea {background-color:#fff; border:2px inset;}
+        #menu {width:auto;}
+		#controls {float:left;}
+		#content {position:fixed; margin-left:400px;}
+    </style>
+</head>
+<body>
+	<header>
+		<h1>Booklet Example</h1>
+		<div class="clear"></div>
+	</header>
+	<aside id="controls">
+    	<h3>Top Level Methods</h3>
+		<ul>
+	    	<li><a href="#" id="custom-destroy">Destroy</a></li>
+	    	<li><a href="#" id="custom-create">Create</a></li>
+	    	<li><a href="#" id="custom-enable">Enable</a></li>
+	    	<li><a href="#" id="custom-disable">Disable</a></li>
+	    </ul>
+		<h3>Navigation Methods</h3>
+		<ul>
+	    	<li><a href="#" id="custom-next">Next page</a></li>
+	    	<li><a href="#" id="custom-prev">Previous page</a></li>
+	    	<li><a href="#" id="custom-gotopage">Go to page:</a>
+				<select id="gotoIndex">
+					<option value="start">start</option>
+					<option value="end">end</option>
+				</select>
+			</li>
+	    </ul>
+	    <h3>Add / Remove Pages</h3>
+		<ul>
+	    	<li><a href="#" id="custom-add-index">Add a New Page, at:</a>
+				<select id="addIndex">
+					<option value="start">start</option>
+					<option value="end">end</option>
+				</select>
+			</li>
+	    	<li><a href="#" id="custom-remove-index">Remove Page, at:</a>
+				<select id="removeIndex">
+					<option value="start">start</option>
+					<option value="end">end</option>
+				</select>
+			</li>
+	    </ul>
+	    <h3>Update Option(s)</h3>
+		<div id="options-wrapper">
+			<ul id="options-list">
+		    	<li></li>
+		    </ul>
+		</div>
+	</aside>
+	<section id="content" class="sub-content">
+		<a href="#" id="custom-update-options">Update Options</a>
+		<a href="#" id="custom-reset-options">Reset Options</a>
+		<h3>Command Output</h3>
+		<textarea id="display"></textarea>
+	    <div id="menu"></div>
+	    <div id="mybook">
+	        <div title="first page" rel="first chapter">
+	            <h3>1 jQuery Booklet</h3>
+	            <p>This is a sample booklet! It uses all of the default options, but feel free to explore all the possibilities in the <a href="options">options</a> section.</p>
+	            <h3>Content Variety</h3>
+	            <p>You can place any sort of html elements inside of your booklet pages. There is no limit to the possibilities you can create. Even using simple options, you can have elaborate displays.</p>
+	        </div>
+	        <div title="second page">
+	            <h3>2 Default Options</h3>
+	            <p>The default options include:</p>
+	            <ul>
+	                <li><h4>Manual Page Turning</h4>This option requires jQuery UI, but will degrade and be usable if not included.</li>
+	                <li><h4>Keyboard Navigation (use your arrows!)</h4></li>
+	                <li><h4>Page Numbers</h4></li>
+	                <li><h4>Shadows (during animation)</h4></li>
+	            </ul>
+	            <p>Move to the next page by dragging or the arrow keys to see the animation in action!</p>
+	        </div>
+	        <div title="third page">
+	            <h3>3 Huzzah!</h3>
+	            <p>That awesome page turning animation was made possible by jQuery. Pretty cool, huh?</p>
+	            <h3>What's Next?</h3>
+	            <ul>
+	                <li><a href="options">View the Options Reference</a></li>
+	                <li><a href="examples/">View Examples</a></li>
+	                <li><a href="installation">View Installation Instructions</a></li>
+	                <li>Download below!</li>
+	            </ul>
+	        </div>
+	        <div title="fourth page">
+	            <h3>4 jQuery Booklet</h3>
+	            <p>This is a sample booklet! It uses all of the default options, but feel free to explore all the possibilities in the <a href="options">options</a> section.</p>
+	            <h3>Content Variety</h3>
+	            <p>You can place any sort of html elements inside of your booklet pages. There is no limit to the possibilities you can create. Even using simple options, you can have elaborate displays.</p>
+	        </div>
+	        <div title="fifth page" rel="second chapter">
+	            <h3>5 jQuery Booklet</h3>
+	            <p>This is a sample booklet! It uses all of the default options, but feel free to explore all the possibilities in the <a href="options">options</a> section.</p>
+	            <h3>Content Variety</h3>
+	            <p>You can place any sort of html elements inside of your booklet pages. There is no limit to the possibilities you can create. Even using simple options, you can have elaborate displays.</p>
+	        </div>
+	        <div title="sixth page">
+	            <h3>6 Default Options</h3>
+	            <p>The default options include:</p>
+	            <ul>
+	                <li><h4>Manual Page Turning</h4>This option requires jQuery UI, but will degrade and be usable if not included.</li>
+	                <li><h4>Keyboard Navigation (use your arrows!)</h4></li>
+	                <li><h4>Page Numbers</h4></li>
+	                <li><h4>Shadows (during animation)</h4></li>
+	            </ul>
+	            <p>Move to the next page by dragging or the arrow keys to see the animation in action!</p>
+	        </div>
+	        <div title="seventh page">
+	            <h3>7 Huzzah!</h3>
+	            <p>That awesome page turning animation was made possible by jQuery. Pretty cool, huh?</p>
+	            <h3>What's Next?</h3>
+	            <ul>
+	                <li><a href="options">View the Options Reference</a></li>
+	                <li><a href="examples/">View Examples</a></li>
+	                <li><a href="installation">View Installation Instructions</a></li>
+	                <li>Download below!</li>
+	            </ul>
+	        </div>
+	        <div title="eighth page">
+	            <h3>8 jQuery Booklet</h3>
+	            <p>This is a sample booklet! It uses all of the default options, but feel free to explore all the possibilities in the <a href="options">options</a> section.</p>
+	            <h3>Content Variety</h3>
+	            <p>You can place any sort of html elements inside of your booklet pages. There is no limit to the possibilities you can create. Even using simple options, you can have elaborate displays.</p>
+	        </div>
+	    </div>
+	</section>
+	<footer></footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script> window.jQuery || document.write('<script src="../booklet/jquery-2.1.0.min.js"><\/script>') </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script> window.jQuery.ui || document.write('<script src="../booklet/jquery-ui-1.10.4.min.js"><\/script>') </script>
+    <script src="../booklet/jquery.easing.1.3.js"></script>
+    <script src="../booklet/jquery.booklet.latest.js"></script>
+	<script type="text/javascript">
+	    $(function () {
+		
+			// Init
+			
+			var updateSelect = function (event, data) {
+				var pageTotal = data.options.pageTotal;
+				$('#gotoIndex, #addIndex, #removeIndex').children().remove();
+				$('#gotoIndex, #addIndex, #removeIndex').append('<option value="start">start</option><option value="end">end</option>');						
+				for(i = 0; i < pageTotal; i++) {
+					$('#gotoIndex, #addIndex, #removeIndex').append('<option value="'+ i +'">'+ i +'</option>');						
+				}
+			};
+			
+			var options = $.extend({}, $.fn.booklet.defaults, {
+			    pagePadding: 15,
+			    menu: "#menu",
+			    pageSelector: true,
+			    chapterSelector: true,
+			    arrows: true,
+			    tabs: true,
+                arrowsHide:true
+			});
+			var updateOptions = function () {
+				$('#options-list').children().remove();
+				$.each(options, function(key, value){
+					$('#options-list').append('<li>'+key+' <input value="'+value+'" id="option-'+key+'" /></li>');
+					$('#option-'+key).on('change', function(e){
+						e.preventDefault();
+						var value = $(this).val();
+						var intValue = parseInt(value);
+						
+						if(!isNaN(intValue)) {
+							options[key] = intValue;
+							return;
+						}
+
+						options[key] = value;
+					});
+				});
+			};
+			updateOptions();
+			
+			var config = $.extend({}, options, {
+				create: updateSelect,
+				add: updateSelect,
+				remove: updateSelect
+			});
+	        var mybook = $("#mybook").booklet(config);
+	
+			$('#gotoIndex').on('change', function(e){
+				e.preventDefault();
+				$('#custom-gotopage').click();
+			});
+	
+			// New Page Default HTML
+	
+			var newPageCount = 0;
+	        var newPageHtml = function() {
+				newPageCount++;
+				return "<div rel='new chapter'>New Page \#"+newPageCount+"</div>";
+			};
+			
+			
+			// Display
+			
+	        var display = $("#display");
+			var updateDisplay = function(message) {
+				display.text(message + '\r\n' + display.text());
+			};
+	
+			// Demo Actions
+	
+	        $('#custom-destroy').click(function (e) {
+	            e.preventDefault();
+	            $("#mybook").booklet("destroy");
+	            updateDisplay('$("#mybook").booklet("destroy")');
+	        });
+
+	        $('#custom-create').click(function (e) {
+	            e.preventDefault();
+	            $("#mybook").booklet(config);
+	            updateDisplay('$("#mybook").booklet();');
+	        });
+
+	        $('#custom-disable').click(function (e) {
+	            e.preventDefault();
+	            $("#mybook").booklet("disable");
+	            updateDisplay('$("#mybook").booklet("disable")');
+	        });
+
+	        $('#custom-enable').click(function (e) {
+	            e.preventDefault();
+	            $("#mybook").booklet("enable");
+	            updateDisplay('$("#mybook").booklet("enable")');
+	        });
+
+	        $('#custom-next').click(function (e) {
+	            e.preventDefault();
+	            $("#mybook").booklet("next");
+				updateDisplay('$("#mybook").booklet("next");');
+	        });
+
+	        $('#custom-prev').click(function (e) {
+	            e.preventDefault();
+	            $("#mybook").booklet("prev");
+				updateDisplay('$("#mybook").booklet("prev");');
+	        });
+
+	        $('#custom-gotopage').click(function (e) {
+	            e.preventDefault();
+				var index = $('#gotoIndex').val();
+	            $("#mybook").booklet("gotopage", index);
+				updateDisplay('$("#mybook").booklet("gotopage", '+(index == "start" || index == "end" ? '"'+index+'"' : index)+');');
+	        });
+
+	        $('#custom-add-index').click(function (e) {
+	            e.preventDefault();
+				var newPage = newPageHtml();
+				var index = $('#addIndex').val();
+	            $("#mybook").booklet("add", index, newPage);
+				updateDisplay('$("#mybook").booklet("add", '+ (index == "start" || index == "end" ? '"'+index+'"' : index) +', "'+ new String(newPage) +'");');
+	        });
+	
+	        $('#custom-remove-index').click(function (e) {
+	            e.preventDefault();
+				var index = $('#removeIndex').val();
+	            $("#mybook").booklet("remove", index);
+				updateDisplay('$("#mybook").booklet("remove", '+ (index == "start" || index == "end" ? '"'+index+'"' : index) +');');
+	        });
+
+	        $('#custom-update-options').click(function (e) {
+	            e.preventDefault();
+				$("#mybook").booklet("option", options);
+				updateDisplay('$("#mybook").booklet("option", '+ options +');');
+	        });
+	
+	        $('#custom-reset-options').click(function (e) {
+	            e.preventDefault();
+				$("#mybook").booklet("option", config);
+				updateDisplay('$("#mybook").booklet("option", '+ options +');');
+				updateOptions();
+	        });
+
+	    });
+    </script>
+</body>
+</html>
