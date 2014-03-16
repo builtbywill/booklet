@@ -4,7 +4,7 @@
  *
  * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
  *
- * Version : 1.4.3
+ * Version : 1.4.4
  *
  * Originally based on the work of:
  *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
@@ -689,10 +689,6 @@
                     overlayP = $('<div class="b-overlay b-overlay-prev b-prev" title="' + options.previousControlTitle + '"></div>').appendTo(ctrls);
                     overlayN = $('<div class="b-overlay b-overlay-next b-next" title="' + options.nextControlTitle + '"></div>').appendTo(ctrls);
                     overlaysB = target.find('.b-overlay');
-                    // ie fix
-                    if ($.browser.msie) {
-                        overlaysB.css({ 'background': '#fff', 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=0) !important' });
-                    }
                 } else if (!options.overlays) {
                     overlaysB.remove();
                     overlaysB = null;
