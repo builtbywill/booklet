@@ -239,8 +239,7 @@
 
                 // if closed book, add empty pages to start and end
                 if (options.closed) {
-                    $(templates.empty).attr({ title: options.closedFrontTitle || '', rel: options.closedFrontChapter || '' }).prependTo(target);
-                    target.children().last().attr({ title: options.closedBackTitle || '', rel: options.closedBackChapter || '' });
+                    target.prepend(templates.empty);
                     target.append(templates.empty);
                 }
 
@@ -304,7 +303,7 @@
             updatePageStructure = function () {
                 // reset all content
                 target.find('.b-page').removeClass('b-pN b-p0 b-p1 b-p2 b-p3 b-p4').hide();
-                target.find('.b-shadow-left, .b-shadow-right').remove();
+                removeShadows();
 
                 // add page classes
                 if (options.currentIndex - 2 >= 0) {
@@ -358,7 +357,8 @@
             destroyPages = function () {
                 // remove booklet markup
                 target.find(".b-page").children().unwrap();
-                target.find(".b-counter, .b-page-blank, .b-page-empty, .b-shadow-left, .b-shadow-right").remove();
+                target.find(".b-counter, .b-page-blank, .b-page-empty").remove();
+                removeShadows();
 
                 // revert page order to original
                 if (options.direction == directions.rightToLeft) {
@@ -651,18 +651,18 @@
                 }
 
                 // add arrow animations
-                if(options.arrows) {
-                    if(options.arrowsHide) {
+                if (options.arrows) {
+                    if (options.arrowsHide) {
                         ctrlsN.on('mouseover.booklet', function () {
                             arrowN.find('div').stop().fadeTo('fast', 1);
                         }).on('mouseout.booklet', function () {
-                                arrowN.find('div').stop().fadeTo('fast', 0);
-                            });
+                            arrowN.find('div').stop().fadeTo('fast', 0);
+                        });
                         ctrlsP.on('mouseover.booklet', function () {
                             arrowP.find('div').stop().fadeTo('fast', 1);
                         }).on('mouseout.booklet', function () {
-                                arrowP.find('div').stop().fadeTo('fast', 0);
-                            });
+                            arrowP.find('div').stop().fadeTo('fast', 0);
+                        });
                     } else {
                         arrowN.find('div').show();
                         arrowP.find('div').show();
@@ -670,7 +670,6 @@
                 }
             },
             addCustomControlActions = function () {
-                // add click action to custom controls
                 if (options.next && $(options.next).length > 0) {
                     customN = $(options.next);
                     customN.on('click.booklet', function (e) {
@@ -687,7 +686,6 @@
                 }
             },
             addKeyboardControlAction = function () {
-                // keyboard controls
                 $(document).on('keyup.booklet', function (event) {
                     if (event.keyCode == 37 && options.keyboard) {
                         prev();
@@ -698,7 +696,6 @@
             },
 
             addHashControlAction = function () {
-                // hash controls
                 clearInterval(h);
                 h = null;
                 if (options.hash) {
@@ -839,12 +836,10 @@
                     customN.off('click.booklet');
                     customN = null;
                 }
-
                 if (customP) {
                     customP.off('click.booklet');
                     customP = null;
                 }
-
                 if (ctrlsN) {
                     ctrlsN.off(".booklet");
                     ctrlsN = null;
@@ -853,8 +848,9 @@
                     ctrlsP.off(".booklet");
                     ctrlsP = null;
                 }
-
+                
                 target.find('.b-controls').remove();
+                ctrls = tabs = tabN = tabP = arrows = arrowN = arrowP = null;
 
                 // keyboard
                 $(document).off('keyup.booklet');
@@ -878,10 +874,8 @@
                 }
                 play = null;
 
-                // remove mouse tracking for page movement
-                target.off('click.booklet');
-                target.off('mousemove.booklet');
-                target.off('mouseleave.booklet');
+                // remove mouse tracking for page movement and hover clicks
+                target.off('.booklet');
 
                 destroyManualControls();
             },
@@ -1340,27 +1334,33 @@
                     if (newIndex == options.pageTotal - 2 || newIndex == 0) {
                         updateControlVisibility();
                     }
-
+                    
+                    setupPagesBeforeAnimation(diff, options.movingForward);
                     animatePages(diff, options.movingForward, speed);
+                    animateShadows(options.movingForward, speed, 1);
                 }
             },
             startHoverAnimation = function (inc) {
-                if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
-                    if (inc && !isBusy && !isHoveringRight && !isHoveringLeft && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
-                        p4.css({visibility:'visible'});
-                        p2.stop().transition({rotateY:'-10deg'}, anim.hover.speed, options.easing);
-                        animateShadows(inc, anim.hover.speed, 0.10);
-                        isHoveringRight = true;
-                    } else if (!isBusy && !isHoveringLeft && !isHoveringRight && !p0drag && options.currentIndex - 2 >= 0) {
-                        pN.css({visibility:'visible'});
-                        p1.stop().transition({rotateY:'10deg'}, anim.hover.speed, options.easing);
-                        animateShadows(inc, anim.hover.speed, 0.10);
-                        isHoveringLeft = true;
+                if (!isDisabled && (options.hovers || options.manual)) {
+                    if (inc) {
+                        if (!isBusy && !isHoveringRight && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
+                            p4.css({visibility:'visible'});
+                            p2.stop().transition({rotateY:'-10deg'}, anim.hover.speed, options.easing);
+                            animateShadows(inc, anim.hover.speed, 0.10);
+                            isHoveringRight = true;
+                        }
+                    } else {
+                        if (!isBusy && !isHoveringLeft && !p0drag && options.currentIndex - 2 >= 0) {
+                            pN.css({visibility:'visible'});
+                            p1.stop().transition({rotateY:'10deg'}, anim.hover.speed, options.easing);
+                            animateShadows(inc, anim.hover.speed, 0.10);
+                            isHoveringLeft = true;
+                        }
                     }
                 }
             },
             endHoverAnimation = function (inc) {
-                if (!isDisabled && ((options.hovers && options.overlays) || options.manual)) {
+                if (!isDisabled && (options.hovers || options.manual)) {
                     if (inc) {
                         if (!isBusy && isHoveringRight && !p3drag && options.currentIndex + 2 <= options.pageTotal - 2) {
                             p4.css({visibility:'hidden'});
@@ -1380,8 +1380,6 @@
             },
             animatePages = function(diff, inc, speed) {
 
-                setupPagesBeforeAnimation(diff, inc);
-
                 // animate booklet width
                 if (options.closed && options.autoCenter) {
                     if (options.currentIndex == 0) {
@@ -1394,27 +1392,26 @@
                 }
 
                 if (inc) {
-
                     p4.css({visibility:'visible'});
-
+                    
                     var opening = options.closed && options.autoCenter && options.currentIndex - diff == 0;
                     if (opening) {
                         p1.transition({left:0}, speed, options.easing);
                         p4.transition({left:pWidth}, speed, options.easing);
                     }
 
-                    p2.transition({rotateY:'-90deg', left: opening ? pWidthH : p2.css('left')}, speed/2, options.easeIn)
-                      .transition({visibility:'hidden'}, 0)
-                      .transition({left: opening ? pWidth : p2.css('left')}, speed/2, options.easeIn);
-
-                    p3.transition({rotateY:'90deg', left: opening ? -(pWidthH) : p3.css('left')}, speed/2, options.easeIn)
-                      .transition({visibility:'visible'}, 0)
-                      .transition({rotateY:'0deg', left: opening ? 0 : p3.css('left')}, speed/2, options.easeOut, function(){updateAfter()});
+                    p2.transition({rotateY:'-90deg', left: opening ? pWidthH : p2.css('left')}, speed/2, options.easeIn, function(){
+                        p2.transition({visibility:'hidden'}, 0)
+                          .transition({left: opening ? pWidth : p2.css('left')}, speed/2, options.easeIn); 
+              
+                        p3.transition({visibility:'visible'}, 0)
+                          .transition({rotateY:'0deg', left: opening ? 0 : p3.css('left')}, speed/2, options.easeOut, function(){updateAfter()});              
+                    });
+                    p3.transition({rotateY:'90deg', left: opening ? -(pWidthH) : p3.css('left')}, speed/2, options.easeIn);
 
                     //todo: handle manual drag
 
                 } else {
-
                     pN.css({visibility:'visible'});
 
                     var closing = options.closed && options.autoCenter && options.currentIndex == 0;
@@ -1423,18 +1420,16 @@
                         p2.transition({left:0}, speed, options.easing);
                     }
 
-                    p1.transition({rotateY:'90deg', left: closing ? -(pWidthH) : p1.css('left')}, speed/2, options.easeIn)
-                      .transition({visibility:'hidden'}, 0)
-                      .transition({rotateY:'180deg', left: closing ? 0 : p1.css('left')}, speed/2, options.easeOut);
-
-                    p0.transition({rotateY:'-90deg', left: closing ? pWidthH : p0.css('left')}, speed/2, options.easeIn)
-                      .transition({visibility:'visible'}, 0)
-                      .transition({rotateY:'0deg', left: closing ? 0 : p0.css('left')}, speed/2, options.easeOut, function(){updateAfter()});
+                    p1.transition({rotateY:'90deg', left: closing ? -(pWidthH) : p1.css('left')}, speed/2, options.easeIn, function(){
+                        p1.transition({visibility:'hidden'}, 0)
+                          .transition({rotateY:'180deg', left: closing ? 0 : p1.css('left')}, speed/2, options.easeOut);
+                        p0.transition({visibility:'visible'}, 0)
+                          .transition({rotateY:'0deg', left: closing ? 0 : p0.css('left')}, speed/2, options.easeOut, function(){updateAfter()});                        
+                    });
+                    p0.transition({rotateY:'-90deg', left: closing ? pWidthH : p0.css('left')}, speed/2, options.easeIn);
 
                     //todo: handle manual drag
                 }
-
-                animateShadows(inc, speed, 1);
             },
             addShadows = function (inc) {
                 if ((inc && p3.find('.b-shadow-left').length == 0) || (!inc && p1.find('.b-shadow-left').length == 0)) {
@@ -1450,30 +1445,41 @@
                     shadowRight2 = $(templates.shadowRight).appendTo(inc ? p4: p2).css(css.shadow);
                 }
             },
+            removeShadows = function (inc) {
+                target.find('.b-shadow-left, .b-shadow-right').remove();
+            },
             animateShadows = function (inc, speed, percentage) {
                 if (options.shadows) {
                     addShadows(inc);
                     if (inc) {
                         shadowLeft1.css({ opacity: percentage });
                         shadowRight2.css({ opacity: percentage });
-                        shadowRight2.animate({ opacity: 0 }, speed, options.easing);
-                        shadowRight1.animate({ opacity: percentage }, speed/2, options.easeIn, function(){
-                            shadowLeft1.animate({ opacity: 0 }, speed/2, options.easeOut);
+                        shadowRight2.stop().animate({ opacity: 0 }, speed, options.easing);
+                        shadowRight1.stop().animate({ opacity: percentage }, speed/2, options.easeIn, function(){
+                            shadowLeft1.stop().animate({ opacity: 0 }, speed/2, options.easeOut);
                         });
-                        shadowLeft2.animate({ opacity: percentage }, speed, options.easing);
+                        shadowLeft2.stop().animate({ opacity: percentage }, speed, options.easing, function () {
+                            if (percentage == 0) {
+                                removeShadows();
+                            }
+                        });
                     } else {
                         shadowRight1.css({ opacity: percentage });
                         shadowLeft2.css({ opacity: percentage });
                         shadowLeft2.animate({ opacity: 0 }, speed, options.easeIn);
-                        shadowLeft1.animate({ opacity: percentage }, speed/2, options.easeIn, function(){
-                            shadowRight1.animate({ opacity: 0 }, speed/2, options.easeOut);
+                        shadowLeft1.stop().animate({ opacity: percentage }, speed/2, options.easeIn, function(){
+                            shadowRight1.stop().animate({ opacity: 0 }, speed/2, options.easeOut);
                         });
-                        shadowRight2.animate({ opacity: percentage }, speed, options.easing);
+                        shadowRight2.stop().animate({ opacity: percentage }, speed, options.easing, function () {
+                            if (percentage == 0) {
+                                removeShadows();
+                            }
+                        });
                     }
                 }
             },
             setupPagesBeforeAnimation = function (diff, inc) {
-                // setup content
+
                 if (inc && diff > 2) {
                     // initialize next 2 pages, if jumping forward in the book
                     target.find('.b-p3, .b-p4').removeClass('b-p3 b-p4').hide();
@@ -1560,6 +1566,9 @@
                             // if value is sent in, set the option value and update options
                             options[name] = value;
                             updateOptions();
+                            
+                            // todo: only update specific option
+                            
                         } else {
                             // if no value sent in, get the current option value
                             return options[name];
