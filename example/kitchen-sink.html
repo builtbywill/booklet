@@ -13,6 +13,9 @@
 		#content {margin-left:400px;}
         #options-list li {clear:both; line-height:23px;}
         #options-list li input {float:right;}
+        
+        #mybook .b-page div {padding:10px 20px;}
+        
     </style>
 </head>
 <body>
@@ -66,7 +69,6 @@
 		<a href="#" id="custom-reset-options">Reset Options</a>
 		<h3>Command Output</h3>
 		<textarea id="display"></textarea>
-	    <div id="menu"></div>
 	    <div id="mybook">
 	        <div>
 	            <h3>1 jQuery Booklet</h3>
@@ -153,7 +155,7 @@
 			// Init
 			
 			var updateSelect = function (event, data) {
-                console.log(event, data);
+                //console.log(event, data);
 
                 var pageTotal = data.options.pageTotal;
 				$('#gotoIndex, #addIndex, #removeIndex').children().remove();
@@ -165,10 +167,10 @@
 			
 			var options = $.extend({}, $.fn.booklet.defaults, {
                 width:800,
-			    pagePadding: 50,
                 //overlays:true,
                 //manual:false,
                 //hovers:true,
+                autoCenter:true,
                 closed:true
 			});
 			var updateOptions = function () {
@@ -201,8 +203,9 @@
 			
 			var config = $.extend({}, options, {
 				create: updateSelect,
-                start: updateSelect,
-                change: updateSelect,
+                willchange: updateSelect,
+                startchange: updateSelect,
+                didchange: updateSelect,
                 add: updateSelect,
 				remove: updateSelect
 			});
@@ -218,7 +221,7 @@
 			var newPageCount = 0;
 	        var newPageHtml = function() {
 				newPageCount++;
-				return "<div rel='new chapter'>New Page \#"+newPageCount+"</div>";
+				return "<div>New Page \#"+newPageCount+"</div>";
 			};
 			
 			
@@ -298,7 +301,8 @@
 	        $('#custom-reset-options').click(function (e) {
 	            e.preventDefault();
 				$("#mybook").booklet("option", config);
-				updateDisplay('$("#mybook").booklet("option", '+ options +');');
+                options = config;
+				updateDisplay('$("#mybook").booklet("option", '+ config +');');
 				updateOptions();
 	        });
 

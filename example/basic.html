@@ -7,6 +7,7 @@
     <link href="../booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
     <style type="text/css">
         body {background:#ccc; font:normal 12px/1.2 arial, verdana, sans-serif;}
+        #mybook .b-page div {padding:10px;}
     </style>
 </head>
 <body>
@@ -51,10 +52,7 @@
     <script src="../booklet/jquery.booklet.latest.js"></script>
 	<script>
 	    $(function () {
-            var directions = $.booklet.directions;
-	        $("#mybook").booklet({
-	            pagePadding: 50
-	        });
+	        $("#mybook").booklet();
 	    });
     </script>
 </body>

@@ -4,54 +4,25 @@
  *
  * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
  *
- * Version : 1.4.3
+ * Version : 2.0.0
  *
- * Originally based on the work of:
- *	1) Charles Mangin (http://clickheredammit.com/pageflip/)
  */
 	.booklet {
 		width:800px; height:600px; position:relative; margin:0 auto 10px; overflow:visible !important;
-        -webkit-perspective:1200px; -webkit-perspective-origin:50% 50%; -webkit-transform-style:preserve-3d;
-        -moz-perspective:1200px; -moz-perspective-origin:50% 50%; -moz-transform-style:preserve-3d;
-        perspective:1200px; perspective-origin:50% 50%; transform-style:preserve-3d;
+        -webkit-perspective:2000px; -webkit-perspective-origin:50% 50%; -webkit-transform-style:preserve-3d; -webkit-backface-visibility:hidden;
+        -moz-perspective:2000px; -moz-perspective-origin:50% 50%; -moz-transform-style:preserve-3d; -moz-backface-visibility:hidden;
+        perspective:2000px; perspective-origin:50% 50%; transform-style:preserve-3d; backface-visibility:hidden;
     }
 
 	.booklet .b-page {
-		left:0; top:0; position:absolute; overflow:hidden; padding:0; outline:1px solid transparent;
+		left:0; top:0; position:absolute; overflow:hidden; padding:0; outline:1px solid transparent; visibility:hidden;
 	}
 
-	.booklet .b-pN  {
-        -webkit-transform-origin:100% 0;
-        -moz-transform-origin:100% 0;
-        transform-origin:100% 0;
-    }
-	.booklet .b-p0  {
-        -webkit-transform-origin:0 0;
-        -moz-transform-origin:0 0;
-        transform-origin:0 0;
-    }
-	.booklet .b-p1  {
-        -webkit-transform-origin:100% 0;
-        -moz-transform-origin:100% 0;
-        transform-origin:100% 0;
-    }
-	.booklet .b-p2  {
-        -webkit-transform-origin:0 0;
-        -moz-transform-origin:0 0;
-        transform-origin:0 0;
-    }
-	.booklet .b-p3  {
-        -webkit-transform-origin:100% 0;
-        -moz-transform-origin:100% 0;
-        transform-origin:100% 0;
-    }
-	.booklet .b-p4  {
-        -webkit-transform-origin:0 0;
-        -moz-transform-origin:0 0;
-        transform-origin:0 0;
-    }
-
 	.booklet .b-page:nth-child(odd)  {
+        -webkit-transform-origin:100% 0;
+        -moz-transform-origin:100% 0;
+        transform-origin:100% 0;
+
         background:-webkit-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
         background:-moz-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
         background:-ms-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
@@ -59,6 +30,11 @@
         background:linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
     }
 	.booklet .b-page:nth-child(even) {
+        left:50%;
+        -webkit-transform-origin:0 0;
+        -moz-transform-origin:0 0;
+        transform-origin:0 0;
+
         background:-webkit-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
         background:-moz-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
         background:-ms-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
@@ -67,7 +43,7 @@
     }
 
    	/* Custom Page Types */
-    .booklet .b-page-empty  {background:transparent !important;}
+    .booklet .b-page-transparent  {background:transparent !important;}
 	.booklet .b-page-blank  {}
 	.booklet .b-page-cover  {}
 
@@ -75,7 +51,7 @@
 	.booklet .b-counter {bottom:10px; position:absolute; display:block; width:25px; height:20px; background:#ccc; color:#444; text-align:center; font-size:10px; padding:5px 0 0;}
 	.booklet .b-page:nth-child(odd)  .b-counter  {left:10px;}
 	.booklet .b-page:nth-child(even) .b-counter {right:10px;}
-   
+
    	/* Page Shadows */
     .booklet .b-shadow-left, .booklet .b-shadow-right {left:0; top:0; position:absolute; opacity:0; width:100%; height:100%;}
 	.booklet .b-shadow-left  {
@@ -98,39 +74,9 @@
 	.booklet .b-grab     {cursor: url("images/openhand.cur"), default;}
 	.booklet .b-grabbing {cursor: url("images/closedhand.cur"), default;}
 
-   	/* Overlay Controls */
-	.booklet .b-overlay      {top:0; position:absolute; height:100%; width:50%;}
-	.booklet .b-overlay-prev {left:0;}
-	.booklet .b-overlay-next {right:0;}
-
-   	/* Tab Controls */
-	.booklet .b-tab        {background:#000; height:40px; width:100%; padding:10px 0 0; text-align:center; color:#ccc; position:absolute; font-size:11px;}
-	.booklet .b-tab-prev   {left:0;}
-	.booklet .b-tab-next   {right:0;}
-	.booklet .b-tab:hover  {background:#aaa; color:#000;}	
-	
-   	/* Arrow Controls */
-	.booklet .b-arrow          {display:block; position:absolute; text-indent:-9999px; top:0; height:100%; width:74px;}
-	.booklet .b-arrow div      {display:none; text-indent:-9999px; height:170px; width:74px; position:absolute; left:0; top:25%;}
-	.booklet .b-arrow-next     {right:-80px;}
-	.booklet .b-arrow-prev     {left:-80px;}
-	.booklet .b-arrow-next div {background:url("images/arrow-next.png") no-repeat left top;}
-	.booklet .b-arrow-prev div {background:url("images/arrow-prev.png") no-repeat left top;}
-		
 /* @z-index fix (needed for older IE browsers)
 ----------------------------------------*/
 
     body              {z-index:0;}
-    .b-menu           {z-index:100;}
-    .b-selector       {z-index:100;}
-    .b-overlay        {z-index:100;}
     .booklet          {z-index:10;}
-    .b-pN             {z-index:10;}
-    .b-p0             {z-index:30;}
-    .b-p1             {z-index:20;}
-    .b-p2             {z-index:20;}
-    .b-p3             {z-index:30;}
-    .b-p4             {z-index:10;}
-    .b-prev           {z-index:40;}
-    .b-next           {z-index:40;}
-    .b-counter        {z-index:40;}
+    .b-page           {z-index:10;}
