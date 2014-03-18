@@ -12,20 +12,20 @@ To install jQuery Booklet into your webpage, first include jQuery, jQuery UI (op
 and the booklet CSS and JS files.
 
 ``` html
-// CSS
+<!-- CSS -->
 <link href="booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
 ```
 
 ``` html
-// jQuery
+<!-- jQuery -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script> window.jQuery || document.write('<script src="booklet/jquery-2.1.0.min.js"><\/script>') </script>
 
-// jQuery UI (optional)
+<!-- jQuery UI (optional) -->
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script> window.jQuery.ui || document.write('<script src="booklet/jquery-ui-1.10.4.min.js"><\/script>') </script>
 
-// Booklet
+<!-- Booklet -->
 <script src="booklet/jquery.easing.1.3.js" type="text/javascript"></script>
 <script src="booklet/jquery.booklet.latest.min.js" type="text/javascript"></script>
 ```

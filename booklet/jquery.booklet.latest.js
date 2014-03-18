@@ -11,16 +11,45 @@
  */
 ;(function ($) {
 
+    $.booklet = {
+        version: '2.0.0',
+        templates : {
+            page : {
+                blank:   '<div class="b-page b-page-blank"></div>', // transparent page used with closed books
+                empty:   '<div class="b-page b-page-empty"></div>', // page with no content
+                cover:   '<div class="b-page b-page-cover"></div>', // cover page
+                default: '<div class="b-page"></div>' // default page
+            },
+            shadow : {
+                left:  '<div class="b-shadow-left"></div>', // shadow for left handed pages
+                right: '<div class="b-shadow-right"></div>' // shadow for right handed pages
+            }
+        },
+        directions : {
+            leftToRight: 'LTR',
+            rightToLeft: 'RTL'
+        },
+        events : {
+            create: 'bookletcreate', // called when booklet has been created
+            willchange: 'bookletwillchange',
+            startchange:  'bookletstartchange',  // called when booklet starts to change pages
+            didchange: 'bookletdidchange', // called when booklet has finished changing pages
+            add:    'bookletadd',    // called when booklet has added a page
+            remove: 'bookletremove'  // called when booklet has removed a page
+        }
+    }
+
     $.fn.booklet = function (options, param1, param2) {
 
-        var obj, method, params, output, result, config, index;
+        var booklet, method, params, output, result, config;
 
         // option type string - api call
         if (typeof options === 'string') {
             result = [];
+            // loop each booklet, adding results to array
             $(this).each(function () {
-                obj = $(this).data('booklet');
-                if (obj) {
+                booklet = $(this).data('booklet');
+                if (booklet) {
                     method = options;
                     // add optional parameters
                     params = [];
@@ -30,10 +59,10 @@
                     if (typeof param2 !== 'undefined') {
                         params.push(param2);
                     }
-                    if (obj[method]) {
-                        output = obj[method].apply(obj, params);
+                    if (booklet[method]) {
+                        output = booklet[method].apply(booklet, params);
                         if (typeof output !== 'undefined' || output) {
-                            result.push(obj[method].apply(obj, params));
+                            result.push(output);
                         }
                     } else {
                         $.error('Method "' + method + '" does not exist on jQuery.booklet.');
@@ -50,374 +79,492 @@
                 return $(this);
             }
         }
-        // option type number - api call
-        else if (typeof options === 'number') {
+        // build new booklet
+        else {
             return $(this).each(function () {
-                obj = $(this).data('booklet');
-                if (obj) {
-                    index = options;
-                    obj.gotopage(index);
-                } else {
-                    $.error('jQuery.booklet has not been initialized.');
-                }
-            });
-        }
-        // else build new booklet
-        else if (typeof method === 'object' || !method) {
-            return $(this).each(function () {
-                config = $.extend({}, $.fn.booklet.defaults, options);
-                obj = $(this).data('booklet');
+                booklet = $(this).data('booklet');
 
-                // destroy old booklet before creating new one
-                if (obj) {
-                    obj.destroy();
+                // destroy old booklet if it exists
+                if (booklet) {
+                    booklet.destroy();
                 }
 
-                // instantiate the booklet
-                obj = new Booklet($(this), config);
-                obj.init();
+                // instantiate new booklet
+                booklet = new Booklet($(this), options);
 
-                return this; // preserve chaining on main function
+                // preserve chaining on main function
+                return this;
             });
         }
-    };
+    }
 
-    function Booklet(inTarget, inOptions) {
-        var target = inTarget,
-            options = inOptions,
-            isInit = false,
-            isBusy = false,
-            isPlaying = false,
-            isHoveringRight = false,
-            isHoveringLeft = false,
-            isDisabled = false,
-            templates = {
-                empty: '<div class="b-page-empty"></div>', // book page with no content
-                blank: '<div class="b-page-blank"></div>', // transparent item used with closed books
-                shadowLeft: '<div class="b-shadow-left"></div>',    // shadow for left handed pages
-                shadowRight: '<div class="b-shadow-right"></div>'   // shadow for right handed pages
-            },
-            directions = {
-                leftToRight: 'LTR',
-                rightToLeft: 'RTL'
-            },
-            css = {}, anim = {},
-            pages = [],
+    // default options
+    $.fn.booklet.defaults = {
+        width:                600,                             // container width
+        height:               400,                             // container height
+        speed:                2000,                            // speed of the transition between pages
+        direction:            'LTR',                           // direction of the overall content organization, default LTR, left to right, can be RTL for languages which read right to left
+        startingPage:         0,                               // index of the first page to be displayed
+        easing:               'easeInOutQuad',                 // easing method for complete transition
+        easeIn:               'easeInQuad',                    // easing method for first half of transition
+        easeOut:              'easeOutQuad',                   // easing method for second half of transition
+
+        closed:               false,                           // start with the book "closed", will add empty pages to beginning and end of book
+        covers:               false,                           // used with "closed", makes first and last pages into covers, without page numbers (if enabled)
+        autoCenter:           false,                           // used with "closed", makes book position in center of container when closed
+
+        manual:               true,                            // enables manual page turning, requires jQuery UI to function
+        hovers:               true,                            // enables preview page-turn hover animation, shows a small preview of previous or next page on hover
+        hoverWidth:           50,                              // default width for page-turn hover preview
+        hoverSpeed:           500,                             // default speed for page-turn hover preview
+        hoverThreshold:       0.25,                            // default percentage used for manual page dragging, sets the percentage amount a drag must be before moving next or prev
+        hoverClick:           true,                            // enables hovered areas to be clicked when using manual page turning
+        overlays:             false,                           // enables navigation using a page sized overlay, when enabled links inside the content will not be clickable        arrows:               false,                           // adds arrow overlays over the book edges
+
+        keyboard:             true,                            // enables navigation with arrow keys (left: previous, right: next)
+        shadows:              true,                            // display shadows on page animations
+
+        // callbacks
+        create:               null,                            // called when booklet has been created
+        willchange:           null,                            // called when booklet starts to change pages
+        startchange:          null,
+        didchange:            null,                            // called when booklet has finished changing pages
+        add:                  null,                            // called when booklet has added a page
+        remove:               null                             // called when booklet has removed a page
+    }
+
+    function EventHandler(){}
+    EventHandler.prototype = {
+        constructor: EventHandler,
+        dispatch: function(eventType, target){
+            target.trigger(eventType, {
+                options: $.extend({}, target.options),
+                index: target.options.currentIndex,
+                pages: [target.pages[options.currentIndex].contentNode, pages[options.currentIndex + 1].contentNode]
+            });
+        }
+    }
+
+    function OptionManager(options){
+        this.options = $.extend({}, $.fn.booklet.defaults, options);;
+    }
+    OptionManager.prototype = {
+        constructor: OptionManager,
+        setOptions: function(options){
+            this.options = $.extend({}, this.options, options);
+            // todo: notify booklet
+        },
+        getOption: function(name){
+            if (typeof options[name] !== 'undefined')
+                return this.options[name];
+            $.error('Option "' + name + '" does not exist.');
+        },
+        setOption: function(name, value){
+            if (typeof options[name] !== 'undefined') {
+                if (typeof value !== 'undefined') {
+                    options[name] = value;
+                    // todo: notify booklet
+                }
+            } else {
+                $.error('Option "' + name + '" does not exist.');
+            }
+        }
+    }
+
+    function Page(contentNode, index, options)
+    {
+        this.index = index;
+        this.contentNode = contentNode;
+        this.isBlank = this.contentNode.hasClass('b-page-blank');
+        this.isEmpty = this.contentNode.hasClass('b-page-empty');
+        this.isCover = options.closed && options.covers && (index == 1 || index == options.pageTotal - 2);
+        this.pageNode = this.createPageNode();
+
+        this.pageNumber = 0;
+        this.pageNumberNode = null;
+        this.updatePageNumber(index, options);
+
+        if (options.pageNumbers && !this.isEmpty && !this.isCover){
+            this.addPageNumberNode();
+        }
+
+        return;
+
+        // add page numbers
+
+        if (options.pageNumbers && !this.isEmpty && !this.isCover
+            //(options.layoutSingle && !this.isBlank) &&
+            //(!options.closed || (options.closed && !options.covers) ||
+            //    (options.closed && options.covers && index != 1 && index != options.pageTotal - 2))
+            ) {
+
+            /*if (options.direction == $.booklet.directions.leftToRight) {
+                startingPageNumber++;
+            }
+
+            contentNode.parent().append('<div class="b-counter">' + startingPageNumber + '</div>');
+
+            if (options.direction == $.booklet.directions.rightToLeft) {
+                startingPageNumber--;
+            }*/
+        }
+    }
+
+    Page.prototype = {
+        constructor: Page,
+        createPageNode: function(){
+            if (this.isEmpty || this.isBlank) {
+                return this.contentNode.addClass('b-page-' + this.index);
+            } else if (this.isCover) {
+                return this.contentNode.wrap($.booklet.templates.page.cover).parent().addClass('b-page-' + this.index);
+            } else {
+                return this.contentNode.wrap($.booklet.templates.page.default).parent().addClass('b-page-' + this.index);
+            }
+        },
+        updatePageNumber: function(index, options){
+            this.index = index;
+            if (options.direction == $.booklet.directions.rightToLeft){
+                this.pageNumber = options.pageTotal - index;
+            } else {
+                this.pageNumber = index + 1;
+            }
+            if (this.pageNumberNode){
+                this.pageNumberNode.text(this.pageNumber);
+            }
+        },
+        addPageNumberNode: function(){
+            this.pageNumberNode = $('<div class="b-counter">' + this.pageNumber + '</div>').appendTo(this.pageNode);
+        },
+        removePageNumberNode: function(){
+            if (this.pageNumberNode){
+                this.pageNumberNode.remove();
+                this.pageNumberNode = null
+            }
+        },
+        destroy: function(){
+            this.removeClass('b-page-' + this.index);
+            this.removePageNumberNode();
+            if (this.isEmpty || this.isBlank)
+                this.remove();
+            else
+                this.contentNode.unwrap();
+        }
+    }
+
+    function Booklet(target, options) {
+
+        this.target = target;
+        this.options = $.extend({}, $.fn.booklet.defaults, options);
+        this.optionManager = new OptionManager(options);
+        this.pages = [];
+
+        this.originalPageTotal = 0;
+        this.created = false;
+        this.busy = false;
+        this.playing = false;
+        this.hoveringRight = false;
+        this.hoveringLeft = false;
+        this.enabled = true;
+
+        this.init();
+    }
+
+    Booklet.prototype = {
+        constructor: Booklet,
+        init: function () {
+            this.target.addClass('booklet');
+            this.target.data('booklet', this);
+
+            this.originalPageTotal = this.target.children().length;
+            this.options.currentIndex = 0;
+
+            createPages(this);
+            updateOptions(this);
+            updatePages(this);
+            //updateControlVisibility();
+
+            this.created = true;
+
+            // event - create
+            if (this.options.create) {
+                this.target.off($.booklet.events.create + '.booklet').on($.booklet.events.create + '.booklet', this.options.create);
+            }
+            this.target.trigger($.booklet.events.create, {
+                options: $.extend({}, this.options),
+                index: this.options.currentIndex,
+                pages: [this.pages[this.options.currentIndex].contentNode, this.pages[this.options.currentIndex + 1].contentNode]
+            });
+        },
+        enable: function () {
+            this.enabled = true;
+        },
+        disable: function () {
+            this.enabled = false;
+        },
+        destroy: function () {
+            // destroy all booklet items
+            //destroyControls();
+            destroyPages(this);
+
+            // clear class from target DOM object
+            this.target.removeClass('booklet');
+
+            // clear out booklet from data object
+            this.target.removeData('booklet');
+
+            this.created = false;
+        }
+    }
+
+    function createPages(booklet){
+        booklet.pages = [];
+
+        // fix for odd number of pages
+        if ((booklet.target.children().length % 2) != 0) {
+            // if book is closed and using covers, add page before back cover, else after last page
+            //if (options.closed && options.covers) {
+            //    booklet.target.children().last().before($.booklet.templates.blank);
+            //} else {
+                booklet.target.children().last().after($.booklet.templates.blank);
+            //}
+        }
+
+        // if closed book, add empty pages to start and end
+        /*
+        if (booklet.options.closed) {
+            booklet.target.prepend($.booklet.templates.empty);
+            booklet.target.append($.booklet.templates.empty);
+        }
+        */
+
+        // set total page count
+        booklet.options.pageTotal = booklet.target.children().length;
+
+        /*
+        // reverse page order
+        if (options.direction == $.booklet.directions.rightToLeft) {
+            $(booklet.target.children().get().reverse()).each(function () {
+                $(this).appendTo(booklet.target);
+            });
+        }
+
+        if (!booklet.created) {
+            // set currentIndex
+            if (options.direction == directions.leftToRight) {
+                options.currentIndex = 0;
+            } else if (options.direction == directions.rightToLeft) {
+                options.currentIndex = options.pageTotal - 2;
+            }
+
+            if (!isNaN(options.startingPage) && options.startingPage <= options.pageTotal && options.startingPage > 0) {
+                if ((options.startingPage % 2) != 0) {
+                    options.startingPage--;
+                }
+                options.currentIndex = options.startingPage;
+            }
+        }
+        */
+        /*
+         if(options.layoutSingle) {
+         target.children().each(function () {
+         if(options.direction == directions.leftToRight){
+         $(this).before(templates.blank);
+         }else{
+         $(this).after(templates.blank);
+         }
+         });
+         }
+         */
+
+        booklet.target.children().each(function (i) {
+            var newPage = new Page($(this), i, booklet.options);
+            booklet.pages.push(newPage);
+        });
+    }
+
+    function destroyPages(booklet) {
+        booklet.pages.each(function(){
+            this.destroy();
+        });
+        booklet.pages = [];
+
+        booklet.target.find(".b-page-blank, .b-page-empty").remove();
+        //removeShadows();
+
+        // revert page order to original
+        /*
+        if (options.direction == directions.rightToLeft) {
+            $(booklet.target.children().get().reverse()).each(function () {
+                $(this).appendTo(target);
+            });
+        }*/
+    }
+
+    function updatePageStructure(booklet) {
+        // reset all content
+        booklet.target.find('.b-page').removeClass('b-pN b-p0 b-p1 b-p2 b-p3 b-p4').hide();
+        //removeShadows();
+/*
+        // add page classes
+        if (booklet.options.currentIndex - 2 >= 0) {
+            booklet.target.find('.b-page-' + (options.currentIndex - 2)).addClass('b-pN').show();
+            booklet.target.find('.b-page-' + (options.currentIndex - 1)).addClass('b-p0').show();
+        }
+        booklet.target.find('.b-page-' + (options.currentIndex)).addClass('b-p1').show();
+        booklet.target.find('.b-page-' + (options.currentIndex + 1)).addClass('b-p2').show();
+        if (booklet.options.currentIndex + 3 <= options.pageTotal) {
+            booklet.target.find('.b-page-' + (options.currentIndex + 2)).addClass('b-p3').show();
+            booklet.target.find('.b-page-' + (options.currentIndex + 3)).addClass('b-p4').show();
+        }
+
+        // save structure to vars
+        /*
+        pN = target.find('.b-pN');
+        p0 = target.find('.b-p0');
+        p1 = target.find('.b-p1');
+        p2 = target.find('.b-p2');
+        p3 = target.find('.b-p3');
+        p4 = target.find('.b-p4');
+        */
+    }
+
+    function updatePageCSS(booklet) {
+        // update css
+        booklet.target.find('.b-p0, .b-p3').css({ 'filter': '', 'zoom': '' });
+        /*
+        booklet.target.find('.b-page').removeAttr('style').css(css.bPage);
+        p1.css(css.p1);
+        p2.css(css.p2);
+        pN.css(css.pN);
+        p0.css(css.p0);
+        p3.css(css.p3);
+        p4.css(css.p4);
+
+        if (options.closed && options.autoCenter && options.currentIndex == 0) {
+            pN.css({ 'left': pWidthN });
+            p0.css({ 'left': 0 });
+            p1.css({ 'left': pWidthN });
+            p2.css({ 'left': 0 });
+            p3.css({ 'left': pWidthN });
+            p4.css({ 'left': 0 });
+        }
+
+        if (options.closed && options.autoCenter && (options.currentIndex == 0 || options.currentIndex >= options.pageTotal - 2)) {
+            target.width(pWidth);
+        } else {
+            target.width(options.width);
+        }
+
+        // ie fix
+        target.find('.b-page').css({ 'filter': '', 'zoom': '' });*/
+    }
+
+    function updatePages(booklet) {
+        updatePageStructure(booklet);
+        updatePageCSS(booklet);
+    }
+
+    function destroyShadows(booklet) {
+
+    }
+
+    function updateOptions(booklet, newOptions){
+        var didUpdate = false;
+
+        // update options if newOptions have been passed in
+        if (newOptions != null && typeof newOptions != "undefined") {
+            // remove page structure, revert to original order
+            destroyPages(booklet);
+
+            booklet.options = $.extend({}, booklet.options, newOptions);
+            didUpdate = true;
+
+            createPages(booklet);
+        }
+
+        updateSizes(booklet.target, booklet.options);
+        // update all CSS, as sizes may have changed
+        updateCSSandAnimations();
+
+        // update pages after first create
+        if (booklet.created) {
+            updatePages();
+        }
+
+        destroyControls();
+        createControls();
+        addCustomControlActions();
+        addKeyboardControlAction();
+        addHashControlAction();
+        addResizeControlAction();
+        addAutoPlayControlAction();
+
+        // if options were updated force pages and controls to update
+        if (didUpdate) {
+            updatePages();
+            updateControlVisibility();
+        }
+    }
+
+    function updateSizes(target, options) {
+        // set width + height
+        if (!options.width) {
+            options.width = target.width();
+        } else if (typeof options.width == 'string' && options.width.indexOf("px") != -1) {
+            options.width = options.width.replace('px', '');
+        } else if (typeof options.width == 'string' && options.width.indexOf("%") != -1) {
+            //wPercent = true;
+            //wOrig = options.width;
+            options.width = (options.width.replace('%', '') / 100) * parseFloat(target.parent().css('width'));
+        }
+        if (!options.height) {
+            options.height = target.height();
+        } else if (typeof options.height == 'string' && options.height.indexOf("px") != -1) {
+            options.height = options.height.replace('px', '');
+        } else if (typeof options.height == 'string' && options.height.indexOf("%") != -1) {
+            //hPercent = true;
+            //hOrig = options.height;
+            options.height = (options.height.replace('%', '') / 100) * parseFloat(target.parent().css('height'));
+        }
+        target.width(options.width);
+        target.height(options.height);
+
+        // save page sizes and other vars
+        /*
+        pWidth = options.width / 2;
+        pWidthN = '-' + (pWidth) + 'px';
+        pWidthH = pWidth / 2;
+        pHeight = options.height;
+        speedH = options.speed / 2;
+        */
+
+        // set width for closed + autoCenter
+        if (options.closed && options.autoCenter) {
+            if (options.currentIndex == 0) {
+                target.width(options.width / 2);
+            } else if (options.currentIndex >= options.pageTotal - 2) {
+                target.width(options.width / 2);
+            }
+        }
+    }
+
+    function Old(){
+        var css = {}, animations = {},
 
             currentHash = '', hashRoot = '/page/', hash, i, j, h, a, diff,
             originalPageTotal, startingPageNumber,
         // page content vars
             pN, p0, p1, p2, p3, p4,
         // control vars
-            p3drag, p0drag, ctrls, overlaysB, overlayN, overlayP, tabs, tabN, tabP, arrows, arrowN, arrowP, customN, customP, ctrlsN, ctrlsP, pause, play,
+            p3drag, p0drag, controls, tabs, tabN, tabP, arrows, arrowN, arrowP, customN, customP, ctrlsN, ctrlsP, pause, play,
             wPercent, wOrig, hPercent, hOrig,
             pWidth, pWidthN, pWidthH, pHeight, speedH,
             shadowLeft1, shadowRight1, shadowLeft2, shadowRight2,
-
-            events = {
-                create: 'bookletcreate', // called when booklet has been created
-                start:  'bookletstart',  // called when booklet starts to change pages
-                change: 'bookletchange', // called when booklet has finished changing pages
-                add:    'bookletadd',    // called when booklet has added a page
-                remove: 'bookletremove'  // called when booklet has removed a page
-            },
-            callback,
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // CLASSES
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            Page = function (contentNode, index, options) {
-                var pageNode;
-
-                //give content the correct wrapper and page wrapper
-                if (contentNode.hasClass('b-page-empty')) {
-                    contentNode.wrap('<div class="b-page b-page-empty"></div></div>');
-                } else if (options.closed && options.covers && (index == 1 || index == options.pageTotal - 2)) {
-                    contentNode.wrap('<div class="b-page b-page-cover"></div></div>');
-                } else {
-                    contentNode.wrap('<div class="b-page"></div>');
-                }
-
-                pageNode = contentNode.parents('.b-page').addClass('b-page-' + index);
-
-                // add page numbers
-                if (options.pageNumbers && !contentNode.hasClass('b-page-empty') &&
-                    //(options.layoutSingle && !contentNode.hasClass('b-page-blank')) &&
-                    (!options.closed || (options.closed && !options.covers) || (options.closed && options.covers && index != 1 && index != options.pageTotal - 2))
-                    ) {
-                    if (options.direction == directions.leftToRight) {
-                        startingPageNumber++;
-                    }
-                    contentNode.parent().append('<div class="b-counter">' + startingPageNumber + '</div>');
-                    if (options.direction == directions.rightToLeft) {
-                        startingPageNumber--;
-                    }
-                }
-
-                return {
-                    index: index,
-                    contentNode: contentNode[0],
-                    pageNode: pageNode[0]
-                }
-            },
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // INITIAL FUNCTIONS
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            init = function () {
-
-                // setup target DOM object
-                target.addClass('booklet');
-
-                // store data for api calls
-                target.data('booklet', this);
-
-                // save original number of pages
-                originalPageTotal = target.children().length;
-                options.currentIndex = 0;
-
-                // generate page markup
-                initPages();
-                // initialize options
-                updateOptions();
-                // update after initialized
-                updatePages();
-
-                updateControlVisibility();
-
-                isInit = true;
-                isDisabled = false;
-
-                callback = {
-                    options: $.extend({}, options),
-                    index: options.currentIndex,
-                    pages: [pages[options.currentIndex].contentNode, pages[options.currentIndex + 1].contentNode]
-                };
-                if (options.create) {
-                    target.off(events.create + '.booklet').on(events.create + '.booklet', options.create);
-                }
-                target.trigger(events.create, callback);
-            },
-            enable = function () {
-                isDisabled = false;
-            },
-            disable = function () {
-                isDisabled = true;
-            },
-            destroy = function () {
-                // destroy all booklet items
-                destroyControls();
-                destroyPages();
-
-                // clear class from target DOM object
-                target.removeClass('booklet');
-
-                // clear out booklet from data object
-                target.removeData('booklet');
-
-                isInit = false;
-            },
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // PAGE FUNCTIONS
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            initPages = function () {
-                pages = [];
-
-                // fix for odd number of pages
-                if ((target.children().length % 2) != 0) {
-                    // if book is closed and using covers, add page before back cover, else after last page
-                    if (options.closed && options.covers) {
-                        target.children().last().before(templates.blank);
-                    } else {
-                        target.children().last().after(templates.blank);
-                    }
-                }
-
-                // if closed book, add empty pages to start and end
-                if (options.closed) {
-                    target.prepend(templates.empty);
-                    target.append(templates.empty);
-                }
-
-                // set total page count
-                options.pageTotal = target.children().length;
-
-                startingPageNumber = 0;
-
-                if (options.direction == directions.rightToLeft) {
-                    startingPageNumber = options.pageTotal;
-                    if (options.closed) {
-                        startingPageNumber -= 2;
-                    }
-                    if (options.covers) {
-                        startingPageNumber -= 2;
-                    }
-                    $(target.children().get().reverse()).each(function () {
-                        $(this).appendTo(target);
-                    });
-                }
-
-                if (!isInit) {
-                    // set currentIndex
-                    if (options.direction == directions.leftToRight) {
-                        options.currentIndex = 0;
-                    } else if (options.direction == directions.rightToLeft) {
-                        options.currentIndex = options.pageTotal - 2;
-                    }
-
-                    if (!isNaN(options.startingPage) && options.startingPage <= options.pageTotal && options.startingPage > 0) {
-                        if ((options.startingPage % 2) != 0) {
-                            options.startingPage--;
-                        }
-                        options.currentIndex = options.startingPage;
-                    }
-                }
-
-                /*
-                if(options.layoutSingle) {
-	                 target.children().each(function () {
-		                 if(options.direction == directions.leftToRight){
-			                 $(this).before(templates.blank);
-		                 }else{
-			                 $(this).after(templates.blank);
-		                 }
-	                 });
-	             }
-                 */
-
-                // load pages
-                target.children().each(function (i) {
-                    var newPage = new Page($(this), i, options);
-                    pages.push(newPage);
-                });
-            },
-            updatePages = function () {
-                updatePageStructure();
-                updatePageCSS();
-                updateManualControls();
-            },
-            updatePageStructure = function () {
-                // reset all content
-                target.find('.b-page').removeClass('b-pN b-p0 b-p1 b-p2 b-p3 b-p4').hide();
-                removeShadows();
-
-                // add page classes
-                if (options.currentIndex - 2 >= 0) {
-                    target.find('.b-page-' + (options.currentIndex - 2)).addClass('b-pN').show();
-                    target.find('.b-page-' + (options.currentIndex - 1)).addClass('b-p0').show();
-                }
-                target.find('.b-page-' + (options.currentIndex)).addClass('b-p1').show();
-                target.find('.b-page-' + (options.currentIndex + 1)).addClass('b-p2').show();
-                if (options.currentIndex + 3 <= options.pageTotal) {
-                    target.find('.b-page-' + (options.currentIndex + 2)).addClass('b-p3').show();
-                    target.find('.b-page-' + (options.currentIndex + 3)).addClass('b-p4').show();
-                }
-
-                // save structure to vars
-                pN = target.find('.b-pN');
-                p0 = target.find('.b-p0');
-                p1 = target.find('.b-p1');
-                p2 = target.find('.b-p2');
-                p3 = target.find('.b-p3');
-                p4 = target.find('.b-p4');
-            },
-            updatePageCSS = function () {
-                // update css
-                target.find('.b-p0, .b-p3').css({ 'filter': '', 'zoom': '' });
-                target.find('.b-page').removeAttr('style').css(css.bPage);
-                p1.css(css.p1);
-                p2.css(css.p2);
-                pN.css(css.pN);
-                p0.css(css.p0);
-                p3.css(css.p3);
-                p4.css(css.p4);
-
-                if (options.closed && options.autoCenter && options.currentIndex == 0) {
-                    pN.css({ 'left': pWidthN });
-                    p0.css({ 'left': 0 });
-                    p1.css({ 'left': pWidthN });
-                    p2.css({ 'left': 0 });
-                    p3.css({ 'left': pWidthN });
-                    p4.css({ 'left': 0 });
-                }
-
-                if (options.closed && options.autoCenter && (options.currentIndex == 0 || options.currentIndex >= options.pageTotal - 2)) {
-                    target.width(pWidth);
-                } else {
-                    target.width(options.width);
-                }
-
-                // ie fix
-                target.find('.b-page').css({ 'filter': '', 'zoom': '' });
-            },
-            destroyPages = function () {
-                // remove booklet markup
-                target.find(".b-page").children().unwrap();
-                target.find(".b-counter, .b-page-blank, .b-page-empty").remove();
-                removeShadows();
-
-                // revert page order to original
-                if (options.direction == directions.rightToLeft) {
-                    $(target.children().get().reverse()).each(function () {
-                        $(this).appendTo(target);
-                    });
-                }
-            },
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // OPTIONS + CONTROLS
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            updateOptions = function (newOptions) {
-
-                var didUpdate = false;
-
-                // update options if newOptions have been passed in
-                if (newOptions != null && typeof newOptions != "undefined") {
-                    // remove page structure, revert to original order
-                    destroyPages();
-                    options = $.extend({}, options, newOptions);
-                    didUpdate = true;
-                    initPages();
-                }
-
-                updateSizes();
-                // update all CSS, as sizes may have changed
-                updateCSSandAnimations();
-
-                // set total page count
-                options.pageTotal = target.children('.b-page').length;
-
-                // set booklet opts.name
-                if (options.name) {
-                    document.title = options.name;
-                } else {
-                    options.name = document.title;
-                }
-
-                // update pages after first init
-                if (isInit) {
-                    updatePages();
-                }
-
-                destroyControls();
-                createControls();
-                addCustomControlActions();
-                addKeyboardControlAction();
-                addHashControlAction();
-                addResizeControlAction();
-                addAutoPlayControlAction();
-
-                // if options were updated force pages and controls to update
-                if (didUpdate) {
-                    updatePages();
-                    updateControlVisibility();
-                }
-            },
             updateSizes = function () {
                 // set width + height
                 if (!options.width) {
@@ -458,7 +605,7 @@
                 }
             },
             updateCSSandAnimations = function () {
-                // init base css
+                // create base css
                 css = {
                     bPage: {
                         padding: options.pagePadding,
@@ -510,7 +657,7 @@
                     }
                 };
 
-                // init animation params
+                // create animation params
                 anim = {
                     hover: {
                         speed: options.hoverSpeed,
@@ -521,9 +668,9 @@
 
             createControls = function () {
                 // add controls container
-                ctrls = target.find('.b-controls');
-                if (ctrls.length == 0) {
-                    ctrls = $('<div class="b-controls"></div>').appendTo(target);
+                controls = target.find('.b-controls');
+                if (controls.length == 0) {
+                    controls = $('<div class="b-controls"></div>').appendTo(target);
                 }
 
                 // create controls
@@ -531,8 +678,8 @@
                 createArrowControls();
 
                 // save all controls
-                ctrlsN = ctrls.find('.b-next');
-                ctrlsP = ctrls.find('.b-prev');
+                ctrlsN = controls.find('.b-next');
+                ctrlsP = controls.find('.b-prev');
 
                 addControlActions();
             },
@@ -540,8 +687,8 @@
                 // add tabs
                 tabs = target.find('.b-tab');
                 if (options.tabs && tabs.length == 0) {
-                    tabP = $('<div class="b-tab b-tab-prev b-prev" title="' + options.previousControlTitle + '">' + options.previousControlText + '</div>').appendTo(ctrls);
-                    tabN = $('<div class="b-tab b-tab-next b-next" title="' + options.nextControlTitle + '">' + options.nextControlText + '</div>').appendTo(ctrls);
+                    tabP = $('<div class="b-tab b-tab-prev b-prev" title="' + options.previousControlTitle + '">' + options.previousControlText + '</div>').appendTo(controls);
+                    tabN = $('<div class="b-tab b-tab-next b-next" title="' + options.nextControlTitle + '">' + options.nextControlText + '</div>').appendTo(controls);
                     tabs = target.find('.b-tab');
                 } else if (!options.tabs) {
                     target.css({ 'marginTop': 0 });
@@ -572,8 +719,8 @@
                 // add arrows
                 arrows = target.find('.b-arrow');
                 if (options.arrows && arrows.length == 0) {
-                    arrowP = $('<div class="b-arrow b-arrow-prev b-prev" title="' + options.previousControlTitle + '"><div>' + options.previousControlText + '</div></div>').appendTo(ctrls);
-                    arrowN = $('<div class="b-arrow b-arrow-next b-next" title="' + options.nextControlTitle + '"><div>' + options.nextControlText + '</div></div>').appendTo(ctrls);
+                    arrowP = $('<div class="b-arrow b-arrow-prev b-prev" title="' + options.previousControlTitle + '"><div>' + options.previousControlText + '</div></div>').appendTo(controls);
+                    arrowN = $('<div class="b-arrow b-arrow-next b-next" title="' + options.nextControlTitle + '"><div>' + options.nextControlText + '</div></div>').appendTo(controls);
                     arrows = target.find('.b-arrow');
 
                     // update control titles for RTL direction
@@ -850,7 +997,7 @@
                 }
                 
                 target.find('.b-controls').remove();
-                ctrls = tabs = tabN = tabP = arrows = arrowN = arrowP = null;
+                controls = tabs = tabN = tabP = arrows = arrowN = arrowP = null;
 
                 // keyboard
                 $(document).off('keyup.booklet');
@@ -1523,7 +1670,7 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         return {
-            init: init,
+            init: create,
             enable: enable,
             disable: disable,
             destroy: destroy,
@@ -1585,63 +1732,6 @@
                 }
             }
         }
-    }
-
-    // define default options
-    $.fn.booklet.defaults = {
-        name:                 null,                            // name of the booklet to display in the document title bar
-        width:                600,                             // container width
-        height:               400,                             // container height
-        speed:                2000,                            // speed of the transition between pages
-        direction:            'LTR',                           // direction of the overall content organization, default LTR, left to right, can be RTL for languages which read right to left
-        startingPage:         0,                               // index of the first page to be displayed
-        easing:               'easeInOutQuad',                 // easing method for complete transition
-        easeIn:               'easeInQuad',                    // easing method for first half of transition
-        easeOut:              'easeOutQuad',                   // easing method for second half of transition
-
-        closed:               false,                           // start with the book "closed", will add empty pages to beginning and end of book
-        covers:               false,                           // used with "closed", makes first and last pages into covers, without page numbers (if enabled)
-        autoCenter:           false,                           // used with "closed", makes book position in center of container when closed
-
-        pagePadding:          10,                              // padding for each page wrapper
-        pageNumbers:          true,                            // display page numbers on each page
-        pageBorder:           0,                               // size of the border around each page
-
-        manual:               true,                            // enables manual page turning, requires jQuery UI to function
-        hovers:               true,                            // enables preview page-turn hover animation, shows a small preview of previous or next page on hover
-        hoverWidth:           50,                              // default width for page-turn hover preview
-        hoverSpeed:           500,                             // default speed for page-turn hover preview
-        hoverThreshold:       0.25,                            // default percentage used for manual page dragging, sets the percentage amount a drag must be before moving next or prev
-        hoverClick:           true,                            // enables hovered areas to be clicked when using manual page turning
-        overlays:             false,                           // enables navigation using a page sized overlay, when enabled links inside the content will not be clickable
-        tabs:                 false,                           // adds tabs along the top of the pages
-        tabWidth:             60,                              // set the width of the tabs
-        tabHeight:            20,                              // set the height of the tabs
-        nextControlText:      'Next',                          // inline text for all 'next' controls
-        previousControlText:  'Previous',                      // inline text for all 'previous' controls
-        nextControlTitle:     'Next Page',                     // text for title attributes of all 'next' controls
-        previousControlTitle: 'Previous Page',                 // text for title attributes of all 'previous' controls
-        arrows:               false,                           // adds arrow overlays over the book edges
-        arrowsHide:           false,                           // auto hides arrows when controls are not hovered
-        cursor:               'pointer',                       // cursor css setting for side bar areas
-
-        hash:                 false,                           // enables navigation using a hash string, ex: #/page/1 for page 1, will affect all booklets with 'hash' enabled
-        hashTitleText:        " - Page ",                      // text which forms the hash page title, ex: (Name)" - Page "(1)
-        keyboard:             true,                            // enables navigation with arrow keys (left: previous, right: next)
-        next:                 null,                            // selector for element to use as click trigger for next page
-        prev:                 null,                            // selector for element to use as click trigger for previous page
-        auto:                 false,                           // enables automatic navigation, requires "delay"
-        delay:                5000,                            // amount of time between automatic page flipping
-        pause:                null,                            // selector for element to use as click trigger for pausing auto page flipping
-        play:                 null,                            // selector for element to use as click trigger for restarting auto page flipping
-
-        shadows:              true,                            // display shadows on page animations
-
-        create:               null,                            // called when booklet has been created
-        start:                null,                            // called when booklet starts to change pages
-        change:               null,                            // called when booklet has finished changing pages
-        add:                  null,                            // called when booklet has added a page
-        remove:               null                             // called when booklet has removed a page
     }
 
 })(jQuery);
