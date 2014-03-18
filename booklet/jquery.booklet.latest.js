@@ -105,7 +105,7 @@
         });
     };
 
-    // Default options
+    // Default Options
     
     $.fn.booklet.defaults = {
         width:                600,                             // container width
