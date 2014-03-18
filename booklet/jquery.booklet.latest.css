@@ -47,11 +47,6 @@
 	.booklet .b-page-blank  {}
 	.booklet .b-page-cover  {}
 
-   	/* Page Numbers */
-	.booklet .b-counter {bottom:10px; position:absolute; display:block; width:25px; height:20px; background:#ccc; color:#444; text-align:center; font-size:10px; padding:5px 0 0;}
-	.booklet .b-page:nth-child(odd)  .b-counter  {left:10px;}
-	.booklet .b-page:nth-child(even) .b-counter {right:10px;}
-
    	/* Page Shadows */
     .booklet .b-shadow-left, .booklet .b-shadow-right {left:0; top:0; position:absolute; opacity:0; width:100%; height:100%;}
 	.booklet .b-shadow-left  {
@@ -69,10 +64,6 @@
         background:-ms-radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
         background:radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
     }
-
-   	/* Overlay Controls */
-	.booklet .b-grab     {cursor: url("images/openhand.cur"), default;}
-	.booklet .b-grabbing {cursor: url("images/closedhand.cur"), default;}
 
 /* @z-index fix (needed for older IE browsers)
 ----------------------------------------*/
