@@ -23,11 +23,11 @@
         -moz-transform-origin:100% 0;
         transform-origin:100% 0;
 
-        background:-webkit-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:-moz-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:-ms-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:-o-linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:linear-gradient(left, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
+        background:-webkit-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:-moz-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:-ms-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:-o-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
     }
 	.booklet .b-page:nth-child(even) {
         left:50%;
@@ -35,11 +35,11 @@
         -moz-transform-origin:0 0;
         transform-origin:0 0;
 
-        background:-webkit-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:-moz-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:-ms-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:-o-linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
-        background:linear-gradient(right, rgb(255,255,255) 50%, rgb(250, 250, 250) 95%, rgb(245, 245, 245));
+        background:-webkit-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:-moz-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:-ms-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:-o-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
+        background:linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
     }
 
    	/* Custom Page Types */
