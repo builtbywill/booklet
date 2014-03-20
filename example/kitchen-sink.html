@@ -8,11 +8,12 @@
     <style type="text/css">
 		body {background:#ccc; font:normal 12px/1.2 arial, verdana, sans-serif;}
         input, textarea {background-color:#fff; border:2px inset;}
-        #display {width:400px; height:150px;}
+        #display {width:400px; height:150px; margin:0 auto;}
 		#controls {float:left; width:300px;}
 		#content {margin-left:400px;}
         #options-list li {clear:both; line-height:23px;}
         #options-list li input {float:right;}
+        #mybook .b-page div {padding:10px 20px;}
     </style>
 </head>
 <body>
@@ -66,7 +67,6 @@
 		<a href="#" id="custom-reset-options">Reset Options</a>
 		<h3>Command Output</h3>
 		<textarea id="display"></textarea>
-	    <div id="menu"></div>
 	    <div id="mybook">
 	        <div>
 	            <h3>1 jQuery Booklet</h3>
@@ -142,39 +142,42 @@
 	<footer></footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script> window.jQuery || document.write('<script src="../booklet/jquery-2.1.0.min.js"><\/script>') </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-	<script> window.jQuery.ui || document.write('<script src="../booklet/jquery-ui-1.10.4.min.js"><\/script>') </script>
     <script src="../booklet/jquery.transit.min.js"></script>
     <script src="../booklet/jquery.easing.1.3.js"></script>
     <script src="../booklet/jquery.booklet.latest.js"></script>
 	<script type="text/javascript">
 	    $(function () {
-		
-			// Init
-			
-			var updateSelect = function (event, data) {
+
+            var updateSelect = function (event, data) {
                 console.log(event, data);
 
-                var pageTotal = data.options.pageTotal;
-				$('#gotoIndex, #addIndex, #removeIndex').children().remove();
-				$('#gotoIndex, #addIndex, #removeIndex').append('<option value="start">start</option><option value="end">end</option>');						
-				for(i = 0; i < pageTotal; i++) {
-					$('#gotoIndex, #addIndex, #removeIndex').append('<option value="'+ i +'">'+ i +'</option>');						
-				}
-			};
+                var pageTotal = data.info.pageTotal;
+                $('#gotoIndex, #addIndex, #removeIndex').children().remove();
+                $('#gotoIndex, #addIndex, #removeIndex').append('<option value="start">start</option><option value="end">end</option>');
+                for(i = 0; i < pageTotal; i++) {
+                    $('#gotoIndex, #addIndex, #removeIndex').append('<option value="'+ i +'">'+ i +'</option>');
+                }
+            };
 			
 			var options = $.extend({}, $.fn.booklet.defaults, {
                 width:800,
-			    pagePadding: 50,
                 //overlays:true,
                 //manual:false,
                 //hovers:true,
-                closed:true
+                //autoCenter:true,
+                //closed:true
 			});
 			var updateOptions = function () {
 				$('#options-list').children().remove();
 				$.each(options, function(key, value){
-					$('#options-list').append('<li>'+key+' <input value="'+value+'" id="option-'+key+'" /></li>');
+                    if (typeof value === 'function' || value === null) {
+                        if (value === null)
+                            $('#options-list').append('<li>'+key+': null</li>');
+                        else
+                            $('#options-list').append('<li>'+key+': <pre><code>'+value+'</code></pre></li>');
+                        return;
+                    }
+                    $('#options-list').append('<li>'+key+' <input value="'+value+'" id="option-'+key+'" /></li>');
 					$('#option-'+key).on('change', function(e){
 						e.preventDefault();
 						var value = $(this).val();
@@ -201,26 +204,27 @@
 			
 			var config = $.extend({}, options, {
 				create: updateSelect,
-                start: updateSelect,
-                change: updateSelect,
+                willchange: function (event, data){
+                    console.log(event, data);
+                },
+                startchange: function (event, data){
+                    console.log(event, data);
+                },
+                didchange: function (event, data){
+                    console.log(event, data);
+                },
                 add: updateSelect,
 				remove: updateSelect
 			});
 	        var mybook = $("#mybook").booklet(config);
-	
-			$('#gotoIndex').on('change', function(e){
-				e.preventDefault();
-				$('#custom-gotopage').click();
-			});
-	
+
 			// New Page Default HTML
 	
 			var newPageCount = 0;
 	        var newPageHtml = function() {
 				newPageCount++;
-				return "<div rel='new chapter'>New Page \#"+newPageCount+"</div>";
+				return "<div>New Page \#"+newPageCount+"</div>";
 			};
-			
 			
 			// Display
 			
@@ -274,7 +278,12 @@
 				updateDisplay('$("#mybook").booklet("gotopage", '+(index == "start" || index == "end" ? '"'+index+'"' : index)+');');
 	        });
 
-	        $('#custom-add-index').click(function (e) {
+            $('#gotoIndex').on('change', function(e){
+                e.preventDefault();
+                $('#custom-gotopage').click();
+            });
+
+            $('#custom-add-index').click(function (e) {
 	            e.preventDefault();
 				var newPage = newPageHtml();
 				var index = $('#addIndex').val();
@@ -298,7 +307,8 @@
 	        $('#custom-reset-options').click(function (e) {
 	            e.preventDefault();
 				$("#mybook").booklet("option", config);
-				updateDisplay('$("#mybook").booklet("option", '+ options +');');
+                options = config;
+				updateDisplay('$("#mybook").booklet("option", '+ config +');');
 				updateOptions();
 	        });
 
