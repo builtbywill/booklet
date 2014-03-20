@@ -8,12 +8,14 @@
     <style type="text/css">
 		body {background:#ccc; font:normal 12px/1.2 arial, verdana, sans-serif;}
         input, textarea {background-color:#fff; border:2px inset;}
+
         #display {width:400px; height:150px;}
 		#controls {float:left; width:300px;}
 		#content {margin-left:400px;}
         #options-list li {clear:both; line-height:23px;}
         #options-list li input {float:right;}
-        
+
+        #mybook {width:1000px;}
         #mybook .b-page div {padding:10px 20px;}
         
     </style>
@@ -144,8 +146,6 @@
 	<footer></footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script> window.jQuery || document.write('<script src="../booklet/jquery-2.1.0.min.js"><\/script>') </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-	<script> window.jQuery.ui || document.write('<script src="../booklet/jquery-ui-1.10.4.min.js"><\/script>') </script>
     <script src="../booklet/jquery.transit.min.js"></script>
     <script src="../booklet/jquery.easing.1.3.js"></script>
     <script src="../booklet/jquery.booklet.latest.js"></script>
@@ -153,30 +153,37 @@
 	    $(function () {
 		
 			// Init
-			
-			var updateSelect = function (event, data) {
-                //console.log(event, data);
+
+            var updateSelect = function (event, data) {
+                console.log(event, data);
 
                 var pageTotal = data.options.pageTotal;
-				$('#gotoIndex, #addIndex, #removeIndex').children().remove();
-				$('#gotoIndex, #addIndex, #removeIndex').append('<option value="start">start</option><option value="end">end</option>');						
-				for(i = 0; i < pageTotal; i++) {
-					$('#gotoIndex, #addIndex, #removeIndex').append('<option value="'+ i +'">'+ i +'</option>');						
-				}
-			};
+                $('#gotoIndex, #addIndex, #removeIndex').children().remove();
+                $('#gotoIndex, #addIndex, #removeIndex').append('<option value="start">start</option><option value="end">end</option>');
+                for(i = 0; i < pageTotal; i++) {
+                    $('#gotoIndex, #addIndex, #removeIndex').append('<option value="'+ i +'">'+ i +'</option>');
+                }
+            };
 			
 			var options = $.extend({}, $.fn.booklet.defaults, {
                 width:800,
                 //overlays:true,
                 //manual:false,
                 //hovers:true,
-                autoCenter:true,
-                closed:true
+                //autoCenter:true,
+                //closed:true
 			});
 			var updateOptions = function () {
 				$('#options-list').children().remove();
 				$.each(options, function(key, value){
-					$('#options-list').append('<li>'+key+' <input value="'+value+'" id="option-'+key+'" /></li>');
+                    if (typeof value === 'function' || value === null) {
+                        if (value === null)
+                            $('#options-list').append('<li>'+key+': null</li>');
+                        else
+                            $('#options-list').append('<li>'+key+': <pre><code>'+value+'</code></pre></li>');
+                        return;
+                    }
+                    $('#options-list').append('<li>'+key+' <input value="'+value+'" id="option-'+key+'" /></li>');
 					$('#option-'+key).on('change', function(e){
 						e.preventDefault();
 						var value = $(this).val();
@@ -203,19 +210,14 @@
 			
 			var config = $.extend({}, options, {
 				create: updateSelect,
-                willchange: updateSelect,
-                startchange: updateSelect,
-                didchange: updateSelect,
+                willchange: console.log,
+                startchange: console.log,
+                didchange: console.log,
                 add: updateSelect,
 				remove: updateSelect
 			});
 	        var mybook = $("#mybook").booklet(config);
-	
-			$('#gotoIndex').on('change', function(e){
-				e.preventDefault();
-				$('#custom-gotopage').click();
-			});
-	
+
 			// New Page Default HTML
 	
 			var newPageCount = 0;
@@ -223,7 +225,6 @@
 				newPageCount++;
 				return "<div>New Page \#"+newPageCount+"</div>";
 			};
-			
 			
 			// Display
 			
@@ -277,7 +278,12 @@
 				updateDisplay('$("#mybook").booklet("gotopage", '+(index == "start" || index == "end" ? '"'+index+'"' : index)+');');
 	        });
 
-	        $('#custom-add-index').click(function (e) {
+            $('#gotoIndex').on('change', function(e){
+                e.preventDefault();
+                $('#custom-gotopage').click();
+            });
+
+            $('#custom-add-index').click(function (e) {
 	            e.preventDefault();
 				var newPage = newPageHtml();
 				var index = $('#addIndex').val();
