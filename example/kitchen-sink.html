@@ -8,16 +8,12 @@
     <style type="text/css">
 		body {background:#ccc; font:normal 12px/1.2 arial, verdana, sans-serif;}
         input, textarea {background-color:#fff; border:2px inset;}
-
-        #display {width:400px; height:150px;}
+        #display {width:400px; height:150px; margin:0 auto;}
 		#controls {float:left; width:300px;}
 		#content {margin-left:400px;}
         #options-list li {clear:both; line-height:23px;}
         #options-list li input {float:right;}
-
-        #mybook {width:1000px;}
         #mybook .b-page div {padding:10px 20px;}
-        
     </style>
 </head>
 <body>
@@ -151,8 +147,6 @@
     <script src="../booklet/jquery.booklet.latest.js"></script>
 	<script type="text/javascript">
 	    $(function () {
-		
-			// Init
 
             var updateSelect = function (event, data) {
                 console.log(event, data);

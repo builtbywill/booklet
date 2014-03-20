@@ -9,9 +9,32 @@
  */
 ;(function ($) {
 
-    // Private Constants
+    var styles = window.getComputedStyle(document.documentElement, ''),
+        pre = (Array.prototype.slice
+            .call(styles)
+            .join('')
+            .match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
+            )[1],
+        dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1],
+        prefix = {
+            dom: dom,
+            lowercase: pre,
+            css: '-' + pre + '-',
+            js: pre[0].toUpperCase() + pre.substr(1)
+        },
+        browserPrefix = function(style){ return prefix.css + style; }
 
-    var classes = {
+        // Private Constants
+
+        bookletStyle = ['booklet',
+            browserPrefix('perspective')+':2000px; ' +
+            browserPrefix('perspective-origin') + ':50% 50%; ' +
+            browserPrefix('transform-style')+':preserve-3d; ' +
+            browserPrefix('backface-visibility')+':hidden;'
+        ],
+        pageOddStyle =  browserPrefix('transform-origin')+':100% 0; background:'+browserPrefix('linear-gradient')+'(left, #fff 50%, #fafafa 95%, #f5f5f5);',
+        pageEvenStyle = browserPrefix('transform-origin')+':0 0; background:'+browserPrefix('linear-gradient')+'(right, #fff 50%, #fafafa 95%, #f5f5f5); left:50%;',
+        classes = {
             booklet: 'booklet',
             page: {
                 default: 'b-page',
@@ -311,7 +334,7 @@
             init = function () {
 
                 // setup target DOM object
-                target.addClass(classes.booklet);
+                target.addClass(bookletStyle[0]).attr('style', bookletStyle[1]);
                 // store data for api calls
                 target.data('booklet', this);
 
@@ -342,7 +365,7 @@
                 destroyWrapper();
 
                 // clear class from target DOM object, reset width + height
-                target.removeClass(classes.booklet).css({width:'',height:''});
+                target.removeClass(bookletStyle[0]).style('');
                 // clear out booklet from data object
                 target.removeData('booklet');
 

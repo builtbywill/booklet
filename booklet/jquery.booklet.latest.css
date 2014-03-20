@@ -8,10 +8,10 @@
  *
  */
 	.booklet {
-		width:800px; height:600px; position:relative; margin:0 auto 10px; overflow:visible !important;
-        -webkit-perspective:2000px; -webkit-perspective-origin:50% 50%; -webkit-transform-style:preserve-3d; -webkit-backface-visibility:hidden;
+		position:relative; margin:0 auto 10px; overflow:visible !important;
+        /*-webkit-perspective:2000px; -webkit-perspective-origin:50% 50%; -webkit-transform-style:preserve-3d; -webkit-backface-visibility:hidden;
         -moz-perspective:2000px; -moz-perspective-origin:50% 50%; -moz-transform-style:preserve-3d; -moz-backface-visibility:hidden;
-        perspective:2000px; perspective-origin:50% 50%; transform-style:preserve-3d; backface-visibility:hidden;
+        perspective:2000px; perspective-origin:50% 50%; transform-style:preserve-3d; backface-visibility:hidden;*/
     }
 
 	.booklet .b-page {
