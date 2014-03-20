@@ -157,7 +157,7 @@
             var updateSelect = function (event, data) {
                 console.log(event, data);
 
-                var pageTotal = data.options.pageTotal;
+                var pageTotal = data.info.pageTotal;
                 $('#gotoIndex, #addIndex, #removeIndex').children().remove();
                 $('#gotoIndex, #addIndex, #removeIndex').append('<option value="start">start</option><option value="end">end</option>');
                 for(i = 0; i < pageTotal; i++) {
@@ -210,9 +210,15 @@
 			
 			var config = $.extend({}, options, {
 				create: updateSelect,
-                willchange: console.log,
-                startchange: console.log,
-                didchange: console.log,
+                willchange: function (event, data){
+                    console.log(event, data);
+                },
+                startchange: function (event, data){
+                    console.log(event, data);
+                },
+                didchange: function (event, data){
+                    console.log(event, data);
+                },
                 add: updateSelect,
 				remove: updateSelect
 			});

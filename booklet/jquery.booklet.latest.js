@@ -143,7 +143,6 @@
 
             // instantiate new booklet
             booklet = new Booklet($(this), optionsOrMethod);
-            booklet.init();
 
             // preserve chaining on main function
             return this;
@@ -215,8 +214,7 @@
 
     function Booklet(inTarget, inOptions) {
                 
-        var that = this,
-            target = inTarget,
+        var that = this, target = inTarget,
             options = $.extend({}, $.fn.booklet.defaults, inOptions),
             wrapper, pages = [], pN, p0, p1, p2, p3, p4,
             created = false, busy = false, hoveringRight = false, hoveringLeft = false, enabled = false, movingForward = false,
@@ -227,20 +225,35 @@
 
         // Helpers
 
-            triggerEvent = function(event, callback, index, eventPages){
+            getInfo = function(){
+                return {
+                    target:target,
+                    wrapper:wrapper,
+                    options:$.extend({}, options),
+                    pages:pages,
+                    pageTotal:pageTotal,
+                    originalPageTotal:originalPageTotal,
+                    currentIndex:currentIndex,
+                    created:created,
+                    busy:busy,
+                    hoveringRight:hoveringRight,
+                    hoveringLeft:hoveringLeft,
+                    enabled:enabled,
+                    movingForward:movingForward
+                };
+            },
+            triggerEvent = function(eventName, callback, index, eventPages){
                 index = index || currentIndex;
                 eventPages = eventPages || [pages[currentIndex], pages[currentIndex + 1]];
 
-                if (callback) {
-                    target.off(event + namespace).on(event + namespace, callback);
+                target.off(eventName + namespace);
+                if (typeof callback === 'function') {
+                    target.on(eventName + namespace, callback);
                 }
-                target.trigger(event, {
-                    booklet: that,
-                    currentIndex: currentIndex,
-                    eventIndex: index,
-                    options: $.extend({}, options),
-                    pages: eventPages,
-                    pageTotal: pageTotal
+                target.trigger(eventName, {
+                    info: getInfo(),
+                    index: index,
+                    pages: eventPages
                 });
             },
             isLTR = function(){
@@ -865,61 +878,66 @@
 
         // Public
 
-        return {
-            init: init,
-            enable: enable,
-            disable: disable,
-            destroy: destroy,
-            next: next,
-            prev: prev,
-            gotopage: function (index) {
-                if (!notUndefinedAndNull(index)) {
-                    $.error('jquery.booklet:gotopage: index must not be undefined or null');
-                    return;
-                }
-                if (isNumber(index) && index < 0 || index >= pageTotal){
-                    $.error('jquery.booklet:gotopage: index is out of bounds');
-                    return;
-                }
-                if (isString(index)) {
-                    index = index == "start" ? 0 : index == "end" ? pageTotal - 2 : parseInt(index);
-                    if (isNaN(index)){
-                        $.error('jquery.booklet:gotopage: index parseInt failed');
-                        return;
-                    }
-                }
-                // adjust for odd page
-                if (index % 2 != 0) {
-                    index -= 1;
-                }
-                // adjust for booklet direction
-                if (!isLTR()) {
-                    index = Math.abs(index - pageTotal) - 2;
-                }
-                goToPage(index);
-            },
-            add: addPage,
-            remove: removePage,
-            option: function (name, value) {
-                if (isString(name)) {
-                    if (!notUndefinedAndNull(options[name]))
-                        $.error('jquery.booklet:option: option "' + name + '" does not exist');
-                    if (notUndefinedAndNull(value)) {
-                        // if value is sent in, set the option value and update options
-                        options[name] = value;
-                        updateOptions();
-                        // todo: only update specific option
-                        return value;
-                    }
-                    // if no value sent in, get the current option value
-                    return options[name];
-                }
-                // if sending in an object, update options
-                if (isObject(name)) {
-                    updateOptions(name);
-                }
-                return $.extend({}, options);
+        this.info = getInfo;
+        this.init = init;
+        this.enable = enable;
+        this.disable = disable;
+        this.destroy = destroy;
+        this.next = next;
+        this.prev = prev;
+        this.gotopage = function (index) {
+            if (!notUndefinedAndNull(index)) {
+                $.error('jquery.booklet:gotopage: index must not be undefined or null');
+                return;
             }
-        }
+            if (isNumber(index) && index < 0 || index >= pageTotal){
+                $.error('jquery.booklet:gotopage: index is out of bounds');
+                return;
+            }
+            if (isString(index)) {
+                index = index == "start" ? 0 : index == "end" ? pageTotal - 2 : parseInt(index);
+                if (isNaN(index)){
+                    $.error('jquery.booklet:gotopage: index parseInt failed');
+                    return;
+                }
+            }
+            // adjust for odd page
+            if (index % 2 != 0) {
+                index -= 1;
+            }
+            // adjust for booklet direction
+            if (!isLTR()) {
+                index = Math.abs(index - pageTotal) - 2;
+            }
+            goToPage(index);
+        };
+        this.add = addPage;
+        this.remove = removePage;
+        this.option = function (name, value) {
+            if (isString(name)) {
+                if (!notUndefinedAndNull(options[name]))
+                    $.error('jquery.booklet:option: option "' + name + '" does not exist');
+                if (notUndefinedAndNull(value)) {
+                    // if value is sent in, set the option value and update options
+                    options[name] = value;
+                    updateOptions();
+                    // todo: only update specific option
+                    return value;
+                }
+                // if no value sent in, get the current option value
+                return options[name];
+            }
+            // if sending in an object, update options
+            if (isObject(name)) {
+                updateOptions(name);
+            }
+            return $.extend({}, options);
+        };
+
+        // call initialize function
+        this.init();
     }
+    Booklet.prototype = {
+        constructor: Booklet
+    };
 })(jQuery);
