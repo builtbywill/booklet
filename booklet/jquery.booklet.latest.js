@@ -166,25 +166,27 @@
         width:          600,             // container width
         height:         400,             // container height
         speed:          500,             // speed of the transition between pages
-        leftToRight:    true,            // direction of the overall content organization, left to right, can be false for languages which read right to left
         startingIndex:  0,               // index of the first page to be displayed
         easing:         'easeInOutQuad', // easing method for complete transition
         easeIn:         'easeInQuad',    // easing method for first half of transition
         easeOut:        'easeOutQuad',   // easing method for second half of transition
+        shadows:        true,            // display shadows on page animations
 
+        leftToRight:    true,            // direction of the overall content organization, left to right, can be false for languages which read right to left
         single:         false,           // displays a single page layout, where content provided is only shown on one side of the booklet. spacer pages are added and the booklet frame is reduced in width
         closed:         false,           // start with the book "closed", will add transparent pages to beginning and end of book
         autoCenter:     false,           // used with "closed", makes book position in center of container when closed
 
-        manual:         true,            // enables manual page turning
+        swipe:          true,
+        drag:           true,
+
         hovers:         true,            // enables page-turn hover animation
         hoverWidth:     50,              // default width for page-turn hover preview
         hoverSpeed:     500,             // default speed for page-turn hover preview
         hoverThreshold: 0.25,            // default percentage used for manual page dragging, sets the percentage amount a drag must be before moving next or prev
-        hoverClick:     true,            // enables hovered areas to be clicked when using manual page turning
+
         overlays:       false,           // enables navigation by clicking anywhere in the booklet. when enabled links inside the content will not be clickable
         keyboard:       true,            // enables navigation with arrow keys (left: previous, right: next)
-        shadows:        true,            // display shadows on page animations
 
         create:         null,            // called when booklet has been created
         willchange:     null,            // called when booklet will changes pages, before the DOM or CSS is updated
@@ -636,6 +638,13 @@
                 addWindowResizeAction();
                 addHoverControlAction();
                 addHoverClickAction();
+
+                if (options.swipe) {
+                    target.on({
+                        'swipeleft': next,
+                        'swiperight': prev
+                    })
+                }
             },
             removeControlActions = function () {
 
