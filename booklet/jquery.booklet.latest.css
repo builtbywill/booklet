@@ -7,63 +7,17 @@
  * Version : 2.0.0
  *
  */
-	.booklet {
-		position:relative; margin:0 auto 10px; overflow:visible !important;
-        /*-webkit-perspective:2000px; -webkit-perspective-origin:50% 50%; -webkit-transform-style:preserve-3d; -webkit-backface-visibility:hidden;
-        -moz-perspective:2000px; -moz-perspective-origin:50% 50%; -moz-transform-style:preserve-3d; -moz-backface-visibility:hidden;
-        perspective:2000px; perspective-origin:50% 50%; transform-style:preserve-3d; backface-visibility:hidden;*/
-    }
+	.booklet {position:relative; margin:0 auto 10px; overflow:visible !important;}
 
-	.booklet .b-page {
-		left:0; top:0; position:absolute; overflow:hidden; padding:0; outline:1px solid transparent; visibility:hidden;
-	}
+    .booklet .b-page                 {left:0; top:0; position:absolute; overflow:hidden; padding:0; outline:1px solid rgba(0,0,0,0); visibility:hidden;}
+	.booklet .b-page:nth-child(odd)  {}
+	.booklet .b-page:nth-child(even) {}
+    .booklet .b-page-transparent     {background:transparent !important;}
+	.booklet .b-page-blank           {}
 
-	.booklet .b-page:nth-child(odd)  {
-        -webkit-transform-origin:100% 0;
-        -moz-transform-origin:100% 0;
-        transform-origin:100% 0;
-
-        background:-webkit-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:-moz-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:-ms-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:-o-linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:linear-gradient(left, #fff 50%, #fafafa 95%, #f5f5f5);
-    }
-	.booklet .b-page:nth-child(even) {
-        left:50%;
-        -webkit-transform-origin:0 0;
-        -moz-transform-origin:0 0;
-        transform-origin:0 0;
-
-        background:-webkit-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:-moz-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:-ms-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:-o-linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
-        background:linear-gradient(right, #fff 50%, #fafafa 95%, #f5f5f5);
-    }
-
-   	/* Custom Page Types */
-    .booklet .b-page-transparent  {background:transparent !important;}
-	.booklet .b-page-blank  {}
-	.booklet .b-page-cover  {}
-
-   	/* Page Shadows */
     .booklet .b-shadow {left:0; top:0; position:absolute; opacity:0; width:100%; height:100%;}
-	.booklet .b-page:nth-child(odd) .b-shadow  {
-        background:-webkit-radial-gradient(right, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:-moz-linear-gradient(right, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:-o-linear-gradient(right, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:-ms-linear-gradient(right, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:linear-gradient(right, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-
-    }
-	.booklet .b-page:nth-child(even) .b-shadow  {
-        background:-webkit-radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:-moz-radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:-o-radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:-ms-radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-        background:radial-gradient(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%);
-    }
+	.booklet .b-page:nth-child(odd) .b-shadow  {}
+	.booklet .b-page:nth-child(even) .b-shadow  {}
 
 /* @z-index fix (needed for older IE browsers)
 ----------------------------------------*/

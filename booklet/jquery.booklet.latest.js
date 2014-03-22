@@ -22,48 +22,36 @@
             css: '-' + pre + '-',
             js: pre[0].toUpperCase() + pre.substr(1)
         },
-        browserPrefix = function(style){ return prefix.css + style; }
+        browserPrefix = function(style){ return prefix.css + style;},
 
         // Private Constants
 
-        bookletStyle = ['booklet',
-            browserPrefix('perspective')+':2000px; ' +
-            browserPrefix('perspective-origin') + ':50% 50%; ' +
-            browserPrefix('transform-style')+':preserve-3d; ' +
-            browserPrefix('backface-visibility')+':hidden;'
-        ],
-        pageOddStyle =  browserPrefix('transform-origin')+':100% 0; background:'+browserPrefix('linear-gradient')+'(left, #fff 50%, #fafafa 95%, #f5f5f5);',
-        pageEvenStyle = browserPrefix('transform-origin')+':0 0; background:'+browserPrefix('linear-gradient')+'(right, #fff 50%, #fafafa 95%, #f5f5f5); left:50%;',
-        classes = {
-            booklet: 'booklet',
-            page: {
-                default: 'b-page',
-                blank: 'b-page b-page-blank',
-                cover: 'b-page b-page-cover',
-                transparent: 'b-page b-page-transparent'
-            },
-            shadow: 'b-shadow',
-            wrapper: 'b-wrapper'
-        },
+        bookletClass         = 'booklet',
+        pageClass            = 'b-page',
+        pageBlankClass       = pageClass + '-blank',
+        pageTransparentClass = pageClass + '-transparent',
+        shadowClass          = 'b-shadow',
+        wrapperClass         = 'b-wrapper',
+
+        bookletStyle    = browserPrefix('perspective')+':2000px; '+browserPrefix('perspective-origin')+':50% 50%; '+browserPrefix('transform-style')+':preserve-3d; '+browserPrefix('backface-visibility')+':hidden;',
+        pageOddStyle    = browserPrefix('transform-origin')+':100% 0; background-image:'+browserPrefix('linear-gradient')+'(left, #fff 50%, #fafafa 95%, #f5f5f5);',
+        pageEvenStyle   = 'left:50%; '+ browserPrefix('transform-origin')+':0 0; background-image:'+browserPrefix('linear-gradient')+'(right, #fff 50%, #fafafa 95%, #f5f5f5);',
+        shadowOddStyle  = 'background-image:'+browserPrefix('radial-gradient')+'(right, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%)',
+        shadowEvenStyle = 'background-image:'+browserPrefix('radial-gradient')+'(left, circle, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0) 70%)',
+
         css = {
             page: {visibility:'hidden', zIndex:10},
             pageOuter: {zIndex: 10},
             pageInner: {zIndex: 30},
             pageVisible: {visibility: 'visible', zIndex: 20}
         },
-        direction = {
-            leftToRight: 'LTR',
-            rightToLeft: 'RTL'
-        },
-        events = {
-            create:      'bookletcreate',      // called when booklet has been created
-            willchange:  'bookletwillchange',  // called when booklet will changes pages, before the DOM or CSS is updated
-            startchange: 'bookletstartchange', // called when booklet starts to change pages
-            didchange:   'bookletdidchange',   // called when booklet has finished changing pages
-            add:         'bookletadd',         // called when booklet has added a page
-            remove:      'bookletremove'       // called when booklet has removed a page
-        },
-        namespace = '.booklet'; // namespace for all internal events
+        eventCreate      = 'bookletcreate',      // called when booklet has been created
+        eventWillChange  = 'bookletwillchange',  // called when booklet will changes pages, before the DOM or CSS is updated
+        eventStartChange = 'bookletstartchange', // called when booklet starts to change pages
+        eventDidChange   = 'bookletdidchange',   // called when booklet has finished changing pages
+        eventAdd         = 'bookletadd',         // called when booklet has added a page
+        eventRemove      = 'bookletremove',      // called when booklet has removed a page
+        eventNamespace   = '.booklet';           // eventNamespace for all internal events
 
     // Helpers
 
@@ -175,36 +163,35 @@
     // Plugin Default Options
     
     $.fn.booklet.defaults = {
-        width:                600,                             // container width
-        height:               400,                             // container height
-        speed:                500,                             // speed of the transition between pages
-        direction:            'LTR',                           // direction of the overall content organization, default LTR, left to right, can be RTL for languages which read right to left
-        startingIndex:         0,                              // index of the first page to be displayed
-        easing:               'easeInOutQuad',                 // easing method for complete transition
-        easeIn:               'easeInQuad',                    // easing method for first half of transition
-        easeOut:              'easeOutQuad',                   // easing method for second half of transition
+        width:          600,             // container width
+        height:         400,             // container height
+        speed:          500,             // speed of the transition between pages
+        leftToRight:    true,            // direction of the overall content organization, left to right, can be false for languages which read right to left
+        startingIndex:  0,               // index of the first page to be displayed
+        easing:         'easeInOutQuad', // easing method for complete transition
+        easeIn:         'easeInQuad',    // easing method for first half of transition
+        easeOut:        'easeOutQuad',   // easing method for second half of transition
 
-        single:               false,
-        closed:               false,                           // start with the book "closed", will add empty pages to beginning and end of book
-        autoCenter:           false,                           // used with "closed", makes book position in center of container when closed
+        single:         false,           // displays a single page layout, where content provided is only shown on one side of the booklet. spacer pages are added and the booklet frame is reduced in width
+        closed:         false,           // start with the book "closed", will add transparent pages to beginning and end of book
+        autoCenter:     false,           // used with "closed", makes book position in center of container when closed
 
-        manual:               true,                            // enables manual page turning, requires jQuery UI to function
-        hovers:               true,                            // enables preview page-turn hover animation, shows a small preview of previous or next page on hover
-        hoverWidth:           50,                              // default width for page-turn hover preview
-        hoverSpeed:           500,                             // default speed for page-turn hover preview
-        hoverThreshold:       0.25,                            // default percentage used for manual page dragging, sets the percentage amount a drag must be before moving next or prev
-        hoverClick:           true,                            // enables hovered areas to be clicked when using manual page turning
-        overlays:             false,                           // enables navigation using a page sized overlay, when enabled links inside the content will not be clickable        arrows:               false,                           // adds arrow overlays over the book edges
-        keyboard:             true,                            // enables navigation with arrow keys (left: previous, right: next)
-        shadows:              true,                            // display shadows on page animations
+        manual:         true,            // enables manual page turning
+        hovers:         true,            // enables page-turn hover animation
+        hoverWidth:     50,              // default width for page-turn hover preview
+        hoverSpeed:     500,             // default speed for page-turn hover preview
+        hoverThreshold: 0.25,            // default percentage used for manual page dragging, sets the percentage amount a drag must be before moving next or prev
+        hoverClick:     true,            // enables hovered areas to be clicked when using manual page turning
+        overlays:       false,           // enables navigation by clicking anywhere in the booklet. when enabled links inside the content will not be clickable
+        keyboard:       true,            // enables navigation with arrow keys (left: previous, right: next)
+        shadows:        true,            // display shadows on page animations
 
-        // callbacks
-        create:               null,                            // called when booklet has been created
-        willchange:           null,                            // called when booklet will changes pages, before the DOM or CSS is updated
-        startchange:          null,                            // called when booklet starts to change pages
-        didchange:            null,                            // called when booklet has finished changing pages
-        add:                  null,                            // called when booklet has added a page
-        remove:               null                             // called when booklet has removed a page
+        create:         null,            // called when booklet has been created
+        willchange:     null,            // called when booklet will changes pages, before the DOM or CSS is updated
+        startchange:    null,            // called when booklet starts to change pages
+        didchange:      null,            // called when booklet has finished changing pages
+        add:            null,            // called when booklet has added a page
+        remove:         null             // called when booklet has removed a page
     };
 
     // Page
@@ -212,9 +199,10 @@
     function Page(contentNode, index){
         this.index = index;
         this.contentNode = contentNode;
-        this.isTransparent = this.contentNode.hasClass(classes.page.transparent);
-        this.isBlank = this.contentNode.hasClass(classes.page.blank);
+        this.isTransparent = this.contentNode.hasClass(pageTransparentClass);
+        this.isBlank = this.contentNode.hasClass(pageBlankClass);
         this.pageNode = this.createPageNode();
+        this.pageNode.attr('style', (index % 2) == 0 ? pageOddStyle : pageEvenStyle);
     }
     Page.prototype = {
         constructor: Page,
@@ -222,7 +210,7 @@
             if (this.isBlank || this.isTransparent) {
                 return this.contentNode;
             } else {
-                return this.contentNode.wrap(template(classes.page.default)).parent();
+                return this.contentNode.wrap(template(pageClass)).parent();
             }
         },
         destroy: function () {
@@ -237,12 +225,12 @@
 
     function Booklet(inTarget, inOptions) {
                 
-        var that = this, target = inTarget,
+        var target = inTarget,
             options = $.extend({}, $.fn.booklet.defaults, inOptions),
             wrapper, pages = [], pN, p0, p1, p2, p3, p4,
             created = false, busy = false, hoveringRight = false, hoveringLeft = false, enabled = false, movingForward = false,
             diff, originalPageTotal, pageTotal, currentIndex,
-            p3drag, p0drag,
+            //p3drag, p0drag,
             percentWidthString, percentHeightString,
             shadowLeft1, shadowRight1, shadowLeft2, shadowRight2,
 
@@ -269,9 +257,9 @@
                 index = index || currentIndex;
                 eventPages = eventPages || [pages[currentIndex], pages[currentIndex + 1]];
 
-                target.off(eventName + namespace);
+                target.off(eventName + eventNamespace);
                 if (typeof callback === 'function') {
-                    target.on(eventName + namespace, callback);
+                    target.on(eventName + eventNamespace, callback);
                 }
                 target.trigger(eventName, {
                     info: getInfo(),
@@ -280,7 +268,7 @@
                 });
             },
             isLTR = function(){
-                return options.direction == direction.leftToRight;
+                return options.leftToRight;
             },
             atBeginning = function(){
                 return currentIndex == 0;
@@ -315,6 +303,14 @@
             pageSize = function(){
                 return {width:pageWidth(), height:pageHeight()};
             },
+            pagesNotTransparent = function(){
+                var notTransparent = [];
+                $.each(pages, function(){
+                    if (!this.isTransparent)
+                        notTransparent.push(this);
+                });
+                return notTransparent;
+            },
             shadows = function(){
                 return [shadowLeft1, shadowLeft2, shadowRight1, shadowRight2];
             },
@@ -334,7 +330,7 @@
             init = function () {
 
                 // setup target DOM object
-                target.addClass(bookletStyle[0]).attr('style', bookletStyle[1]);
+                target.addClass(bookletClass).attr('style', bookletStyle);
                 // store data for api calls
                 target.data('booklet', this);
 
@@ -350,7 +346,7 @@
                 created = true;
                 enabled = true;
 
-                triggerEvent(events.create, options.create);
+                triggerEvent(eventCreate, options.create);
             },
             enable = function () {
                 enabled = true;
@@ -365,7 +361,7 @@
                 destroyWrapper();
 
                 // clear class from target DOM object, reset width + height
-                target.removeClass(bookletStyle[0]).style('');
+                target.removeClass(bookletClass).removeAttr('style');
                 // clear out booklet from data object
                 target.removeData('booklet');
 
@@ -382,9 +378,9 @@
                     target.children().each(function (i) {
                         if (!options.closed || i != 0){
                             if (isLTR()){
-                                $(this).before(template(classes.page.blank));
+                                $(this).before(template(pageClass+' '+pageBlankClass));
                             } else {
-                                $(this).after(template(classes.page.blank));
+                                $(this).after(template(pageClass+' '+pageBlankClass));
                             }
                         }
                     });
@@ -392,13 +388,13 @@
 
                 // fix for odd number of pages
                 if ((target.children().length % 2) != 0) {
-                    target.children().last().after(template(classes.page.blank));
+                    target.children().last().after(template(pageClass+' '+pageBlankClass));
                 }
 
                 // if closed book, add empty pages to start and end
                 if (options.closed) {
-                    target.prepend(template(classes.page.transparent));
-                    target.append(template(classes.page.transparent));
+                    target.prepend(template(pageClass+' '+pageTransparentClass));
+                    target.append(template(pageClass+' '+pageTransparentClass));
                 }
 
                 // save total page count
@@ -470,22 +466,22 @@
         // Shadows
 
             createShadows = function(){
-                shadowLeft1 = $(template(classes.shadow));
-                shadowLeft2 = $(template(classes.shadow));
-                shadowRight1= $(template(classes.shadow));
-                shadowRight2 = $(template(classes.shadow));
+                shadowLeft1  = $(template(shadowClass)).attr('style', shadowOddStyle);
+                shadowLeft2  = $(template(shadowClass)).attr('style', shadowOddStyle);
+                shadowRight1 = $(template(shadowClass)).attr('style', shadowEvenStyle);
+                shadowRight2 = $(template(shadowClass)).attr('style', shadowEvenStyle);
             },
             addShadows = function (inc) {
-                if ((inc && shadowLeft1.parent() != p3) || (!inc && shadowLeft1.parent() != p1)) {
+                if ((inc && shadowLeft1.parent()[0] != p3[0]) || (!inc && shadowLeft1.parent()[0] != p1[0])) {
                     shadowLeft1.css({opacity:0}).appendTo(inc ? p3 : p1);
                 }
-                if ((inc && shadowRight1.parent() != p2) || (!inc && shadowRight1.parent() != p0)) {
+                if ((inc && shadowRight1.parent()[0] != p2[0]) || (!inc && shadowRight1.parent()[0] != p0[0])) {
                     shadowRight1.css({opacity:0}).appendTo(inc ? p2: p0);
                 }
-                if ((inc && shadowLeft2.parent() != p1) || (!inc && shadowLeft2.parent() != pN)) {
+                if ((inc && shadowLeft2.parent()[0] != p1[0]) || (!inc && shadowLeft2.parent()[0] != pN[0])) {
                     shadowLeft2.css({opacity:0}).appendTo(inc ? p1 : pN);
                 }
-                if ((inc && shadowRight2.parent() != p4) || (!inc && shadowRight2.parent() != p2)) {
+                if ((inc && shadowRight2.parent()[0] != p4[0]) || (!inc && shadowRight2.parent()[0] != p2[0])) {
                     shadowRight2.css({opacity:0}).appendTo(inc ? p4: p2);
                 }
             },
@@ -496,14 +492,14 @@
         // Wrapper
 
             createWrapper = function(){
-                if (target.parent().hasClass(classes.wrapper)) {
+                if (target.parent().hasClass(wrapperClass)) {
                     wrapper = target.parent();
                 } else {
-                    wrapper = target.wrap(template(classes.wrapper)).parent();
+                    wrapper = target.wrap(template(wrapperClass)).parent();
                 }
             },
             destroyWrapper = function(){
-                if (target.parent().hasClass(classes.wrapper)){
+                if (target.parent().hasClass(wrapperClass)){
                     target.unwrap();
                     wrapper = null;
                 }
@@ -513,39 +509,56 @@
 
             updateOptions = function (newOptions) {
 
-                var didUpdate = false;
+                var recreate = false;
 
                 // update options if newOptions have been passed in
                 if (notUndefinedAndNull(newOptions)) {
 
-                    // todo: don't fully re-create for all options
+                    // copy current options, make updates
+                    var currentOptions = $.extend({}, options),
+                        size = false,
+                        autoCenter = false;
 
-                    // remove page structure, revert to original order
-                    destroyPages();
+                    // compare to see what changed
+                    for (var name in newOptions) {
+                        if (!newOptions.hasOwnProperty(name) || !currentOptions.hasOwnProperty(name)) continue;
+                        var value = currentOptions[name];
+                        var newValue = newOptions[name];
+                        if (value != newValue) {
+                            if (name == 'leftToRight' || name == 'single' || name == 'closed'){
+                                recreate = true;
+                                continue;
+                            }
+                            if (name == 'width' || name == 'height') {
+                                size = true;
+                            }
+                            if (name == 'autoCenter' || name == 'single' || name == 'closed') {
+                                autoCenter = true;
+                            }
+                        }
+                    }
 
+                    // must call destroy before updating options
+                    if (recreate) destroyPages();
+
+                    // update options
                     options = $.extend({}, options, newOptions);
-                    didUpdate = true;
 
-                    createPages();
+                    // make necessary changes
+                    if (recreate) createPages();
+                    if (size || recreate) updateSize();
+                    if (autoCenter || recreate) {
+                        updateWrapper();
+                        updateAutoCenter();
+                    }
+                    if (recreate) updatePages();
+                    return;
                 }
 
                 updateSize();
-
-                // autoCenter
-                if (!options.autoCenter && !options.single && !options.single) {
-                    destroyWrapper();
-                } else {
-                    createWrapper();
-                    updateAutoCenter();
-                }
-
-                removeControlActions();
+                updateWrapper();
+                updateAutoCenter();
                 addControlActions();
-
-                // if options were updated force pages and controls to update
-                if (didUpdate) {
-                    updatePages();
-                }
             },
             updateSize = function () {
 
@@ -592,76 +605,111 @@
                     this.css(pageSize());
                 });
             },
-            updateAutoCenter = function(){
-                // set width for closed + autoCenter or single
-                if (options.closed && options.autoCenter || options.single) {
-                    if (wrapper){
-                        wrapper.width(options.width);
-                        wrapper.height(options.height);
-
-                        if (options.single){
-                            wrapper.width(pageWidth());
-                            target.css({marginLeft:pageWidthNegative()});
-                        } else if (atBeginning()) {
-                            target.css({marginLeft:pageWidthHalfNegative()});
-                        } else if (atEnd()) {
-                            target.css({marginLeft:pageWidthHalf()});
-                        }
-                    } else {
-                        target.css({marginLeft:0});
-                    }
+            updateWrapper = function(){
+                if (!options.autoCenter && !options.single && !options.single) {
+                    destroyWrapper();
+                } else {
+                    createWrapper();
                 }
             },
-            addControlActions = function () {
+            updateAutoCenter = function(){
+                // set width for closed + autoCenter or single
+                if (wrapper){
+                    wrapper.width(options.width);
+                    wrapper.height(options.height);
 
-                $(document).on('keyup' + namespace, function (event) {
+                    if (options.single){
+                        wrapper.width(pageWidth());
+                        target.css({marginLeft:pageWidthNegative()});
+                    } else if (atBeginning()) {
+                        target.css({marginLeft:pageWidthHalfNegative()});
+                    } else if (atEnd()) {
+                        target.css({marginLeft:pageWidthHalf()});
+                    }
+                } else {
+                    target.css({marginLeft:0});
+                }
+            },
+
+            addControlActions = function () {
+                addKeyboardControlAction();
+                addWindowResizeAction();
+                addHoverControlAction();
+                addHoverClickAction();
+            },
+            removeControlActions = function () {
+
+                removeKeyboardControlAction();
+                removeWindowResizeAction();
+                removeHoverControlAction();
+                removeHoverClickAction();
+
+                // remove any other namespace actions
+                target.off(eventNamespace);
+            },
+            addKeyboardControlAction = function(){
+                $(document).on('keyup' + eventNamespace, function (event) {
                     if (event.keyCode == 37 && options.keyboard) {
                         prev();
                     } else if (event.keyCode == 39 && options.keyboard) {
                         next();
                     }
                 });
-
-                $(window).on('resize' + namespace, function () {
+            },
+            removeKeyboardControlAction = function(){
+                $(document).off('keyup' + eventNamespace);
+            },
+            addWindowResizeAction = function() {
+                $(window).on('resize' + eventNamespace, function () {
                     if (usingPercentageSize) {
                         updatePercentageSize();
                     }
                 });
+            },
+            removeWindowResizeAction = function() {
+                $(window).off('resize' + eventNamespace);
+            },
+            addHoverControlAction = function() {
 
-                // add page hover animations
-                if (options.hovers) {
-                    // mouse tracking for page movement
-                    target.on('mousemove' + namespace,function (e) {
-                        diff = e.pageX - target.offset().left;
+                // mouse tracking for page movement
+                target.on('mousemove' + eventNamespace,function (e) {
+                    diff = e.pageX - target.offset().left;
+                    if (options.hovers) {
                         if (options.overlays) {
                             if (diff < pageWidth() && !atBeginning()) {
-                                if (hoveringRight) endHoverAnimation(true);
-                                startHoverAnimation(false);
+                                if (hoveringRight) hoverAnimation(true, false);
+                                hoverAnimation(false, true);
                             } else if (diff > pageWidth && !atEnd()) {
-                                if (hoveringLeft) endHoverAnimation(false);
-                                startHoverAnimation(true);
+                                if (hoveringLeft) hoverAnimation(false, false);
+                                hoverAnimation(true, true);
                             } else {
                                 endHoverAnimations();
                             }
                         } else {
                             if (diff < options.hoverWidth) {
-                                startHoverAnimation(false);
+                                hoverAnimation(false, true);
                             } else if (diff > options.width - options.hoverWidth) {
-                                startHoverAnimation(true);
+                                hoverAnimation(true, true);
                             } else {
                                 endHoverAnimations();
                             }
                         }
-                    }).on('mouseleave' + namespace, function () {
-                        endHoverAnimations();
-                    });
-                }
+                    }
+                }).on('mouseleave' + eventNamespace, function(){
+                    if (options.hovers) endHoverAnimations();
+                });
+            },
+            removeHoverControlAction = function(){
+                target.off('mousemove' + eventNamespace)
+                    .off('mouseleave' + eventNamespace);
+            },
+            addHoverClickAction = function (){
 
-                // add overlay or hover click action
-                if (options.overlays || options.hovers) {
-                    // mouse tracking for page movement
-                    target.on('click' + namespace, function(e) {
-                        diff = e.pageX - target.offset().left;
+                target.on('click' + eventNamespace, function(e) {
+                    diff = e.pageX - target.offset().left;
+
+                    // add overlay or hover click action
+                    if (options.overlays || (options.hovers && options.hoverClick)) {
                         if (diff < pageWidth() && !atBeginning()) {
                             if (options.overlays)
                                 e.preventDefault();
@@ -671,20 +719,11 @@
                                 e.preventDefault();
                             next();
                         }
-                    });
-                }
+                    }
+                });
             },
-            removeControlActions = function () {
-
-                // keyboard
-                $(document).off('keyup' + namespace);
-
-                // window resize
-                $(window).off('resize' + namespace);
-
-                // remove mouse tracking for page movement and hover clicks
-                target.off(namespace);
-
+            removeHoverClickAction = function(){
+                target.off('click' + eventNamespace);
             },
 
         // Page Animations
@@ -702,7 +741,7 @@
             goToPage = function (newIndex) {
                 if (newIndex != currentIndex && newIndex >= 0 && newIndex < pageTotal && !busy && enabled) {
 
-                    triggerEvent(events.willchange, options.willchange);
+                    triggerEvent(eventWillChange, options.willchange);
 
                     busy = true;
                     movingForward = newIndex > currentIndex;
@@ -714,56 +753,56 @@
                     //speed = p3drag === true ? options.speed * (p3.width() / pageWidth()) : options.speed;
                     //speed = p0drag === true ? options.speed * (p0.width() / pageWidth()) : options.speed;
 
-                    setupPagesBeforeAnimation(diff, movingForward);
-                    animatePages(diff, movingForward, options.speed);
+                    setupPagesBeforeAnimation(diff);
+                    animatePages(diff, options.speed);
                     animateShadows(movingForward, options.speed, 1);
                 }
             },
-            setupPagesBeforeAnimation = function (diff, inc) {
+            setupPagesBeforeAnimation = function (diff) {
                 // initialize visible pages, if jumping forward or backward in the book
-                if (inc && diff > 2) {
+                if (movingForward && diff > 2) {
                     p3.hide(); p4.hide();
                     p3 = pages[currentIndex].pageNode.css(css.pageInner).show();
                     p4 = pages[currentIndex+1].pageNode.css(css.pageOuter).show();
-                } else if (!inc && diff > 2) {
+                } else if (!movingForward && diff > 2) {
                     pN.hide(); p0.hide();
                     pN = pages[currentIndex].pageNode.css(css.pageOuter).show();
                     p0 = pages[currentIndex+1].pageNode.css(css.pageInner).show();
                 }
             },
-            animatePages = function(diff, inc, speed) {
+            animatePages = function(diff, speed) {
 
-                triggerEvent(events.startchange, options.startchange);
+                triggerEvent(eventStartChange, options.startchange);
 
                 // auto center
                 if (!options.single && wrapper){
-                    if ((inc && currentIndex - diff == 0) || (!inc && currentIndex + diff >= pageTotal - 2)) {
+                    if ((movingForward && currentIndex - diff == 0) || (!movingForward && currentIndex + diff >= pageTotal - 2)) {
                         target.transition({marginLeft:0}, speed, options.easing);
-                    } else if (inc && atEnd()) {
+                    } else if (movingForward && atEnd()) {
                         target.transition({marginLeft:pageWidthHalf()}, speed, options.easing);
-                    } else if (!inc && atBeginning()) {
+                    } else if (!movingForward && atBeginning()) {
                         target.transition({marginLeft:pageWidthHalfNegative()}, speed, options.easing);
                     }
                 }
 
-                var a1 = inc ? p2 : p1,
-                    a2 = inc ? p3 : p0,
-                    a3 = inc ? p4 : pN;
+                var a1 = movingForward ? p2 : p1,
+                    a2 = movingForward ? p3 : p0,
+                    a3 = movingForward ? p4 : pN;
 
                 if (a3) a3.css({visibility:'visible'});
-                a1.transition({rotateY: inc ? nDeg(90) : deg(90) }, speed/2, options.easeIn, function(){
+                a1.transition({rotateY: movingForward ? nDeg(90) : deg(90) }, speed/2, options.easeIn, function(){
                     a1.transition({visibility:'hidden'}, 0);
                     a2.transition({visibility:'visible'}, 0)
                         .transition({rotateY:deg(0)}, speed/2, options.easeOut, updateAfter);
                 });
-                a2.transition({rotateY: inc ? deg(90) : nDeg(90)}, speed/2, options.easeIn);
+                a2.transition({rotateY: movingForward ? deg(90) : nDeg(90)}, speed/2, options.easeIn);
 
                 // todo: handle manual drag
             },
             updateAfter = function () {
                 updatePages();
                 busy = false;
-                triggerEvent(events.didchange, options.didchange);
+                triggerEvent(eventDidChange, options.didchange);
             },
             animateShadows = function (inc, speed, opacity) {
 
@@ -789,50 +828,41 @@
             },
 
         // Hover Animations
-
-            startHoverAnimation = function (inc) {
-                if (!enabled && (options.hovers || options.manual)) {
-                    if (inc) {
-                        if (!busy && !hoveringRight && !p3drag && canGoForward()) {
-                            p4.css({visibility:'visible'});
-                            p2.stop().transition({rotateY:'-10deg'}, options.hoverSpeed, options.easing);
-                            animateShadows(inc, options.hoverSpeed, 0.10);
-                            hoveringRight = true;
+            hoverAnimation = function (inc, start) {
+                if (enabled && !busy && options.hovers) {
+                    var h1 = inc ? p4 : pN,
+                        h2 = inc ? p2 : p1;
+                    if (start){
+                        if (inc && (hoveringRight || !canGoForward()) || !inc && (hoveringLeft || !canGoBack())){
+                            return;
                         }
-                    } else {
-                        if (!busy && !hoveringLeft && !p0drag && canGoBack()) {
-                            pN.css({visibility:'visible'});
-                            p1.stop().transition({rotateY:'10deg'}, options.hoverSpeed, options.easing);
-                            animateShadows(inc, options.hoverSpeed, 0.10);
+                        if (inc) {
+                            hoveringRight = true;
+                        } else {
                             hoveringLeft = true;
                         }
-                    }
-                }
-            },
-            endHoverAnimation = function (inc) {
-                if (enabled && (options.hovers || options.manual)) {
-                    if (inc) {
-                        if (!busy && hoveringRight && !p3drag && canGoForward()) {
-                            p4.css({visibility:'hidden'});
-                            p2.stop().transition({rotateY:'0deg'}, options.hoverSpeed, options.easing, function(){
-                                hoveringRight = false;
-                            });
-                            animateShadows(inc, options.hoverSpeed, 0);
-                        }
+                        h1.css({visibility:'visible'});
+                        h2.stop().transition({rotateY: inc ? nDeg(10) : deg(10)}, options.hoverSpeed, options.easing);
+                        animateShadows(inc, options.hoverSpeed, 0.10);
                     } else {
-                        if (!busy && hoveringLeft && !p0drag && canGoBack()) {
-                            pN.css({visibility:'hidden'});
-                            p1.stop().transition({rotateY:'0deg'}, options.hoverSpeed, options.easing, function(){
-                                hoveringLeft = false;
-                            });
-                            animateShadows(inc, options.hoverSpeed, 0);
+                        if (inc && (!hoveringRight || !canGoForward()) || !inc && (!hoveringLeft || !canGoBack())){
+                            return;
                         }
+                        h1.css({visibility:'hidden'});
+                        h2.stop().transition({rotateY: deg(0)}, options.hoverSpeed, options.easing, function(){
+                            if (inc) {
+                                hoveringRight = false;
+                            } else {
+                                hoveringLeft = false;
+                            }
+                        });
+                        animateShadows(inc, options.hoverSpeed, 0);
                     }
                 }
             },
             endHoverAnimations = function () {
-                endHoverAnimation(false);
-                endHoverAnimation(true);
+                hoverAnimation(false, false);
+                hoverAnimation(true, false);
             },
 
         // Dynamic Page Add + Remove
@@ -856,7 +886,7 @@
                     target.children(':eq(' + index + ')').before(html);
                 }
 
-                triggerEvent(events.add, options.add, index, target.children(':eq(' + index + ')')[0]);
+                triggerEvent(eventAdd, options.add, index, target.children(':eq(' + index + ')')[0]);
 
                 originalPageTotal = target.children().length;
 
@@ -870,7 +900,8 @@
                 index = pageIndexStringToNum(index);
 
                 // stop if removing last remaining page
-                if (target.children(classes.page).not(classes.page.transparent).length == 2) return;
+                if (pagesNotTransparent().length == 2)
+                    return;
 
                 // remove page structure, revert to original order
                 destroyPages();
@@ -878,23 +909,28 @@
 
                 // remove page
                 var removedPage = target.children(':eq(' + (index == originalPageTotal ? (index - 1) : index) + ')').remove();
-                triggerEvent(events.remove, options.remove, index, removedPage[0]);
+                triggerEvent(eventRemove, options.remove, index, removedPage[0]);
                 removedPage = null;
-
-                // update currentIndex
-                if (index >= currentIndex) {
-                    if (index > 0 && (index % 2) != 0) {
-                        currentIndex -= 2;
-                    }
-                    if (currentIndex < 0) {
-                        currentIndex = 0;
-                    }
-                }
 
                 originalPageTotal = target.children().length;
 
                 // recall initialize functions
                 createPages();
+
+                // update currentIndex
+                if (!isLTR()) index = Math.abs(index - pageTotal) - 2;
+                if (index >= currentIndex) {
+                    if (index > 0 && (index % 2) != 0) {
+                        currentIndex = currentIndex - 1;
+                    }
+                }
+                if (currentIndex < 0) {
+                    currentIndex = 0;
+                }
+                if (currentIndex > pageTotal - 2) {
+                    currentIndex = pageTotal - 2;
+                }
+
                 updateOptions();
                 updatePages();
             };
@@ -941,10 +977,9 @@
                 if (!notUndefinedAndNull(options[name]))
                     $.error('jquery.booklet:option: option "' + name + '" does not exist');
                 if (notUndefinedAndNull(value)) {
-                    // if value is sent in, set the option value and update options
-                    options[name] = value;
-                    updateOptions();
-                    // todo: only update specific option
+                    var option = {};
+                    option[name] = value;
+                    updateOptions(option);
                     return value;
                 }
                 // if no value sent in, get the current option value
@@ -963,4 +998,5 @@
     Booklet.prototype = {
         constructor: Booklet
     };
+
 })(jQuery);
