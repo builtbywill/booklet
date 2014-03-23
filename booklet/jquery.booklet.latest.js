@@ -165,7 +165,7 @@
     $.fn.booklet.defaults = {
         width:          600,             // container width
         height:         400,             // container height
-        speed:          500,             // speed of the transition between pages
+        speed:          1000,            // speed of the transition between pages
         startingIndex:  0,               // index of the first page to be displayed
         easing:         'easeInOutQuad', // easing method for complete transition
         easeIn:         'easeInQuad',    // easing method for first half of transition
@@ -177,7 +177,7 @@
         closed:         false,           // start with the book "closed", will add transparent pages to beginning and end of book
         autoCenter:     false,           // used with "closed", makes book position in center of container when closed
 
-        swipe:          true,
+        swipe:          false,
         drag:           true,
 
         hovers:         true,            // enables page-turn hover animation
@@ -633,17 +633,49 @@
                 }
             },
 
+            dragging = false, dragStart = 0, dragPosition = 0, dragPercent = 0,
             addControlActions = function () {
                 addKeyboardControlAction();
                 addWindowResizeAction();
                 addHoverControlAction();
                 addHoverClickAction();
 
-                if (options.swipe) {
-                    target.on({
+                if (options.drag) {
+                    target.on('mousedown', function(e){
+                        dragStart = dragPosition = e.pageX - target.offset().left;
+                        if (dragStart < options.hoverWidth || dragStart > options.width - options.hoverWidth) {
+                            e.preventDefault();
+                            dragging = true;
+                            dragPercent = dragPosition / options.width;
+                            movingForward = dragStart > pageWidth();
+                        }
+                    });
+                    target.on('mousemove', function(e){
+                        if (!dragging) return;
+                        dragPosition = e.pageX - target.offset().left;
+                        dragPercent = dragPosition / options.width;
+                        updatePagesForDragPercent(dragPercent);
+                    });
+                    target.on('mouseup', function(e){
+                        if (!dragging) return;
+                        dragging = false;
+
+                        if (movingForward && dragPercent <= 0.50)
+                            next();
+                        else if (movingForward && dragPercent > 0.50)
+                            updatePagesForDragPercent(1, options.speed);
+
+                        if (!movingForward && dragPercent > 0.50)
+                            prev();
+                        else if (!movingForward && dragPercent <= 0.50)
+                            updatePagesForDragPercent(0, options.speed);
+
+                    });
+                } else if (options.swipe) {
+                    /*target.on({
                         'swipeleft': next,
                         'swiperight': prev
-                    })
+                    })*/
                 }
             },
             removeControlActions = function () {
@@ -681,14 +713,14 @@
             addHoverControlAction = function() {
 
                 // mouse tracking for page movement
-                target.on('mousemove' + eventNamespace,function (e) {
+                target.on('mousemove' + eventNamespace, function (e) {
                     diff = e.pageX - target.offset().left;
                     if (options.hovers) {
                         if (options.overlays) {
-                            if (diff < pageWidth() && !atBeginning()) {
+                            if (diff < pageWidth()) {
                                 if (hoveringRight) hoverAnimation(true, false);
                                 hoverAnimation(false, true);
-                            } else if (diff > pageWidth && !atEnd()) {
+                            } else if (diff > pageWidth()) {
                                 if (hoveringLeft) hoverAnimation(false, false);
                                 hoverAnimation(true, true);
                             } else {
@@ -710,22 +742,24 @@
             },
             removeHoverControlAction = function(){
                 target.off('mousemove' + eventNamespace)
-                    .off('mouseleave' + eventNamespace);
+                      .off('mouseleave' + eventNamespace);
             },
             addHoverClickAction = function (){
 
                 target.on('click' + eventNamespace, function(e) {
                     diff = e.pageX - target.offset().left;
-
-                    // add overlay or hover click action
-                    if (options.overlays || (options.hovers && options.hoverClick)) {
+                    if (options.overlays){
                         if (diff < pageWidth() && !atBeginning()) {
-                            if (options.overlays)
-                                e.preventDefault();
+                            e.preventDefault();
                             prev();
                         } else if (diff > pageWidth() && !atEnd()) {
-                            if (options.overlays)
-                                e.preventDefault();
+                            e.preventDefault();
+                            next();
+                        }
+                    } else if (options.hovers) {
+                        if (diff < options.hoverWidth) {
+                            prev();
+                        } else if (diff > options.width - options.hoverWidth) {
                             next();
                         }
                     }
@@ -806,7 +840,28 @@
                 });
                 a2.transition({rotateY: movingForward ? deg(90) : nDeg(90)}, speed/2, options.easeIn);
 
-                // todo: handle manual drag
+                // todo: handle drag
+            },
+            updatePagesForDragPercent = function(percent, speed){
+
+                speed = speed || 0;
+
+                var a1 = movingForward ? p2 : p1,
+                    a2 = movingForward ? p3 : p0,
+                    a3 = movingForward ? p4 : pN;
+
+                if (a3) a3.css({visibility:'visible'});
+
+                a1.stop().transition({rotateY: movingForward ? nDeg(180 * (1 - percent)) : deg(180 * percent) }, speed);
+                a2.stop().transition({rotateY: movingForward ? deg(180 * percent) : nDeg(180 * (1 - percent))}, speed);
+
+                if (percent > 0.50 && movingForward || percent <= 0.50 && !movingForward){
+                    a1.transition({visibility:'visible'}, 0);
+                    a2.transition({visibility:'hidden'}, 0);
+                } else if (percent <= 0.50 && movingForward || percent > 0.50 && !movingForward) {
+                    a1.transition({visibility:'hidden'}, 0);
+                    a2.transition({visibility:'visible'}, 0);
+                }
             },
             updateAfter = function () {
                 updatePages();
@@ -838,7 +893,7 @@
 
         // Hover Animations
             hoverAnimation = function (inc, start) {
-                if (enabled && !busy && options.hovers) {
+                if (enabled && !busy && options.hovers && !dragging) {
                     var h1 = inc ? p4 : pN,
                         h2 = inc ? p2 : p1;
                     if (start){
