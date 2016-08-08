@@ -1,0 +1,201 @@
+@charset "utf-8";
+
+/* @General
+----------------------------------------*/
+
+	body {font:400 16px/1.5em "Ubuntu", sans-serif; overflow-x:hidden; padding:0; border-top:1px solid #c1ebff;}
+	header, #content, footer p {padding-left:10%; padding-right:10%;}
+		
+	html, header, #content, aside {background-color:#4c9bc0;}
+
+	header {padding-top:40px;}
+	h1     {display:block; text-indent:-999em; width:300px; height:69px; background:url("../images/booklet.png") no-repeat 0 0; float:left;}
+	h1 a   {display:block; height:100%;}
+	
+	nav           {float:right; padding-top:20px;}
+	nav li        {float:left;}
+	nav a         {display:block; color:#eee; margin-left:25px; text-transform:lowercase; text-shadow:0px 1px 1px rgba(0,0,0,0.5); font-weight:bold; font-size:20px;}
+	nav a:hover   {color:#fff;}
+	nav a:active  {color:#000; text-shadow:0 1px 0 rgba(255, 255, 255, 0.25);}
+	nav li:first-child a {margin:0;}
+	nav a.current {color:#222;  text-shadow:0px 1px 1px #c1ebff;}
+	
+	h2 {font-size:200%; line-height:1.75em; text-shadow:0 1px 0 rgba(255, 255, 255, 0.25);}
+	h3 {font-size:150%; line-height:1.75em; text-shadow:0 1px 0 rgba(255, 255, 255, 0.25); color:rgba(0,0,0,0.7);}
+	h4 {font-size:120%; line-height:1.75em; font-style:italic; color:rgba(255,255,255,0.6);}
+	h5 {font-size:105%; line-height:1.75em; text-shadow:0 1px 0 rgba(255, 255, 255, 0.25); padding:0 0 0.5em; font-weight:600;}
+	
+	input, textarea {background-color:white; border:2px inset; padding:2px;}
+	
+	a {
+        -webkit-transition:color 0.25s, background 0.25s; 
+        -moz-transition:color 0.25s, background 0.25s; 
+        -o-transition:color 0.25s, background 0.25s; 
+        transition:color 0.25s, background 0.25s;
+    }
+	
+	#content   {padding-top:20px; padding-bottom:50px;}
+	#content p {padding:0 0 10px;}
+	#content a, aside a {color:#eee; text-shadow:0px 1px 1px rgba(0, 0, 0, 0.25);}
+	#content a:hover, aside a:hover {color:#fff;}
+	#content a:active, aside a:active {color:#000; text-shadow:0 1px 0 rgba(255, 255, 255, 0.25);}
+	#content ul, aside ul {padding:0 0 0 10px; margin:0 0 20px 10px; line-height:20px; list-style:disc outside;}
+	#content ol {padding:0 0 0 10px; margin:0 0 20px 10px; line-height:20px;}
+	#content.sub-content {padding-right:32%}
+
+	aside {float:right; width:19%; padding:20px 10% 50px 1%;}
+	aside h3 {font-size:20px; line-height:1em; padding:0 0 10px;}
+	aside p {font-size:90%;}
+    
+    .demo-nav {list-style:none; margin:0; padding:0;}
+    .demo-nav li {}
+    .demo-nav li a {display:block; padding:3px 10px;}
+    .demo-nav li a:hover {background-color:rgba(0,0,0,0.25);}
+    
+    #donate-form {margin:10px;}
+	#donate-form input[name="submit"] {background-color:transparent; margin:10px auto; display:block; border:none;}
+    
+	.download-area {margin:0 auto 1em;}
+	
+	#download-btn {
+		border-radius:10px;
+		box-shadow:0 1px 2px #333;
+		background:rgba(0,0,0,0.5);
+		border:none;
+		display:block;
+		padding:0.5em;
+		line-height:1.2em;
+		text-align:center;
+		text-shadow:0 1px 2px #333; 
+	}
+	
+	#download-btn:hover {
+		background:rgba(0,0,0,0.8);
+		color:#efefef;
+		text-shadow: 0 -1px 0 #333;
+	}
+	
+	#download-btn span {display:block; font-size:14px; line-height:2em; font-weight:400;}
+	
+	.syntaxhighlighter, 
+	.syntaxhighlighter div, 
+	.syntaxhighlighter code, 
+	.syntaxhighlighter table, 
+	.syntaxhighlighter table td, 
+	.syntaxhighlighter table tr, 
+	.syntaxhighlighter table tbody {font-size:12px !important;}
+	
+	.code-wrap {overflow:scroll; overflow-y:auto; background:#fff; margin:10px 0 20px; width:auto;}
+	
+/* @Documentation Styling
+----------------------------------------*/
+	
+	.details {background:#fff; padding:20px; clear:left;}
+		
+	#content #tabs .toggle {float:right; color:#222;}
+		
+	#tabs {}
+	.ui-tabs-nav   {font-size:14px;}
+	.ui-tabs-panel {}
+	
+    .ui-tabs .ui-tabs-nav li {margin-bottom:0 !important;}
+	.ui-tabs .ui-tabs-nav li a {display:block; border-bottom:0; margin-bottom:0;}
+	.ui-tabs .ui-tabs-nav li.ui-state-active a {background:#fff; color:#000 !important;}
+	
+	.ui-tabs .ui-tabs-panel {padding:1em 0 !important;}
+	
+	#content #tabs h2 {text-shadow:none;}
+	
+	#content #tabs .list {margin:0; padding:0;}
+	#content #tabs .list > li {float:left; width:100%; clear:left; list-style:none; background:#fff;}
+	
+	#content #tabs pre {overflow:auto; padding:10px; font-size:85%;}
+
+	#content #tabs .section-name {padding:0 0 0 20px; margin:0; border-top:1px solid #eee; border-bottom:1px solid #ddd; font-size:20px; line-height:40px; height:40px;  text-shadow:none;}
+
+	#content #tabs .header {background:#efefef; border-top:1px solid #ddd; height:40px; line-height:40px; font-size:13px;}
+	#content #tabs .header:hover {background:#f4f4f4; cursor:pointer;}
+	
+	#content #tabs .name   {float:left; margin:0 0 0 20px; padding:0; text-shadow:none; line-height:40px; font-size:16px;}
+	#content #tabs .list a  {color:#09F; text-shadow:none;}
+
+	.header dl {float:right; width:50%; margin:0; padding:0;}
+	.header dt {float:left; color:#888; padding-right:10px;}
+	.header dd {float:left; margin:0; color:#222;}
+
+	.option-type-label    {display:none;}
+	.option-type          {width:35%; padding-right:10px;}
+	.option-default-label {}
+	.option-default       {}
+		
+	.description {padding:0 20px;}
+	.description p {margin:1em 0;}
+		
+	.examples {padding:0 20px 10px;}	
+	.examples h4 {color:#000; text-shadow:none;}	
+	.examples dl {}
+	.examples dt {}
+	.examples dd {margin:0; padding:0 0 0 20px;}
+	
+/* @Booklet Styling
+----------------------------------------*/
+
+    #menu     {margin:0 auto; width:100%; height:65px; padding:0; position:relative;}
+    #mybook,
+    #mybook2   {margin:40px auto 20px;}
+
+	#content .booklet a        {color:#006699; text-decoration:none; text-shadow:none;}
+	#content .booklet a:hover  {border-bottom:1px dotted;}
+	#content .booklet ul       {font-size:12px; margin:0 0 20px 10px; line-height:20px; color:#524f4a; list-style:disc outside;}
+    #content .booklet h2,
+    #content .booklet h3 {font-size:20px;height:auto;text-shadow:none;}
+    #content .booklet h4 {color:#444; text-shadow:none;}
+    #content .booklet p  {font-size:12px; padding:0 0 10px; line-height:20px; color:#524f4a;}
+	
+	#content .booklet q  {display:block; width:200px; font-size:18px; font-weight:bold; font-style:italic;}
+	
+	#content .booklet .b-counter {font-family: "Ubuntu", sans-serif; line-height:1.2;}
+	
+/* @Responsive Design
+----------------------------------------*/
+
+	@media only screen and (max-width: 1125px) {
+		header {padding-top:5%;}
+		header, #content, footer p {padding-left:5%; padding-right:5%;}
+		aside {width:19%; padding:20px 5% 50px 1%;}
+		#content.sub-content {padding-right:27%}
+		nav {clear:left; float:left;}
+	}
+	@media only screen and (max-width: 768px) {
+		header, #content, footer p {padding-left:5%; padding-right:5%;}
+		aside {width:19%; padding:20px 5% 20px 1%;}
+		#content.sub-content {padding-right:27%}
+		nav {float:none;}
+		nav li {float:none; display:block;}
+		nav li a {margin:0;}		
+	}
+	@media handheld, only screen and (max-width: 480px) {
+		aside {float:none; width:90%; padding:20px 5% 10px;}
+		#content.sub-content {float:none; padding-right:5%}
+		.download-area {width:90%; margin:0 auto;}
+	}
+	@media handheld, only screen and (max-width: 368px) {
+		.ui-tabs .ui-tabs-nav li a {padding:0.5em !important;}
+		#content #tabs .name {line-height:25px;}
+		#content #tabs .header {height:50px; line-height:25px;}
+		.header dl {width:93%;}
+	}
+	@media handheld, only screen and (max-width: 300px) {
+		
+	}
+	/*
+	@media handheld, only screen and (max-width: 767px) {
+		header, #content, footer p {padding-left:20%; padding-right:20%;}
+	}
+	@media handheld, only screen and (max-width: 480px) {
+		header, #content, footer p {padding-left:10%; padding-right:10%;}
+	}
+	@media handheld, only screen and (max-width: 300px) {
+		#content-list img {float:none; display:block; margin: 0 auto 10px;}
+	}
+	*/

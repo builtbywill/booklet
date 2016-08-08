@@ -1,0 +1,41 @@
+<div ng-include="'app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h2>examples</h2>
+	<h3>Arrows</h3>
+	<p>Arrows controls are turned off by default. Enabling them will add clickable areas to either side of your booklet. To modify the image, simply update the background-image style in the CSS file.</p><br/>
+	<div id="mybook" ng-include="'app/includes/sample-booklet.html'"></div>
+
+	<div class="code-wrap">
+	<script type="syntaxhighlighter" class="brush: js"><![CDATA[
+		$(function() {
+			$('#mybook').booklet({
+				arrows: true
+			});
+		});
+	]]></script>
+	</div>
+	<p>If you do not wish the arrows to be visible at all times, you can use the <strong>arrowsHide</strong> option</p><br/>
+	<div id="mybook2" ng-include="'app/includes/sample-booklet.html'"></div>
+
+	<div class="code-wrap">
+	<script type="syntaxhighlighter" class="brush: js"><![CDATA[
+		$(function() {
+			$('#mybook2').booklet({
+				arrows: true,
+				arrowsHide: true
+			});
+		});
+	]]></script>
+	</div>
+</section>
+<script>
+	$(function() {
+		$('#mybook').booklet({
+			arrows: true
+		});
+		$('#mybook2').booklet({
+			arrows: true,
+			arrowsHide: true
+		});
+	});
+</script>

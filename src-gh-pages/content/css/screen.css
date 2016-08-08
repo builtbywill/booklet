@@ -1,0 +1,51 @@
+@charset "utf-8";
+
+/* @General
+----------------------------------------*/
+
+	body {font:300 16px/24px "Ubuntu", sans-serif; overflow-x:hidden;}
+	header, #content, footer p {padding-left:20%; padding-right:20%;}
+	
+	header {padding-top:50px; background-color:#fff; height:200px;}
+	h1     {display:block; text-indent:-999em; width:185px; height:122px; background:url("../images/logo.png") no-repeat 0 0; margin:0 auto;}
+	h1 a   {display:block; width:185px; height:122px;}
+	h2     {font:700 25px/1.5em "Ubuntu", sans-serif;}
+	
+	header ul      {width:100px; margin:0 auto;}
+	header ul li   {display:inline;}	
+	header ul li a {display:block; width:50px; height:50px; text-indent:-999em; float:left;}
+	#gmail_link    {background:url("../images/gmail.png") no-repeat 50% 50%;}
+	#twitter_link  {background:url("../images/twitter.png") no-repeat 50% 50%;}
+	
+	#content {background-color:#fff; padding-bottom:100px;}
+	
+	#about     {background-color:#e6e6e6; border-radius:8px; padding:22px; box-shadow: inset 0 1px 1px #dbdbdb; position:relative; line-height:26px; text-shadow:0 1px 0 #fff;}	
+	#about img {position:absolute; right:-30px; bottom:-50px;}
+	
+	#content-list         {padding:45px 0 0;}
+	#content-list li      {display:inline;}
+	#content-list a       {display:block; clear:both; padding:35px 15px; text-decoration:none; border-bottom:2px solid #e6e6e6; color:#000;  transition:.25s; -webkit-transition:.25s;}
+	#content-list a:hover {color:#09F; border-bottom:2px solid #09F; transition:.25s; -webkit-transition:.25s;}
+	#content-list img     {float:left; margin:0 20px 0 0;}
+	#content-list p       {padding-left:163px;}
+	
+	.clear {display:block; clear:both;}
+	
+	.qtip-content {font-weight:bold; font-size:18px; padding:0.5em;}
+	
+/* @Responsive Design
+----------------------------------------*/
+
+	@media only screen and (min-width: 1260px) {
+		header, #content, footer p {padding-left:30%; padding-right:30%;}
+	}
+	@media handheld, only screen and (max-width: 767px) {
+		header, #content, footer p {padding-left:20%; padding-right:20%;}
+		#content-list img {float:none; display:block; margin: 0 auto 10px;}
+		#content-list p   {padding-left:0;}
+	}
+	@media handheld, only screen and (max-width: 480px) {
+		header, #content, footer p {padding-left:10%; padding-right:10%;}
+	}
+	@media handheld, only screen and (max-width: 300px) {
+	}
