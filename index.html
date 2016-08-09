@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" ng-app="app" ng-strict-di>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<meta name="author" content="Built By Will">
+		<meta name="copyright" content="&copy; 2016 Built By Will">
+		<meta name="description" content="Booklet - jQuery Plugin">
+		<meta name="keywords" content="booklet, jquery, plugin, page flip, page turn, flipbook">
+		<link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
+		<title ng-bind="title"></title>
+		<base href="/">
+
+		<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+		<link rel="stylesheet" href="content/styles/vendor.b62a380a.css">
+
+		<link rel="stylesheet" href="content/styles/styles.092489fa.css" media="screen, projection, tv">
+	
+	<body>
+		<!--[if lt IE 7]><p class="browsehappy">
+			You are using an <strong>outdated</strong> browser.
+			Please <a href="//browsehappy.com/">upgrade your browser</a> to improve your experience.
+		</p><![endif]-->
+
+		<div ng-include="'gh-pages-src/app/includes/header.html'"></div>
+		<div ng-view class="view"></div>
+		<div ng-include="'gh-pages-src/app/includes/footer.html'"></div>
+
+		<script>
+		(function(i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r;
+			i[r] = i[r] || function() {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date();
+			a = s.createElement(o),
+			m = s.getElementsByTagName(o)[0];
+			a.async = 1;
+			a.src = g;
+			m.parentNode.insertBefore(a, m)
+		})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+		var hostname = window.location.hostname;
+		if (hostname.indexOf('localhost') === -1) {
+			ga('create', 'UA-5500036-2', 'builtbywill.com');
+		}
+		</script>
+
+		<script src="content/scripts/vendor.7eaf7fc9.js"></script>
+
+		<script src="content/scripts/scripts.bb68eff5.js"></script>
+	
