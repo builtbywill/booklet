@@ -1,0 +1,82 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h2>examples</h2>
+	<h3>Overlay Links</h3>
+	<p>The overlay links will create a clickable area on top of the entire page. This will make any links or elements in the page un-clickable (except for the first and last page of your book). In order to enable this feature you must have the "manual" option disabled.</p><br />
+	<div id="mybook">
+		<div>
+			<h3>Yay, Page 1!</h3>
+			<a ng-href="#/">Go Back To The Homepage</a>
+		</div>
+		<div>
+			<h3>Yay, Page 2!</h3>
+			<a ng-href="#/">Go Back To The Homepage</a>
+		</div>
+		<div>
+			<h3>Yay, Page 3!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 4!</h3>
+		</div>
+	</div>
+	<div hljs class="code-wrap">
+
+		$(function() {
+			$('#mybook').booklet({
+				overlays: true,
+				manual: false
+			});
+		});
+
+	</div>
+	<p>Disabling this option will allow you to have a wider variety of page content cababilities.</p><br />
+
+	<div id="mybook2">
+		<div>
+			<h3>Yay, Page 1!</h3>
+			<a ng-href="#/">Go Back To The Homepage</a>
+		</div>
+		<div>
+			<h3>Yay, Page 2!</h3>
+			<a ng-href="#/">Go Back To The Homepage</a>
+		</div>
+		<div>
+			<h3>Yay, Page 3!</h3>
+			<a ng-href="#/">Go Back To The Homepage</a>
+		</div>
+		<div>
+			<h3>Yay, Page 4!</h3>
+			 <a ng-href="#/">Go Back To The Homepage</a>
+	   </div>
+		<div>
+			<h3>Yay, Page 5!</h3>
+			<a ng-href="#/">Go Back To The Homepage</a>
+		</div>
+		<div>
+			<h3>Yay, Page 6!</h3>
+			 <a ng-href="#/">Go Back To The Homepage</a>
+	   </div>
+	</div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		tabs: true,
+		overlays: false,
+		manual: false
+	});
+});
+	</div>
+</section>
+<script type="text/javascript">
+$(function() {
+	$('#mybook').booklet({
+		overlays: true,
+		manual: false
+	});
+	$('#mybook2').booklet({
+		tabs: true,
+		overlays: false,
+		manual: false
+	});
+});
+</script>

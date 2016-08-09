@@ -1,0 +1,36 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h3>Custom Size</h3>
+	<div id="mybook" ng-include="'gh-pages-src/app/includes/sample-booklet.html'"></div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		width:  600,
+		height: 200
+	});
+});
+	</div>
+	<h3>Percentage Size</h3>
+	<div id="mybook2" ng-include="'gh-pages-src/app/includes/sample-booklet.html'"></div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook2').booklet({
+		width:  '100%',
+		height: 600
+	});
+});
+	</div>
+</section>
+
+<script>
+	$(function() {
+		$('#mybook').booklet({
+			width:  600,
+			height: 200
+		});
+		$('#mybook2').booklet({
+			width:  '100%',
+			height: 600
+		});
+	});
+</script>
