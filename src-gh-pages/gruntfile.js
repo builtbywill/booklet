@@ -331,6 +331,9 @@ module.exports = function(grunt) {
 			release: {
 				options: {
 					patterns: [{
+						match: 'version',
+						replacement: config.version
+					}, {
 						match: 'year',
 						replacement: grunt.template.today('yyyy')
 					}, {
@@ -368,9 +371,7 @@ module.exports = function(grunt) {
 						'content/fonts/*.*',
 						'content/json/*.*',
 						'vendor/**/{,*/}*.png',
-						'vendor/**/{,*/}*.swf',
-						// copy code folder completely
-						'code/**/{,*/}*'
+						'vendor/**/{,*/}*.swf'
 					]
 				}, {
 					expand: true,
@@ -388,7 +389,7 @@ module.exports = function(grunt) {
 			server: [],
 			test: [],
 			release: [
-				//'imagemin',
+				'imagemin',
 				'svgmin'
 			]
 		},

@@ -14,8 +14,7 @@
 
 		<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-		<!-- build:css(src) content/styles/vendor.css -->
-		<link href="content/js/jquery-ui/base/jquery.ui.tabs.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
+		<!-- build:css(.) content/styles/vendor.css -->
 		<!-- bower:css -->
 		<link rel="stylesheet" href="bower_components/angular-motion/dist/angular-motion.css" />
 		<link rel="stylesheet" href="bower_components/toastr/toastr.css" />
@@ -23,7 +22,7 @@
 		<!-- endbower -->
 		<!-- endbuild -->
 
-		<!-- build:css(src) content/styles/styles.css -->
+		<!-- build:css(.) content/styles/styles.css -->
 		<!-- page css -->
 		<link href="content/styles/common.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
 		<link href="content/styles/booklet.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
@@ -62,7 +61,7 @@
 		}
 		</script>
 
-		<!-- build:js(src) content/scripts/vendor.js -->
+		<!-- build:js(.) content/scripts/vendor.js -->
 		<!-- bower:js -->
 		<script src="bower_components/jquery/dist/jquery.js"></script>
 		<script src="bower_components/angular/angular.js"></script>
@@ -76,18 +75,16 @@
 		<script src="bower_components/angular-strap/dist/angular-strap.js"></script>
 		<script src="bower_components/angular-strap/dist/angular-strap.tpl.js"></script>
 		<script src="bower_components/toastr/toastr.js"></script>
-		<script src="bower_components/highlightjs/highlight.pack.js"></script>
 		<script src="bower_components/angular-highlightjs/build/angular-highlightjs.js"></script>
+		<script src="bower_components/highlightjs/highlight.pack.js"></script>
+		<script src="bower_components/jquery-ui/jquery-ui.js"></script>
+		<script src="bower_components/jquery.easing/js/jquery.easing.js"></script>
 		<!-- endbower -->
-
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-		<script> window.jQuery.ui || document.write('<script src="src/jquery-ui-1.10.4.min.js"><\/script>') </script>
-		<script src="src/jquery.easing.1.3.js"></script>
-		<script src="src/jquery.booklet.latest.min.js"></script>
-		<script src="content/js/booklet.js"></script>
 		<!-- endbuild -->
 
-		<!-- build:js(src) content/scripts/scripts.js -->
+		<!-- build:js(.) content/scripts/scripts.js -->
+		<script src="src/jquery.booklet.latest.min.js"></script>
+
 		<script src="app/app.module.js"></script>
 
 		<script src="app/shared/constants/constants.module.js"></script>
@@ -112,6 +109,14 @@
 		<script src="app/shared/config/config.js"></script>
 
 		<script src="app/config.route.js"></script>
+
+		<script>
+		$(function(){
+			$('#donate-btn').on('click', function(){
+				ga('send', 'event', 'button', 'click',  { page: "/donate" });
+			});
+		});
+		</script>
 
 		<!-- endbuild -->
 	</body>
