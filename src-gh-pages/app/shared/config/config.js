@@ -20,7 +20,7 @@
 
 	function coreConfig($provide, $logProvider, $locationProvider, $routeProvider, $httpProvider, routeHelperConfigProvider, exceptionHandlerProvider) {
 
-		//$locationProvider.html5Mode(true).hashPrefix('!');
+		//$locationProvider.html5Mode(true).hashPrefix('#');
 
 		// TODO: move to provider?
 		// turn $log off/on

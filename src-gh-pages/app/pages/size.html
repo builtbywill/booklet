@@ -1,7 +1,5 @@
-<?php 
-    include($_SERVER["DOCUMENT_ROOT"] . "/code/booklet/-/php/functions.php"); 
-    template_start("Size - Demos", true);
-?>         	
+<div ng-include="'app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">   	
         <h3>Custom Size</h3>
         <div id="mybook" ng-include="'app/includes/sample-booklet.html'"></div>
         <div class="code-wrap">
@@ -27,7 +25,7 @@
                 });
             });
         ]]></script>
-        </div>   
+        </div>
 
 </section>
 
@@ -43,4 +41,3 @@
     		});
         });
     </script>
-    

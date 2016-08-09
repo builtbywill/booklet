@@ -1,8 +1,6 @@
-<?php 
-    include($_SERVER["DOCUMENT_ROOT"] . "/code/booklet/-/php/functions.php"); 
-    template_start("Speed - Demos", true);
-?>    
-        <h3>Custom Speed</h3>        
+<div ng-include="'app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+        <h3>Custom Speed</h3>
         <div id="mybook" ng-include="'app/includes/sample-booklet.html'"></div>
 
         <div class="code-wrap">
@@ -25,4 +23,3 @@
 			});
 		});
     </script>
-    
