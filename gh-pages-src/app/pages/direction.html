@@ -1,0 +1,61 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h2>examples</h2>
+	<h3>Direction</h3>
+	<p>Direction is set to left to right by default.</p><br />
+	<div id="mybook">
+			<div>
+				<h3>Yay, Page 1!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 2!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 3!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 4!</h3>
+			</div>
+	</div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		direction:  'LTR'
+	});
+});
+	</div>
+
+	<p>Alternately, you can modify the direction to be right to left. If you use this option, you may have to use your own CSS to align text to the right.</p><br />
+	<div id="mybook2">
+			<div>
+				<h3>Yay, Page 1!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 2!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 3!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 4!</h3>
+			</div>
+	</div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook2').booklet({
+		direction:  'RTL'
+	});
+});
+	</div>
+</section>
+
+<script type="text/javascript">
+$(function() {
+	$('#mybook').booklet({
+		direction:  'LTR'
+	});
+	$('#mybook2').booklet({
+		direction:  'RTL'
+	});
+});
+</script>
