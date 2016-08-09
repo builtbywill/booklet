@@ -7,7 +7,7 @@
 
 	var coreConfigDetails = {
 		name: 'Booklet - jQuery Plugin',
-		version: '1.4.4',
+		version: '@@version',
 		debug: '@@debug'.indexOf('@@') !== -1
 	};
 	coreConfigDetails.appErrorPrefix = '[' + coreConfigDetails.name + ' Error] '; // Configure the exceptionHandler decorator
@@ -15,10 +15,10 @@
 
 	// Core Config
 
-	coreConfig.$inject = ['$provide', '$logProvider', '$locationProvider', '$routeProvider', '$httpProvider', 'routeHelperConfigProvider', 'exceptionHandlerProvider'];
+	coreConfig.$inject = ['$provide', '$logProvider', '$locationProvider', '$routeProvider', '$httpProvider', 'routeHelperConfigProvider', 'exceptionHandlerProvider', 'hljsServiceProvider'];
 	core.config(coreConfig);
 
-	function coreConfig($provide, $logProvider, $locationProvider, $routeProvider, $httpProvider, routeHelperConfigProvider, exceptionHandlerProvider) {
+	function coreConfig($provide, $logProvider, $locationProvider, $routeProvider, $httpProvider, routeHelperConfigProvider, exceptionHandlerProvider, hljsServiceProvider) {
 
 		//$locationProvider.html5Mode(true).hashPrefix('#');
 
@@ -49,6 +49,11 @@
 
 		// Configure the common exception handler
 		exceptionHandlerProvider.configure(coreConfigDetails.appErrorPrefix);
+
+		hljsServiceProvider.setOptions({
+			// replace tab with 4 spaces
+			tabReplace: '    '
+		});
 	}
 
 	// Toast Config

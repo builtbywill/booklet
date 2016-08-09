@@ -5,31 +5,22 @@
 	<h3>Add CSS and Javascript</h3>
 
 	<p>Add the booklet CSS file to your page.</p>
-	<div class="code-wrap">
-		<div style="width:1000px;">
-		<script type="syntaxhighlighter" class="brush: xml"><![CDATA[
-			 <link href="booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" />
-		 ]]></script>
-		</div>
+	<div hljs hljs-no-escape class="code-wrap">
+&lt;link href="booklet/jquery.booklet.latest.css" type="text/css" rel="stylesheet" media="screen, projection, tv" /&gt;
 	</div>
 
 	<p>Add jQuery, jQuery UI (optional), jQuery Easing Plugin and the Booklet JS files to your page.</p>
-	<div class="code-wrap">
-		<div style="width:1000px;">
-		<script type="syntaxhighlighter" class="brush: xml"><![CDATA[
-			<!-- jQuery -->
-			&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">&lt;/script>
-			&lt;script> window.jQuery || document.write('<script src="booklet/jquery-2.1.0.min.js"><\/script>') &lt;/script>
+	<div hljs hljs-no-escape class="code-wrap">
+<!-- jQuery -->
+&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">&lt;/script&gt;
+&lt;script&gt; window.jQuery || document.write('&lt;script src="booklet/jquery-2.1.0.min.js">&lt;\/script>') &lt;/script&gt;
 
-			<!-- jQuery UI (optional) -->
-			&lt;script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js">&lt;/script>
-			&lt;script> window.jQuery.ui || document.write('<script src="booklet/jquery-ui-1.10.4.custom.min.js"><\/script>') &lt;/script>
+<!-- jQuery UI (optional) -->
+&lt;script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"&gt;&lt;/script&gt;
 
-			<!-- Booklet -->
-			<script src="booklet/jquery.easing.1.3.js">&lt;/script>
-			<script src="booklet/jquery.booklet.latest.min.js">&lt;/script>
-		]]></script>
-		</div>
+<!-- Booklet -->
+&lt;script src="booklet/jquery.easing.1.3.js"&gt;&lt;/script&gt;
+&lt;script src="booklet/jquery.booklet.latest.min.js"&gt;&lt;/script&gt;
 	</div>
 
 	<h3>Create the Content</h3>
@@ -39,40 +30,36 @@
 		<li>Inside of your container, add your pages. The booklet will recognize each direct children as a slide, which could contain content or be a single item.</li>
 	</ol>
 	<p>The following shows a simple four page book.</p>
-	<div class="code-wrap">
-	<script type="syntaxhighlighter" class="brush: xml"><![CDATA[
-	<div id="mybook">
-		<div>
-			<h3>Yay, Page 1!</h3>
-		</div>
-		<div>
-			<h3>Yay, Page 2!</h3>
-		</div>
-		<div>
-			<h3>Yay, Page 3!</h3>
-		</div>
-		<div>
-			<h3>Yay, Page 4!</h3>
-		</div>
+<div hljs class="code-wrap">
+<div id="mybook">
+	<div>
+		<h3>Yay, Page 1!</h3>
 	</div>
-	]]></script>
+	<div>
+		<h3>Yay, Page 2!</h3>
 	</div>
+	<div>
+		<h3>Yay, Page 3!</h3>
+	</div>
+	<div>
+		<h3>Yay, Page 4!</h3>
+	</div>
+</div>
+</div>
 
 	<h3>Initialize the Booklet</h3>
 	<p>Using jQuery selectors initialize your booklet. You can setup multiple books either with the same class or within the same selector, as long as you want their options to be the same.</p>
-	<p>For more information on customization, visit the <a href="documentation">Documentation</a> page</p>
-	<div class="code-wrap">
-	<script type="syntaxhighlighter" class="brush: js"><![CDATA[
-		$(function() {
-			//single book
-			$('#mybook').booklet();
+	<p>For more information on customization, visit the <a ng-href="#/documentation">Documentation</a> page</p>
+	<div hljs class="code-wrap">
+$(function() {
+	//single book
+	$('#mybook').booklet();
 
-			//multiple books with ID's
-			$('#mybook1, #mybook2').booklet();
+	//multiple books with ID's
+	$('#mybook1, #mybook2').booklet();
 
-			//multiple books with a class
-			$('.mycustombooks').booklet();
-		});
-	]]></script>
+	//multiple books with a class
+	$('.mycustombooks').booklet();
+});
 	</div>
 </section>

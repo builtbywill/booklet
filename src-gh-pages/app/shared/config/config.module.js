@@ -1,26 +1,27 @@
 (function() {
-    'use strict';
+	'use strict';
 
-    angular.module('shared.config', [
-        // Angular Modules
-        'ngAnimate',
-        'ngCookies',
-        'ngResource',
-        'ngRoute',
-        'ngSanitize',
-        'ngTouch',
+	angular.module('shared.config', [
+		// Angular Modules
+		'ngAnimate',
+		'ngCookies',
+		'ngResource',
+		'ngRoute',
+		'ngSanitize',
+		'ngTouch',
 
-        // 3rd Party Modules
-        'mgcrea.ngStrap',
+		// 3rd Party Modules
+		'mgcrea.ngStrap',
+		'hljs',
 
-        // Shared Modules
-        'shared.constants',
-        'shared.logger',
-        'shared.exception',
-        'shared.directives',
-        'shared.filters',
-        'shared.route'
+		// Shared Modules
+		'shared.constants',
+		'shared.logger',
+		'shared.exception',
+		'shared.directives',
+		'shared.filters',
+		'shared.route'
 
-    ]);
+	]);
 
 })();

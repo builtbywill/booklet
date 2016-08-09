@@ -1,46 +1,43 @@
 <div ng-include="'app/includes/aside-demos.html'"></div>
 <section id="content" class="sub-content">
 	<h2>examples</h2>
-    <h3>Keyboard Controls</h3>
-    <p>The keyboard controls option uses the left and right arrow keys on the keyboard to navigate through pages.</p><br />
-    <p><strong>Note: if multiple booklets are created using keyboard controls on the same page, they will both be affected and cannot be controlled individually.</strong></p>
-    <br/>
-    <div id="mybook">
-        <div>
-            <h3>Yay, Page 1!</h3>
-        </div>
-        <div>
-            <h3>Yay, Page 2!</h3>
-        </div>
-        <div>
-            <h3>Yay, Page 3!</h3>
-        </div>
-        <div>
-            <h3>Yay, Page 4!</h3>
-        </div>
-        <div>
-            <h3>Yay, Page 5!</h3>
-        </div>
-        <div>
-            <h3>Yay, Page 6!</h3>
-        </div>
-    </div>
-    <div class="code-wrap">
-    <script type="syntaxhighlighter" class="brush: js"><![CDATA[
-
-        $(function() {
-            $('#mybook').booklet({
-                keyboard: true
-            });
-        });
-    ]]></script>
-    </div>
+	<h3>Keyboard Controls</h3>
+	<p>The keyboard controls option uses the left and right arrow keys on the keyboard to navigate through pages.</p><br />
+	<p><strong>Note: if multiple booklets are created using keyboard controls on the same page, they will both be affected and cannot be controlled individually.</strong></p>
+	<br/>
+	<div id="mybook">
+		<div>
+			<h3>Yay, Page 1!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 2!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 3!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 4!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 5!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 6!</h3>
+		</div>
+	</div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		keyboard: true
+	});
+});
+	</div>
 </section>
 
-    <script type="text/javascript">
-    $(function() {
-        $('#mybook').booklet({
-            keyboard: true
-        });
-    });
-    </script>
+<script type="text/javascript">
+$(function() {
+	$('#mybook').booklet({
+		keyboard: true
+	});
+});
+</script>
