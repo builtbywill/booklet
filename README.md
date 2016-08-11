@@ -1,14 +1,14 @@
 # jQuery Booklet Plugin
 
-Booklet is a jQuery tool for displaying content on the web in a flipbook layout. 
+Booklet is a jQuery tool for displaying content on the web in a flipbook layout.
 It was built using the jQuery library. Licensed under both MIT and GPL licenses.
 
-For detailed documentation and information, visit http://www.builtbywill.com/code/booklet/. 
+For detailed documentation and information, visit http://www.builtbywill.com/booklet/.
 Below is some basic information to get you started.
 
 ## Installation
 
-To install jQuery Booklet into your webpage, first include jQuery, jQuery UI (optional), jQuery Easing 
+To install jQuery Booklet into your webpage, first include jQuery, jQuery UI (optional), jQuery Easing
 and the booklet CSS and JS files.
 
 ``` html
@@ -34,16 +34,16 @@ pages inside of the booklet.
 
 ``` html
 <div id="mybook">
-	<div> 
+	<div>
 		<h3>Yay, Page 1!</h3>
 	</div>
-	<div> 
+	<div>
 		<h3>Yay, Page 2!</h3>
 	</div>
-	<div> 
+	<div>
 		<h3>Yay, Page 3!</h3>
 	</div>
-	<div> 
+	<div>
 		<h3>Yay, Page 4!</h3>
 	</div>
 </div>
@@ -66,8 +66,8 @@ $(function() {
 ## Documentation
 ### Options
 
-Options can be set either with an init object, or afterwards with a setter function. Also, you can get the value of an option 
-as well. To see all available options, see the [Documentation](http://www.builtbywill.com/code/booklet/documentation)
+Options can be set either with an init object, or afterwards with a setter function. Also, you can get the value of an option
+as well. To see all available options, see the [Documentation](http://www.builtbywill.com/booklet/#/documentation)
 
 ``` javascript
 //init
@@ -101,8 +101,8 @@ Only available for bookletadd and bookletremove events:
 
 * data.page - element, the page that was either just added or just removed
 
-You can bind your callbacks to events either at init, or using the event type. 
-To see all available events, see the [Documentation](http://www.builtbywill.com/code/booklet/documentation)
+You can bind your callbacks to events either at init, or using the event type.
+To see all available events, see the [Documentation](http://www.builtbywill.com/booklet/#/documentation)
 
 ``` javascript
 //init
@@ -117,8 +117,8 @@ $(".selector").bind("bookletcreate", function(event, data) {
 ```
 
 ## Methods
-The methods available for each booklet can be called on one or more booklets at the same time. 
-Methods which return a value, such as an option, when called on more than one selector will return an array of values. 
+The methods available for each booklet can be called on one or more booklets at the same time.
+Methods which return a value, such as an option, when called on more than one selector will return an array of values.
 Otherwise, the chainability of the elements will be maintained.
 
 ``` javascript
@@ -132,7 +132,7 @@ var val = $("#selector").booklet("option", "width");
 var val = $(".selector, .selector2").booklet("option", "width");
 ```
 
-To see all available methods, see the [Documentation](http://www.builtbywill.com/code/booklet/documentation)
+To see all available methods, see the [Documentation](http://www.builtbywill.com/booklet/#/documentation)
 
 ## Style
 
