@@ -1,0 +1,37 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h2>examples</h2>
+	<h3>Arrows</h3>
+	<p>Arrows controls are turned off by default. Enabling them will add clickable areas to either side of your booklet. To modify the image, simply update the background-image style in the CSS file.</p><br/>
+	<div id="mybook" ng-include="'gh-pages-src/app/includes/sample-booklet.html'"></div>
+
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		arrows: true
+	});
+});
+	</div>
+	<p>If you do not wish the arrows to be visible at all times, you can use the <strong>arrowsHide</strong> option</p><br/>
+	<div id="mybook2" ng-include="'gh-pages-src/app/includes/sample-booklet.html'"></div>
+
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook2').booklet({
+		arrows: true,
+		arrowsHide: true
+	});
+});
+	</div>
+</section>
+<script>
+	$(function() {
+		$('#mybook').booklet({
+			arrows: true
+		});
+		$('#mybook2').booklet({
+			arrows: true,
+			arrowsHide: true
+		});
+	});
+</script>

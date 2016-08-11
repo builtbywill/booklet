@@ -1,0 +1,19 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h3>Custom Speed</h3>
+	<div id="mybook" ng-include="'gh-pages-src/app/includes/sample-booklet.html'"></div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		speed: 250
+	});
+});
+	</div>
+</section>
+<script>
+	$(function() {
+		$('#mybook').booklet({
+			speed:  250
+		});
+	});
+</script>

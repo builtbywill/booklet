@@ -1,0 +1,48 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h2>examples</h2>
+	<h3>Custom "Next" and "Prev" Buttons</h3>
+	<p>By indicating either next or previous buttons you can make custom controls for your booklet.</p>
+	<ul>
+		<li><a href="#" id="custom-next">Next Page</a></li>
+		<li><a href="#" id="custom-prev">Previous page</a></li>
+	</ul><br />
+	<div id="mybook">
+		<div class="b-load">
+			<div>
+				<h3>Yay, Page 1!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 2!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 3!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 4!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 5!</h3>
+			</div>
+			<div>
+				<h3>Yay, Page 6!</h3>
+			</div>
+		</div>
+	</div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		next: '#custom-next',
+		prev: '#custom-prev'
+	});
+});
+	</div>
+</section>
+<script>
+	$(function() {
+		$('#mybook').booklet({
+			next: '#custom-next',
+			prev: '#custom-prev'
+		});
+	});
+</script>

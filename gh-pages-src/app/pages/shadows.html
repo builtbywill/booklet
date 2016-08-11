@@ -1,0 +1,34 @@
+<div ng-include="'gh-pages-src/app/includes/aside-demos.html'"></div>
+<section id="content" class="sub-content">
+	<h2>examples</h2>
+	<h3>Custom Shadows</h3>
+	<p>You can disable shadows on page animation if you wish. To use different images, check the <a ng-href="#/documentation">Documentation</a> page to see all of the available items you can change.</p>
+	<div id="mybook">
+		<div>
+			<h3>Yay, Page 1!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 2!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 3!</h3>
+		</div>
+		<div>
+			<h3>Yay, Page 4!</h3>
+		</div>
+	</div>
+	<div hljs class="code-wrap">
+$(function() {
+	$('#mybook').booklet({
+		shadows: false
+	});
+});
+	</div>
+</section>
+<script type="text/javascript">
+$(function() {
+	$('#mybook').booklet({
+		shadows:  false
+	});
+});
+</script>
