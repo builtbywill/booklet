@@ -112,7 +112,7 @@
             if (typeof $window.ga === 'function') {
                 $rootScope.$on('$routeChangeSuccess', function() {
                     $window.ga('send', 'pageview', {
-                        page: $location.path()
+                        page: '/booklet' + $location.path()
                     });
                 });
             }
