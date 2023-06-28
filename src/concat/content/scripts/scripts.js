@@ -359,8 +359,8 @@
         function trackGoogleAnalyticsPageView() {
             if (typeof $window.ga === 'function') {
                 $rootScope.$on('$routeChangeSuccess', function() {
-                    $window.ga('send', 'pageview', {
-                        page: '/booklet' + $location.path()
+                    $window.gtag('event', 'page_view', {
+                        page_location: '/booklet' + $location.path()
                     });
                 });
             }

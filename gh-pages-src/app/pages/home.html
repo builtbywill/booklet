@@ -42,7 +42,7 @@
 	$(function() {
 
 		$('#download-btn').on('click', function(){
-			ga('send', 'event', 'button', 'click',  { page: "/download/1.4.4" });
+			gtag('event', 'download', { page: "/download/1.4.4" });
 		});
 
 		// basic initialization
