@@ -1,5 +1,8 @@
 # jQuery Booklet Plugin
 
+| :exclamation: This project is no longer under active development and has been archived. You can use as-is or fork the project to make changes. |
+|-----------------------------------------|
+
 Booklet is a jQuery tool for displaying content on the web in a flipbook layout.
 It was built using the jQuery library. Licensed under both MIT and GPL licenses.
 
